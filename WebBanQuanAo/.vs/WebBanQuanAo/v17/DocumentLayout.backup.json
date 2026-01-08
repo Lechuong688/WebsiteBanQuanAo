@@ -1,0 +1,105 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\LamViec\\WebBanQuanAo\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{13E13051-5730-4769-9441-8439C58A4C3C}|WebBanQuanAo.csproj|e:\\lamviec\\webbanquanao\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{13E13051-5730-4769-9441-8439C58A4C3C}|WebBanQuanAo.csproj|solutionrelative:controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09E8F073-6049-468B-98DD-85256B73CCF4}|..\\Data\\Data.csproj|e:\\lamviec\\data\\repository\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09E8F073-6049-468B-98DD-85256B73CCF4}|..\\Data\\Data.csproj|e:\\lamviec\\data\\repository\\baserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09E8F073-6049-468B-98DD-85256B73CCF4}|..\\Data\\Data.csproj|e:\\lamviec\\data\\entity\\userentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{09E8F073-6049-468B-98DD-85256B73CCF4}|..\\Data\\Data.csproj|e:\\lamviec\\data\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "E:\\LamViec\\WebBanQuanAo\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "Controllers\\HomeController.cs",
+              "ToolTip": "E:\\LamViec\\WebBanQuanAo\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-08T05:01:12.211Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BaseRepository.cs",
+              "DocumentMoniker": "E:\\LamViec\\Data\\Repository\\BaseRepository.cs",
+              "RelativeDocumentMoniker": "..\\Data\\Repository\\BaseRepository.cs",
+              "ToolTip": "E:\\LamViec\\Data\\Repository\\BaseRepository.cs",
+              "RelativeToolTip": "..\\Data\\Repository\\BaseRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-08T05:00:19.221Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UserEntity.cs",
+              "DocumentMoniker": "E:\\LamViec\\Data\\Entity\\UserEntity.cs",
+              "RelativeDocumentMoniker": "..\\Data\\Entity\\UserEntity.cs",
+              "ToolTip": "E:\\LamViec\\Data\\Entity\\UserEntity.cs",
+              "RelativeToolTip": "..\\Data\\Entity\\UserEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-08T04:56:21.79Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "E:\\LamViec\\Data\\Repository\\UserRepository.cs",
+              "RelativeDocumentMoniker": "..\\Data\\Repository\\UserRepository.cs",
+              "ToolTip": "E:\\LamViec\\Data\\Repository\\UserRepository.cs",
+              "RelativeToolTip": "..\\Data\\Repository\\UserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-08T04:55:46.364Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\LamViec\\Data\\Program.cs",
+              "RelativeDocumentMoniker": "..\\Data\\Program.cs",
+              "ToolTip": "E:\\LamViec\\Data\\Program.cs",
+              "RelativeToolTip": "..\\Data\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-08T04:54:07.392Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
