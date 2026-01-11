@@ -1,21 +1,30 @@
-using System.Diagnostics;
+using Data.Entity;
+using Data.Repository.Product;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using WebBanQuanAo.Models;
 
 namespace WebBanQuanAo.Controllers
 {
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly SignInManager<UserEntity> _signInManager;
+        private readonly IProductRepository _productRepository;
+        public HomeController(SignInManager<UserEntity> signInManager, ILogger<HomeController> logger, IProductRepository productRepository)
         {
             _logger = logger;
+            _signInManager = signInManager;
+            _productRepository = productRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var products = _productRepository.GetAll();
+            return View(products);
         }
 
         public IActionResult Privacy()
