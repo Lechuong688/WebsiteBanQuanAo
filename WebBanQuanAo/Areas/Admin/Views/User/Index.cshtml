@@ -1,94 +1,92 @@
-﻿@using Data.Entity
-@model IEnumerable<UserEntity>
-@{
-    ViewBag.Title = "Data";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
+﻿<div class="content-wrapper">
     <section class="content-header">
-        <h1>
-            Danh sách người dùng
-        </h1>
-        <ol class="breadcrumb">
-        </ol>
+        <h1>Danh sách người dùng</h1>
     </section>
-    <!-- Main content -->
+
     <section class="content">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="box">
-                    <div class="box-header">
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <table id="example2" class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Họ tên</th>
-                                    <th>Tài khoản</th>
-                                    <th>Email</th>
-                                    <th>Trạng thái</th>
-                                    <th>Đóng tài khoản</th>
-                                    <th>Phân quyền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var user in Model)
-                                {
-                                    <tr>
-                                        <td>@user.Name</td>
-                                        <td>@user.UserName</td>
-                                        <td>@user.Email</td>
-                                        <td>
-                                            @(user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now
-                                                                                    ? "Bị khóa"
-                                                                                    : "Hoạt động")
-                                    </td>
-                                    <td>
-                                        <a asp-area="Admin"
-                                           asp-controller="User"
-                                           asp-action="Lock"
-                                           asp-route-id="@user.Id"
-                                           class="btn btn-danger btn-sm">
-                                            Khóa
-                                        </a>
-                                    </td>
-                                </tr>
-                                }
-            
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- /.box-body -->
-                </div>
-                <!-- /.box -->
+        <div class="row" style="margin-bottom: 15px">
+            <div class="col-sm-12 text-right">
+                <input type="text"
+                       id="keyword"
+                       class="form-control"
+                       placeholder="Tìm kiếm..."
+                       style="width:300px; display:inline-block;" />
+
+                <button class="btn btn-primary" onclick="loadUsers(1)">Tìm</button>
+                <b>
+                    Hiển thị
+                    <select id="pageSize"
+                            class="form-control"
+                            style="width:90px; display:inline-block; margin-left:15px;"
+                            onchange="changePageSize()">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    &nbsp;tài khoản
+                </b>
             </div>
-            <!-- /.col -->
         </div>
-        <!-- /.row -->
+
+        <div id="userTable">
+        </div>
+
     </section>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
-@section Scripts
-{
 
-    <script type="text/javascript">
+@section Scripts {
+    <script>
         $(document).ready(function () {
-          $('#example1').DataTable()
-          $('#example2').DataTable({
-            'paging'      : true,
-            'lengthChange': false,
-            'searching'   : false,
-            'ordering'    : true,
-            'info'        : true,
-            'autoWidth'   : false
-          })
-        })
+            loadUsers(1);
+        });
+
+        function loadUsers(page) {
+            $.ajax({
+                url: '@Url.Action("LoadUsers", "User", new { area = "Admin" })',
+                type: 'GET',
+                data: {
+                    page: page,
+                    keyword: $('#keyword').val(),
+                    pageSize: $('#pageSize').val()
+                },
+                success: function (res) {
+                    $('#userTable').html(res);
+                }
+            });
+        }
+
+        function changePageSize() {
+            loadUsers(1);
+        }
+
+            function goUpdateUser(id) {
+            window.location.href = '/Admin/User/UpdateUser/' + id;
+        }
+
+        function goDeleteUser(id) {
+            if (!confirm('Bạn có chắc muốn xóa người dùng này?'))
+                return;
+
+            window.location.href = '/Admin/User/DeleteUser/' + id;
+        }
+
+                function toggleLockUser(id) {
+            if (!confirm('Bạn có chắc muốn thay đổi trạng thái khóa?')) return;
+
+            $.ajax({
+                url: '/Admin/User/ToggleLock',
+                type: 'POST',
+                data: { id: id },
+                success: function () {
+                    loadUsers(1); // reload bảng
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra');
+                }
+            });
+        }
+
     </script>
-
 }
-

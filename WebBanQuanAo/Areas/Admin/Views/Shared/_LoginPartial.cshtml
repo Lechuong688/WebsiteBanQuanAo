@@ -1,0 +1,36 @@
+﻿@using Azure.Core
+@if (User.Identity != null && User.Identity.IsAuthenticated)
+{
+    <form asp-area=""
+          asp-controller="Account"
+          asp-action="Logout"
+          method="post"
+          class="navbar-right">
+
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a asp-controller="Manage" asp-action="Index">
+                    Hello @User.Identity.Name!
+                </a>
+            </li>
+            <li>
+                <button type="submit" class="btn btn-link navbar-btn">
+                    Log off
+                </button>
+            </li>
+        </ul>
+    </form>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a asp-controller="User" asp-action="Register">Register</a>
+        </li>
+        <li>
+            <a asp-controller="User" asp-action="Login">Log in</a>
+        </li>
+    </ul>
+}

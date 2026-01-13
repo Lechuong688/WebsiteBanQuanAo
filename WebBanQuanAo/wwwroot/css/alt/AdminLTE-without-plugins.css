@@ -53,12 +53,12 @@ body {
  */
 .content-wrapper,
 .main-footer {
-  -webkit-transition: -webkit-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
-  -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
-  -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
-  transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
-  margin-left: 230px;
-  z-index: 820;
+    -webkit-transition: -webkit-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    margin-left: 230px;
+    z-index: 820;
 }
 .layout-top-nav .content-wrapper,
 .layout-top-nav .main-footer {
@@ -190,16 +190,16 @@ a:focus {
   max-height: 100px;
   z-index: 1030;
 }
-.main-header .navbar {
-  -webkit-transition: margin-left 0.3s ease-in-out;
-  -o-transition: margin-left 0.3s ease-in-out;
-  transition: margin-left 0.3s ease-in-out;
-  margin-bottom: 0;
-  margin-left: 230px;
-  border: none;
-  min-height: 50px;
-  border-radius: 0;
-}
+    .main-header .navbar {
+        -webkit-transition: margin-left 0.3s ease-in-out;
+        -o-transition: margin-left 0.3s ease-in-out;
+        transition: margin-left 0.3s ease-in-out;
+        margin-bottom: 0;
+        margin-left: 230px;
+        border: none;
+        min-height: 50px;
+        border-radius: 0;
+    }
 .layout-top-nav .main-header .navbar {
   margin-left: 0;
 }

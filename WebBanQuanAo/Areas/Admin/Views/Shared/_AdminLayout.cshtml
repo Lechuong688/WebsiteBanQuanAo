@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+
+    <!-- ===== CORE CSS ===== -->
+    <link rel="stylesheet" href="~/webbanquanao/components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/webbanquanao/components/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="~/webbanquanao/components/Ionicons/css/ionicons.min.css" />
+
+    <!-- ===== ADMIN LTE ===== -->
+    <link rel="stylesheet" href="~/css/AdminLTE.css" />
+    <link rel="stylesheet" href="~/css/skins/skin-blue.css" />
+
+    <!-- ===== PLUGIN CSS ===== -->
+    <link rel="stylesheet" href="~/webbanquanao/plugins/iCheck/minimal/_all.css" />
+    <link rel="stylesheet" href="~/webbanquanao/plugins/iCheck/square/_all.css" />
+    <link rel="stylesheet" href="~/webbanquanao/plugins/iCheck/flat/_all.css" />
+    <link rel="stylesheet" href="~/webbanquanao/plugins/iCheck/line/_all.css" />
+    <link rel="stylesheet" href="~/webbanquanao/plugins/iCheck/polaris/polaris.css" />
+    <link rel="stylesheet" href="~/webbanquanao/plugins/iCheck/futurico/futurico.css" />
+
+    <!-- ===== CUSTOM ===== -->
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700">
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+
+        @await Html.PartialAsync("_Header", null)
+        @await Html.PartialAsync("_Sidebar", null)
+
+
+        @* <div class="content-wrapper"> *@
+            @RenderBody()
+        @* </div> *@
+
+        @await Html.PartialAsync("_Footer", null)
+        @await Html.PartialAsync("_Aside", null)
+        @* @Html.Partial("_Footer")
+        @Html.Partial("_Aside") *@
+
+        <div class="control-sidebar-bg"></div>
+    </div>
+
+    <!-- ===== CORE JS ===== -->
+    <script src="~/webbanquanao/components/jquery/dist/jquery.min.js"></script>
+    <script src="~/webbanquanao/components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="~/webbanquanao/components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- ===== PLUGIN JS ===== -->
+    <script src="~/webbanquanao/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/webbanquanao/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+
+    <script src="~/webbanquanao/components/raphael/raphael.min.js"></script>
+    <script src="~/webbanquanao/components/morris.js/morris.min.js"></script>
+    <script src="~/webbanquanao/components/chart.js/Chart.min.js"></script>
+
+    <script src="~/webbanquanao/components/Flot/jquery.flot.js"></script>
+    <script src="~/webbanquanao/components/Flot/jquery.flot.resize.js"></script>
+    <script src="~/webbanquanao/components/Flot/jquery.flot.pie.js"></script>
+    <script src="~/webbanquanao/components/Flot/jquery.flot.categories.js"></script>
+
+    <script src="~/webbanquanao/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="~/webbanquanao/components/fastclick/lib/fastclick.js"></script>
+    <script src="~/webbanquanao/plugins/iCheck/icheck.min.js"></script>
+
+    <!-- ===== ADMIN LTE CORE JS (BẮT BUỘC) ===== -->
+    <script src="~/webbanquanao/js/adminlte.min.js"></script>
+    <script src="~/webbanquanao/js/demo.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

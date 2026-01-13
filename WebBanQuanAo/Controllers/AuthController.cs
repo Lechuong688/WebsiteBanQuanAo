@@ -30,20 +30,44 @@ namespace WebBanQuanAo.Controllers
                 ViewBag.Error = "Vui lòng nhập đầy đủ thông tin";
                 return View();
             }
-            var resuilt = await _signInManager.PasswordSignInAsync(
-                username,
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
+                return View();
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(
+                user,
                 password,
                 isPersistent: false,
                 lockoutOnFailure: false
-                );
+            );
 
-            if (resuilt.Succeeded)
+            if (!result.Succeeded)
+            {
+                ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
+                return View();
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                return RedirectToAction(
+                    "Dashboardv1",
+                    "Dashboard",
+                    new { area = "Admin" }
+                );
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "User"))
             {
                 return RedirectToAction("Index", "Home");
             }
-            ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
-            return View();
+
+            return RedirectToAction("Index", "Home");
         }
+
 
         [HttpGet]
         public IActionResult Register()

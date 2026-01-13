@@ -1,0 +1,120 @@
+﻿@model List<Data.Entity.UserEntity>
+
+<table class="table table-bordered table-hover table-striped custom-table">
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Tài khoản</th>
+            <th>Email</th>
+            <th>Trạng thái</th>
+            <th>Đóng tài khoản</th>
+            <th>Phân quyền</th>
+            <th>Quản lý</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            var isLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now;
+
+            <tr class="@(isLocked ? "row-locked" : "")">
+                <td>@(string.IsNullOrEmpty(user.Name) ? user.UserName : user.Name)</td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    @if (isLocked)
+                    {
+                        <span class="label label-danger">Bị khóa</span>
+                    }
+                    else
+                    {
+                        <span class="label label-success">Hoạt động</span>
+                    }
+                </td>
+                <td>
+                    <button type="button"
+                            class="btn btn-warning btn-xs"
+                            onclick="toggleLockUser('@user.Id')">
+                        @(isLocked ? "Mở khóa" : "Khóa")
+                    </button>
+                </td>
+                <td>
+                    @* @{
+                        var roles = ViewBag.UserRoles as Dictionary<string, string>;
+                        var roleName = roles != null && roles.ContainsKey(user.Id)
+                        ? roles[user.Id]
+                        : "User";
+                    } *@
+
+                    @* <select class="form-control input-sm" onchange="changeRole()">
+                        
+                    </select> *@
+                </td>
+                <td>
+                    <button type="button"
+                            class="btn btn-info btn-xs"
+                            onclick="goUpdateUser('@user.Id')">
+                        Sửa
+                    </button>
+                    <button type="button"
+                            class="btn btn-danger btn-xs"
+                            onclick="goDeleteUser('@user.Id')">
+                        Xóa
+                    </button>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.TotalPage > 1)
+{
+    int currentPage = ViewBag.CurrentPage;
+    int totalPage = ViewBag.TotalPage;
+
+    int startPage = currentPage - 2;
+    int endPage = currentPage + 2;
+
+    if (startPage < 1)
+    {
+        startPage = 1;
+        endPage = Math.Min(5, totalPage);
+    }
+
+    if (endPage > totalPage)
+    {
+        endPage = totalPage;
+        startPage = Math.Max(1, totalPage - 4);
+    }
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm pull-right">
+
+            <li class="@(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a href="javascript:void(0)"
+                   onclick="loadUsers(@(ViewBag.CurrentPage - 1))">
+                    &lt;&lt;
+                </a>
+            </li>
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="@(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a href="javascript:void(0)"
+                       onclick="loadUsers(@i)">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="@(ViewBag.CurrentPage == ViewBag.TotalPage ? "disabled" : "")">
+                <a href="javascript:void(0)"
+                   onclick="loadUsers(@(ViewBag.CurrentPage + 1))">
+                    &gt;&gt;
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
