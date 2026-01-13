@@ -30,7 +30,8 @@
     <!-- Google Font -->
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700">
-
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="~/webbanquanao/components/select2/dist/css/select2.min.css" />
     @RenderSection("Styles", required: false)
 </head>
 
@@ -39,11 +40,12 @@
 
         @await Html.PartialAsync("_Header", null)
         @await Html.PartialAsync("_Sidebar", null)
+        @* @Html.Partial("_Header")
+        @Html.Partial("_Sidebar") *@
 
-
-        @* <div class="content-wrapper"> *@
+        <div class="content-wrapper">
             @RenderBody()
-        @* </div> *@
+        </div>
 
         @await Html.PartialAsync("_Footer", null)
         @await Html.PartialAsync("_Aside", null)
@@ -78,6 +80,9 @@
     <!-- ===== ADMIN LTE CORE JS (BẮT BUỘC) ===== -->
     <script src="~/webbanquanao/js/adminlte.min.js"></script>
     <script src="~/webbanquanao/js/demo.js"></script>
+    <!-- Select2 JS -->
+    <script src="~/webbanquanao/components/select2/dist/js/select2.min.js"></script>
+
 
     @RenderSection("scripts", required: false)
 </body>

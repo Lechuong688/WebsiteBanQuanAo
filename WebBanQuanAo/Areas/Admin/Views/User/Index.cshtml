@@ -1,11 +1,17 @@
-﻿<div class="content-wrapper">
-    <section class="content-header">
-        <h1>Danh sách người dùng</h1>
-    </section>
+﻿@* <div class="content-wrapper"> *@
+<section class="content-header">
+    <h1>Danh sách người dùng</h1>
+</section>
 
-    <section class="content">
-        <div class="row" style="margin-bottom: 15px">
-            <div class="col-sm-12 text-right">
+<section class="content">
+    <div class="row" style="margin-bottom: 15px">
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <a href="/Admin/User/CreateUser" class="btn btn-primary">
+                    <i class="fa fa-plus"></i> Thêm người dùng
+                </a>
+            </div>
+            <div class="col-sm-6 text-right">
                 <input type="text"
                        id="keyword"
                        class="form-control"
@@ -29,12 +35,13 @@
                 </b>
             </div>
         </div>
+    </div>
 
-        <div id="userTable">
-        </div>
+    <div id="userTable">
+    </div>
 
-    </section>
-</div>
+</section>
+@* </div> *@
 
 @section Scripts {
     <script>
@@ -69,7 +76,22 @@
             if (!confirm('Bạn có chắc muốn xóa người dùng này?'))
                 return;
 
-            window.location.href = '/Admin/User/DeleteUser/' + id;
+                $.ajax({
+            url: '/Admin/User/DeleteUser',
+            type: 'POST',
+            data: { id: id },
+            success: function () {
+                alert('Xóa người dùng thành công');
+                loadUsers(1);
+            },
+                error: function (xhr) {
+                    if (xhr.responseText) {
+                        alert(xhr.responseText);
+                    } else {
+                        alert('Không thể xóa người dùng');
+                    }
+                }
+            });
         }
 
                 function toggleLockUser(id) {
@@ -80,7 +102,7 @@
                 type: 'POST',
                 data: { id: id },
                 success: function () {
-                    loadUsers(1); // reload bảng
+                    loadUsers(1);
                 },
                 error: function () {
                     alert('Có lỗi xảy ra');

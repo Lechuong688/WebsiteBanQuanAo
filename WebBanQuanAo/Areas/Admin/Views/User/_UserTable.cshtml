@@ -8,7 +8,6 @@
             <th>Email</th>
             <th>Trạng thái</th>
             <th>Đóng tài khoản</th>
-            <th>Phân quyền</th>
             <th>Quản lý</th>
         </tr>
     </thead>
@@ -37,18 +36,6 @@
                             onclick="toggleLockUser('@user.Id')">
                         @(isLocked ? "Mở khóa" : "Khóa")
                     </button>
-                </td>
-                <td>
-                    @* @{
-                        var roles = ViewBag.UserRoles as Dictionary<string, string>;
-                        var roleName = roles != null && roles.ContainsKey(user.Id)
-                        ? roles[user.Id]
-                        : "User";
-                    } *@
-
-                    @* <select class="form-control input-sm" onchange="changeRole()">
-                        
-                    </select> *@
                 </td>
                 <td>
                     <button type="button"

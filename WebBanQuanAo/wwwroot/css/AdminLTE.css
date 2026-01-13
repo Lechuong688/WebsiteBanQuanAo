@@ -57,7 +57,7 @@ body {
   -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
   -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
   transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
-  margin-left: 0px;
+  margin-left: 230px;
   z-index: 820;
 }
 .layout-top-nav .content-wrapper,
@@ -65,10 +65,10 @@ body {
   margin-left: 0;
 }
 @media (max-width: 767px) {
-  .content-wrapper,
-  .main-footer {
-    margin-left: 0;
-  }
+    .content-wrapper,
+    .main-footer {
+        margin-left: 0;
+    }
 }
 @media (min-width: 768px) {
   .sidebar-collapse .content-wrapper,
