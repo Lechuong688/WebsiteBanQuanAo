@@ -17,9 +17,9 @@ namespace Data.Entity
         public int OrdelId { get; set; }
         public string? Note { get; set; }
         public bool IsDeleted { get; set; }
-        public int? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int? UpdatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using Data.Repository.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +19,13 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly RoleManager<RoleEntity> _roleManager;
-        public UserController(UserManager<UserEntity> userManager, RoleManager<RoleEntity> roleManager)
+        private readonly IUserRepository _userRepository;
+        public UserController(UserManager<UserEntity> userManager, 
+            RoleManager<RoleEntity> roleManager, IUserRepository userRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _userRepository = userRepository;
         }
 
         public IActionResult Index()
@@ -31,45 +35,16 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
 
         public async Task<IActionResult> LoadUsers(string? keyword, int page = 1, int pageSize = 5)
         {
-            if (page < 1)
-                page = 1;
-            if (pageSize <= 0) pageSize = 5;
 
-            var query = _userManager.Users.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                query = query.Where(x =>
-                    x.UserName.Contains(keyword) ||
-                    x.Email.Contains(keyword) ||
-                    x.Name.Contains(keyword)
-                );
-            }
-
-            var totalUsers = query.Count();
-
-            var users = query
-                .OrderByDescending(x => x.CreatedDate)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            //var userRoles = new Dictionary<string, string>();
-
-            //foreach (var item in users)
-            //{
-            //    var roles = await _userManager.GetRolesAsync(item);
-            //    userRoles[item.Id] = roles.FirstOrDefault() ?? "User";
-            //}
-
-            //ViewBag.UserRoles = userRoles;
-
+            var result = await _userRepository.GetUserAsync(keyword, page, pageSize);
+            
             ViewBag.CurrentPage = page;
             ViewBag.TotalPage =
-                (int)Math.Ceiling(totalUsers / (double)pageSize);
+                (int)Math.Ceiling(result.Total / (double)pageSize);
             ViewBag.Keyword = keyword;
+            ViewBag.UserRoles = await _userRepository.GetUserRolesAsync(result.Users);
 
-            return PartialView("_UserTable", users);
+            return PartialView("_UserTable", result.Users);
         }
 
         [HttpPost]
@@ -155,11 +130,6 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                 };
 
                 var result = await _userManager.CreateAsync(user, createmodel.Password);
-                //if (createmodel.Password != createmodel.ConfirmPassword)
-                //{
-                //    ViewBag.Error = "Mật khẩu nhập lại không khớp";
-                //    return View(createmodel);
-                //}
 
                 if (!result.Succeeded)
                 {

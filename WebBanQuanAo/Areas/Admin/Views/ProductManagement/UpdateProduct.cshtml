@@ -1,0 +1,100 @@
+﻿@model WebBanQuanAo.Areas.Admin.Models.UpdateProductViewModel
+
+<section class="content-header">
+    <h1>
+        @(Model.Id > 0 ? "Sửa sản phẩm" : "Thêm sản phẩm")
+        <small>
+            @(Model.Id > 0 ? "Cập nhật thông tin" : "Nhập thông tin sản phẩm mới")
+        </small>
+    </h1>
+
+</section>
+
+<section class="content" style="font-family:'Times New Roman'">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="box box-primary">
+
+                <form asp-action="UpdateProduct" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label>Tên sản phẩm</label>
+                            <input name="Name" value="@Model.Name" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Giá</label>
+                            <input name="Price" value="@Model.Price" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Số lượng</label>
+                            <input name="Quantity" value="@Model.Quantity" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Màu sắc</label><br />
+                            @foreach (var c in Model.Colors)
+                            {
+                                <label class="me-2">
+                                    <input type="checkbox"
+                                           name="ColorIds"
+                                           value="@c.Id"
+                                           @(Model.ColorIds.Contains(c.Id) ? "checked" : "") />
+                                    @c.Name
+                                </label>
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label>Size</label><br />
+                            @foreach (var s in Model.Sizes)
+                            {
+                                <label class="me-2">
+                                    <input type="checkbox"
+                                           name="SizeIds"
+                                           value="@s.Id"
+                                           @(Model.SizeIds.Contains(s.Id) ? "checked" : "") />
+                                    @s.Name
+                                </label>
+                            }
+                        </div>
+
+                        <label>Ảnh hiện tại</label>
+                        <div class="d-flex flex-wrap">
+                            @foreach (var img in Model.oldImages)
+                            {
+                                <div style="position:relative;margin:5px">
+                                    <img src="@img.Path" width="100" class="img-thumbnail" />
+
+                                    <input type="checkbox"
+                                           name="DeletedImageIds[]"
+                                           value="@img.Id" style="position:absolute;top:5px;right:5px;" />
+
+                                    <span style="position:absolute;top:5px;right:20px;color:red">✖</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label>Thêm ảnh mới</label>
+                            <input type="file" name="newImages" multiple class="form-control" />
+                        </div>
+
+                    </div>
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                        <a asp-action="Index" class="btn btn-default">Quay lại</a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>

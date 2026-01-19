@@ -24,7 +24,7 @@ namespace Data.Entity
         //[DataType(DataType.Password), Required(ErrorMessage = "Yêu cầu nhập mật khẩu")]
         //public string Password { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public int? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }

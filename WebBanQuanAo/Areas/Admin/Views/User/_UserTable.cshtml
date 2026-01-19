@@ -8,6 +8,7 @@
             <th>Email</th>
             <th>Trạng thái</th>
             <th>Đóng tài khoản</th>
+            <th>Quyền</th>
             <th>Quản lý</th>
         </tr>
     </thead>
@@ -36,6 +37,21 @@
                             onclick="toggleLockUser('@user.Id')">
                         @(isLocked ? "Mở khóa" : "Khóa")
                     </button>
+                </td>
+                <td>
+                    @{
+                        var rolesDict = ViewBag.UserRoles as Dictionary<string, List<string>>;
+                        var roles = rolesDict != null && rolesDict.ContainsKey(user.Id) ? rolesDict[user.Id]
+                        : new List<string>();
+                    }
+
+                    @foreach (var role in roles)
+                    {
+                        <span class="label @(role == "Admin" ? "label-danger" : "label-primary")"
+                              style="margin-right:4px;">
+                            @role
+                        </span>
+                    }
                 </td>
                 <td>
                     <button type="button"
@@ -83,7 +99,7 @@
                    onclick="loadUsers(@(ViewBag.CurrentPage - 1))">
                     &lt;&lt;
                 </a>
-            </li>
+            </li>s
 
             @for (int i = startPage; i <= endPage; i++)
             {

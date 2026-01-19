@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Data.DTO.ProductListDTO>
+
+@{
+    ViewBag.Title = "Index";
+}
+<h2>Quản lý sản phẩm</h2>
+
+<p>
+    @Html.ActionLink("Thêm sản phẩm mới", "Save")
+</p>
+<table class="table table-bordered table-hover table-striped custom-table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Files)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Colors)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sizes)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @foreach (var img in item.Files)
+                    {
+                        <img src="@img" class="img-thumbnail me-1" width="80"/>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @string.Join(", ", item.Colors)
+                </td>
+                <td>
+                    @string.Join(", ", item.Sizes)
+                </td>
+                <td>
+                    @Html.ActionLink(
+                    "Sửa",
+                                "Save",
+                                "ProductManagement",
+                                new { area = "Admin", id = item.Id },
+                                null
+                                ) |
+                    @Html.ActionLink("Chi tiết", "Details") |
+                    @Html.ActionLink("Xóa", "DeleteProduct")
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

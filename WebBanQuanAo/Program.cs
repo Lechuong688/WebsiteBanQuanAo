@@ -1,5 +1,6 @@
 ﻿using Data.Entity;
 using Data.Repository;
+using Data.Repository.MasterData;
 using Data.Repository.Product;
 using Data.Repository.User;
 using Data.Service.Auth;
@@ -31,10 +32,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMasterDataRepository, MasterDataRepository>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddSession();
 

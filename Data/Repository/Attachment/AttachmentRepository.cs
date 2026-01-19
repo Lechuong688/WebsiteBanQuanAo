@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Data.Repository.Attachment
+{
+    public class AttachmentRepository : IAttachmentRepository
+    {
+        private readonly DataContext _context;
+        public AttachmentRepository(DataContext context)
+        {
+            _context = context;
+        }
+    }
+}

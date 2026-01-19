@@ -15,12 +15,15 @@ namespace Data.Entity
         [Required(ErrorMessage = "Mã loại sản phẩm không được để trống")]
         public int TypeId { get; set; }
         [Required(ErrorMessage = "Tên sản phẩm không được để trống")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+        //public int? Color { get; set; }
+        //public int? Size { get; set; }
         public string? Note { get; set; }
         public bool IsDeleted { get; set; }
-        public int? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int? UpdatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }

@@ -1,25 +1,32 @@
-﻿@using Data.Entity
-@model IEnumerable<ProductEntity>
+﻿@using Data.DTO
+@model IEnumerable<ProductListDTO>
 
 <h2>Danh sách sản phẩm</h2>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Tên sản phẩm</th>
-            <th>Giá</th>
-            <th>Chi tiết</th>
-            @* <th>Số lượng</th> *@
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Price</td>
-                <td>@item.Note</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-sm-4 col-lg-3 border">
+            <b>Tên sản phẩm: </b>
+            @Html.DisplayFor(modelItem => item.Name)
+            <br/>
+            @foreach (var img in item.Files)
+            {
+                <img src="@img" class="img-thumbnail me-1" width="200" />
+            }
+            <br/>
+            <b>Giá: </b>
+            @Html.DisplayFor(modelItem => item.Price)
+            <br />
+            <b>Số lượng: </b>
+            @Html.DisplayFor(modelItem => item.Quantity)
+            <br />
+            <b>Màu sắc: </b>
+            @string.Join(", ", item.Colors)
+            <br />
+            <b>Size: </b>
+            @Html.DisplayFor(modelItem => item.Sizes)
+            <br />
+        </div>
+    }
+</div>

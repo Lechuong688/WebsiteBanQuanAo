@@ -1,4 +1,5 @@
-﻿using Data.Entity;
+﻿using Data.DTO;
+using Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,12 @@ namespace Data.Repository.Product
 {
     public interface IProductRepository
     {
-        IEnumerable<ProductEntity> GetAll();
-        ProductEntity? GetById(int id);
+        IEnumerable<ProductListDTO> GetAll();
+
+        ProductUpdateDTO? GetById(int id);
+        List<AttachmentEntity> GetImagesByProductId(int productId);
+
+        //void Update(ProductUpdateDTO dto);
+        ProductEntity Save(ProductUpdateDTO dto);
     }
 }

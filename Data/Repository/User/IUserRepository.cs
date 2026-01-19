@@ -9,8 +9,7 @@ namespace Data.Repository.User
 {
     public interface IUserRepository
     {
-        //UserEntity? GetUserById(int id);
-        //List<UserEntity> GetAllUser();
-        //UserEntity? GetByUsername(string username);
+        Task<(List<UserEntity> Users, int Total)> GetUserAsync(string? keyword, int page, int pageSize);
+        Task<Dictionary<string, List<string>>> GetUserRolesAsync(List<UserEntity> users);
     }
 }

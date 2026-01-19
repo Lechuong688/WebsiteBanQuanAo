@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    public class OrderEntity
+    public class AttachmentEntity
     {
         [Key]
         public int Id { get; set; }
-        public string? Note { get; set; }
-        public bool IsDeleted { get; set; }
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public Guid? UpdatedBy { get; set; }
-        public DateTime? UpdatedDate { get; set; }
+        public bool? IsDeleted { get; set; }
+        public int EntityId { get; set; }
+        public string? EntityType {  get; set; }
     }
 }
