@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Electro - Electronics Website Template</title>
+    <title>VYBE - VYBE Website</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -28,9 +28,7 @@
     <!-- Template Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
 </head>
-
 <body>
-
     <!-- Spinner Start -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
@@ -38,34 +36,15 @@
         </div>
     </div>
     <!-- Spinner End -->
-
     <!-- Topbar Start -->
     @await Html.PartialAsync("_Topbar", null)
 
     <!-- Navbar & Hero Start -->
     @await Html.PartialAsync("_Navbar", null)
 
-    <!-- Carousel Start -->
-    @await Html.PartialAsync("_Carousel", null)
-
-    @RenderBody()
-    <!-- Searvices Start -->
-    @await Html.PartialAsync("_Searvices", null)
-
-    <!-- Products Offer Start -->
-    @await Html.PartialAsync("_ProductsOffer", null)
-
-    <!-- Our Products Start -->
-    @await Html.PartialAsync("_OurProduct", null)
-
-    <!-- Product Banner Start -->
-    @await Html.PartialAsync("_ProductBanner", null)
-
-    <!-- Product List Start -->
-    @await Html.PartialAsync("_ProductList", null)
-
-    <!-- Bestseller Products Start -->
-    @await Html.PartialAsync("_BestsellerProducts", null)
+    <main class="d-flex justify-content-center align-items-center min-vh-100">
+        @RenderBody()
+    </main>
 
     <!-- Footer Start -->
     @await Html.PartialAsync("_Footer", null)
@@ -87,5 +66,4 @@
     <!-- Template Javascript -->
     <script src="~/js/main.js"></script>
 </body>
-
 </html>
