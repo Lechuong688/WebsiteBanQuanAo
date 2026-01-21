@@ -11,11 +11,16 @@ namespace Data.Repository.Product
     public interface IProductRepository
     {
         IEnumerable<ProductListDTO> GetAll();
+        PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
 
         ProductUpdateDTO? GetById(int id);
         List<AttachmentEntity> GetImagesByProductId(int productId);
-
-        //void Update(ProductUpdateDTO dto);
         ProductEntity Save(ProductUpdateDTO dto);
+        void Delete(int id);
+        ProductListDTO? GetForDelete(int id);
+        List<CategoryDTO> GetCategories();
+        List<CategoryDTO> GetColors();
+
     }
 }

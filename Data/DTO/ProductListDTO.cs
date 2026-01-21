@@ -17,10 +17,12 @@ namespace Data.DTO
         [DisplayName("Giá sản phẩm")]
         public decimal Price { get; set; }
         [DisplayName("Hình ảnh")]
-        public List<string> Files { get; set; }
+        public List<string> Files { get; set; } = new();
         [DisplayName("Màu sắc")]
-        public List<string> Colors { get; set; }
+        public List<string> Colors { get; set; } = new();
         [DisplayName("Kích thước")]
-        public List<string> Sizes { get; set; }
+        public List<string> Sizes { get; set; } = new();
+        public int TypeId { get; set; }
+        public string? TypeName { get; set; }
     }
 }

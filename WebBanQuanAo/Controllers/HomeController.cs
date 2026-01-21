@@ -23,13 +23,9 @@ namespace WebBanQuanAo.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var products = _productRepository.GetAll();
+            return View(products);
         }
-        //public IActionResult Index()
-        //{
-        //    var products = _productRepository.GetAll();
-        //    return View(products);
-        //}
 
         public IActionResult Privacy()
         {

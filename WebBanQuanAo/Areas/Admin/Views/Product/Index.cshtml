@@ -39,10 +39,14 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @foreach (var img in item.Files)
+                    @if (item.Files?.Count > 0)
+                    {
+                        <img src="@item.Files.FirstOrDefault()" class="img-thumbnail me-1" width="80" />
+                    }
+                    @* @foreach (var img in item.Files)
                     {
                         <img src="@img" class="img-thumbnail me-1" width="80"/>
-                    }
+                    } *@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Price)
@@ -58,14 +62,19 @@
                 </td>
                 <td>
                     @Html.ActionLink(
-                    "Sửa",
+                                "Sửa",
                                 "Save",
-                                "ProductManagement",
+                                "Product",
                                 new { area = "Admin", id = item.Id },
                                 null
                                 ) |
-                    @Html.ActionLink("Chi tiết", "Details") |
-                    @Html.ActionLink("Xóa", "DeleteProduct")
+                    @Html.ActionLink(
+                                "Xóa",
+                                "Delete",
+                                "Product",
+                                new { area = "Admin", id = item.Id },
+                                null
+                                )
                 </td>
             </tr>
         }

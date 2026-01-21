@@ -9,12 +9,12 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize]
-    public class ProductManagementController : Controller
+    public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
         private readonly IMasterDataRepository _masterDataRepository;
 
-        public ProductManagementController(IProductRepository productRepository, IMasterDataRepository masterDataRepository)
+        public ProductController(IProductRepository productRepository, IMasterDataRepository masterDataRepository)
         {
             _productRepository = productRepository;
             _masterDataRepository = masterDataRepository;
@@ -97,7 +97,6 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
 
             try
             {
-                // Upload ảnh mới
                 if (vm.newImages != null)
                 {
                     foreach (var file in vm.newImages)
@@ -135,5 +134,32 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var product = _productRepository.GetForDelete(id);
+            if (product == null) return NotFound();
+
+            return View(product);
+        }
+
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                _productRepository.Delete(id);
+                TempData["Success"] = "Xóa sản phẩm thành công";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }

@@ -1,43 +1,31 @@
-﻿<div class="container-fluid nav-bar p-0">
+﻿@using Data.DTO
+@using Data.Repository.Product
+@model IEnumerable<ProductListDTO>
+@inject IProductRepository ProductRepository
+
+@{
+    var categories = ProductRepository.GetCategories();
+}
+<div class="container-fluid nav-bar p-0">
     <div class="row gx-0 bg-primary px-5 align-items-center">
         <div class="col-lg-3 d-none d-lg-block">
             <nav class="navbar navbar-light position-relative" style="width: 250px;">
                 <button class="navbar-toggler border-0 fs-4 w-100 px-0 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#allCat">
-                    <h4 class="m-0"><i class="fa fa-bars me-2"></i>All Categories</h4>
+                    <h4 class="m-0"><i class="fa fa-bars me-2"></i>Danh mục sản phẩm</h4>
                 </button>
                 <div class="collapse navbar-collapse rounded-bottom" id="allCat">
                     <div class="navbar-nav ms-auto py-0">
                         <ul class="list-unstyled categories-bars">
-                            <li>
-                                <div class="categories-bars-item">
-                                    <a href="#">Accessories</a>
-                                    <span>(3)</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="categories-bars-item">
-                                    <a href="#">Electronics & Computer</a>
-                                    <span>(5)</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="categories-bars-item">
-                                    <a href="#">Laptops & Desktops</a>
-                                    <span>(2)</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="categories-bars-item">
-                                    <a href="#">Mobiles & Tablets</a>
-                                    <span>(8)</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="categories-bars-item">
-                                    <a href="#">SmartPhone & Smart TV</a>
-                                    <span>(5)</span>
-                                </div>
-                            </li>
+                            @foreach (var item in categories)
+                            {
+                                <li>
+                                    <div class="categories-bars-item">
+                                        <a href="#">@item.Name</a>
+                                        <span>(@item.ProductCount)</span>
+                                    </div>
+                                </li>
+                            }
+                            
                         </ul>
                     </div>
                 </div>
@@ -54,8 +42,8 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto py-0">
-                        <a href="index.html" class="nav-item nav-link active">Home</a>
-                        <a href="shop.html" class="nav-item nav-link">Shop</a>
+                        <a href="~/Home/Index" class="nav-item nav-link active">Home</a>
+                        <a href="~/Product/Index" class="nav-item nav-link">Shop</a>
                         <a href="cart.html" class="nav-item nav-link">Shop Cart</a>
                         <a href="cheackout.html" class="nav-item nav-link">Cheackout</a>
                         <a href="contact.html" class="nav-item nav-link me-2">Contact</a>

@@ -1,0 +1,20 @@
+﻿@model Data.DTO.ProductListDTO
+
+<h1>Bạn có chắc muốn xóa sản phẩm này?</h1>
+
+@* <div>
+    <strong>@Model.Name</strong><br />
+    Giá: @Model.Price<br />
+    Số lượng: @Model.Quantity
+</div> *@
+
+<form asp-action="Delete"
+      asp-controller="Product"
+      asp-area="Admin"
+      method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>
