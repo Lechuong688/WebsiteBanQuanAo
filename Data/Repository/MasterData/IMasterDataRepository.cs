@@ -11,5 +11,6 @@ namespace Data.Repository.MasterData
     {
         List<MasterDataEntity> GetColors();
         List<MasterDataEntity> GetSizes();
+        List<MasterDataEntity> GetProductTypes();
     }
 }

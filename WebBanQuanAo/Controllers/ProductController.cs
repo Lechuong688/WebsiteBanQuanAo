@@ -25,9 +25,13 @@ namespace WebBanQuanAo.Controllers
             return View(products);
         }
 
-        public IActionResult Detail()
+        public IActionResult Detail(int id)
         {
-            return View();
+            var product = _productRepository.GetDetail(id);
+            if (product == null)
+                return NotFound();
+
+            return View(product);
         }
         public IActionResult LoadProducts(
         int page = 1,
@@ -47,6 +51,12 @@ namespace WebBanQuanAo.Controllers
                 keyword,
                 sort
             );
+
+            System.Diagnostics.Debug.WriteLine(
+            colorIds == null
+        ? "COLOR IDS = NULL"
+        : "COLOR IDS = " + string.Join(",", colorIds)
+        );
 
             return PartialView("_ProductItems", result);
         }

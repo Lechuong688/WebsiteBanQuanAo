@@ -1,4 +1,4 @@
-﻿using Data.DTO;
+﻿using Data.DTO.Product;
 using Data.Repository.MasterData;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +36,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                 {
                     Id = 0,
                     Colors = _masterDataRepository.GetColors(),
-                    Sizes = _masterDataRepository.GetSizes()
+                    Sizes = _masterDataRepository.GetSizes(),
+                    Types = _masterDataRepository.GetProductTypes()
                 };
             }
             else
@@ -50,6 +51,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     Name = dto.Name,
                     Price = dto.Price,
                     Quantity = dto.Quantity,
+                    Note = dto.Note,
+                    TypeId = dto.TypeId,
                     ColorIds = dto.ColorIds,
                     SizeIds = dto.SizeIds,
 
@@ -62,7 +65,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                         }).ToList(),
 
                     Colors = _masterDataRepository.GetColors(),
-                    Sizes = _masterDataRepository.GetSizes()
+                    Sizes = _masterDataRepository.GetSizes(),
+                    Types = _masterDataRepository.GetProductTypes()
                 };
             }
 
@@ -78,6 +82,7 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             {
                 vm.Colors = _masterDataRepository.GetColors();
                 vm.Sizes = _masterDataRepository.GetSizes();
+                vm.Types = _masterDataRepository.GetProductTypes();
                 return View(vm);
             }
 
@@ -89,6 +94,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                 Name = vm.Name,
                 Price = vm.Price,
                 Quantity = vm.Quantity,
+                Note = vm.Note,
+                TypeId = vm.TypeId,
                 ColorIds = vm.ColorIds,
                 SizeIds = vm.SizeIds,
                 ImagePaths = imagePaths,

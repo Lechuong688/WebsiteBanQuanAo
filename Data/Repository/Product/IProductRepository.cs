@@ -1,4 +1,4 @@
-﻿using Data.DTO;
+﻿using Data.DTO.Product;
 using Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -21,6 +21,8 @@ namespace Data.Repository.Product
         ProductListDTO? GetForDelete(int id);
         List<CategoryDTO> GetCategories();
         List<CategoryDTO> GetColors();
+        ProductDetailDTO? GetDetail(int id);
+
 
     }
 }

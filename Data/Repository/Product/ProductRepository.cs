@@ -1,4 +1,4 @@
-﻿using Data.DTO;
+﻿using Data.DTO.Product;
 using Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -31,6 +31,7 @@ namespace Data.Repository.Product
                 Name = p.Name,
                 Quantity = p.Quantity,
                 Price = p.Price,
+                Note = p.Note,
 
                 TypeId = p.TypeId,
                 TypeName = md.Name,
@@ -86,7 +87,7 @@ namespace Data.Repository.Product
                     ));
             }
 
-            if (maxPrice.HasValue)
+            if (maxPrice.HasValue && maxPrice.Value > 0)
             {
                 query = query.Where(x => x.p.Price <= maxPrice.Value);
             }
@@ -103,7 +104,7 @@ namespace Data.Repository.Product
                 "name_asc" => query.OrderBy(x => x.p.Name),
                 "name_desc" => query.OrderByDescending(x => x.p.Name),
                 "newest" => query.OrderByDescending(x => x.p.CreatedDate),
-                _ => query.OrderByDescending(x => x.p.Id) // default
+                _ => query.OrderByDescending(x => x.p.Id)
             };
 
             var total = query.Count();
@@ -117,6 +118,7 @@ namespace Data.Repository.Product
                     Name = x.p.Name,
                     Price = x.p.Price,
                     TypeName = x.md.Name,
+                    Note = x.p.Note,
                     Files = _context.Attachment
                         .Where(a => a.EntityId == x.p.Id && a.IsDeleted != true)
                         .Select(a => a.FilePath!)
@@ -147,6 +149,8 @@ namespace Data.Repository.Product
                 Name = product.Name,
                 Price = product.Price,
                 Quantity = product.Quantity,
+                Note = product.Note,
+                TypeId = product.TypeId,
 
                 ColorIds = _context.ProductAttribute
                 .Where(x => x.ProductId == id)
@@ -187,7 +191,7 @@ namespace Data.Repository.Product
                 if (dto.Id > 0)
                 {
                     product = _context.Product
-                        .FirstOrDefault(p => p.Id == dto.Id && !p.IsDeleted);
+                        .FirstOrDefault(p => p.Id == dto.Id && p.IsDeleted != true);
 
                     if (product == null)
                         throw new Exception("Sản phẩm không tồn tại");
@@ -195,6 +199,8 @@ namespace Data.Repository.Product
                     product.Name = dto.Name;
                     product.Price = dto.Price;
                     product.Quantity = dto.Quantity;
+                    product.Note = dto.Note;
+                    product.TypeId = dto.TypeId;
                     product.UpdatedDate = DateTime.Now;
                 }
                 else
@@ -204,6 +210,8 @@ namespace Data.Repository.Product
                         Name = dto.Name,
                         Price = dto.Price,
                         Quantity = dto.Quantity,
+                        Note = dto.Note,
+                        TypeId = dto.TypeId,
                         IsDeleted = false,
                         CreatedDate = DateTime.Now
                     };
@@ -284,7 +292,7 @@ namespace Data.Repository.Product
                 .ToList();
         }
 
-        //Xóa sản phẩm
+        
         public void Delete(int id)
         {
             var product = _context.Product
@@ -337,7 +345,8 @@ namespace Data.Repository.Product
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    Quantity = p.Quantity
+                    Quantity = p.Quantity,
+                    Note = p.Note
                 })
                 .FirstOrDefault();
         }
@@ -387,6 +396,49 @@ namespace Data.Repository.Product
             )
             .OrderBy(x => x.Name)
             .ToList();
+        }
+        public ProductDetailDTO? GetDetail(int id)
+        {
+            return (
+        from p in _context.Product
+        join md in _context.MasterData
+            on p.TypeId equals md.Id
+        where p.Id == id && !p.IsDeleted && !md.IsDeleted
+        select new ProductDetailDTO
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price,
+            Note = p.Note,
+            TypeId = p.TypeId,
+            TypeName = md.Name,
+
+            Images = _context.Attachment
+                .Where(a => a.EntityId == p.Id
+                            && a.EntityType == "Product"
+                            && a.IsDeleted != true)
+                .Select(a => a.FilePath!)
+                .ToList(),
+
+            Colors = (
+                from pa in _context.ProductAttribute
+                join mdc in _context.MasterData
+                    on pa.ValueId equals mdc.Id
+                where pa.ProductId == p.Id
+                      && mdc.GroupId == 18
+                select mdc.Name
+            ).ToList(),
+
+            Sizes = (
+                from pa in _context.ProductAttribute
+                join mds in _context.MasterData
+                    on pa.ValueId equals mds.Id
+                where pa.ProductId == p.Id
+                      && mds.GroupId == 19
+                select mds.Name
+            ).ToList()
+        }
+    ).FirstOrDefault();
         }
     }
 }

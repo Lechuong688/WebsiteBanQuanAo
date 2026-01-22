@@ -1,4 +1,5 @@
 ﻿@using Data.DTO
+@using Data.DTO.Product
 @model IEnumerable<ProductListDTO>
 @{
     var categories = ViewBag.Categories as List<CategoryDTO>;
@@ -38,9 +39,9 @@
                     </ul>
                 </div>
                 <div class="price mb-4">
-                    <h4 class="mb-2">Price</h4>
-                    <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="0" max="500" value="0" oninput="amount.value=rangeInput.value">
-                    <output id="amount" name="amount" min-velue="0" max-value="500" for="rangeInput">0</output>
+                    <h4 class="mb-2">Giá</h4>
+                    <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="0" max="3000000" value="0" oninput="amount.value=rangeInput.value">
+                    <output id="amount" name="amount" min-velue="0" max-value="3000000" for="rangeInput">0 đ</output>
                     <div class=""></div>
                 </div>
                 <div class="product-color mb-3">
@@ -64,7 +65,6 @@
                         </div>
 
                     }
-
                 </div>
                 <div class="additional-product mb-4">
                     <h4>Additional Products</h4>
@@ -102,7 +102,7 @@
                 <div class="row g-4">
                     <div class="col-xl-7">
                         <div class="input-group w-100 mx-auto d-flex">
-                            <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                            <input type="search" id="searchKeyword" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
                             <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                         </div>
                     </div>
@@ -141,33 +141,42 @@
     </div>
 </div>
 <!-- Shop Page End -->
+
 @section Scripts {
     <script>
         let page = 1;
-        let pageSize = 9;
+        let pageSize = 8;                                                             
         let typeId = null;
         let maxPrice = null;
         let keyword = '';
         let sort = '';
         let colorIds = [];
+        let priceTimer;
 
         $(document).ready(function () {
             loadProducts();
         });
 
-        function loadProducts() {
-            $.get('/Product/LoadProducts', {
-                page: page,
-                pageSize: pageSize,
-                typeId: typeId,
-                maxPrice: maxPrice,
-                keyword: keyword,
-                sort: sort,
-                colorIds: colorIds
-            }, function (html) {
-                $('#product-container').html(html);
+                function loadProducts() {
+            $.ajax({
+                url: '/Product/LoadProducts',
+                type: 'GET',
+                data: {
+                    page: page,
+                    pageSize: pageSize,
+                    typeId: typeId,
+                    maxPrice: maxPrice,
+                    keyword: keyword,
+                    sort: sort,
+                    colorIds: colorIds
+                },
+                traditional: true,
+                success: function (html) {
+                    $('#product-container').html(html);
+                }
             });
         }
+
 
         $(document).on('click', '.page-link', function (e) {
             e.preventDefault();
@@ -181,12 +190,18 @@
             loadProducts();
         });
 
-        $('#priceRange').on('input', function () {
-            maxPrice = $(this).val();
-            $('#priceValue').text(maxPrice);
-            page = 1;
-            loadProducts();
+        $('#rangeInput').on('input', function () {
+            clearTimeout(priceTimer);
+
+            maxPrice = parseInt(this.value);
+            $('#amount').text(maxPrice);
+
+            priceTimer = setTimeout(() => {
+                page = 1;
+                loadProducts();
+            }, 300);
         });
+
 
         $('#searchKeyword').on('keyup', function () {
             keyword = $(this).val();
@@ -200,17 +215,16 @@
             loadProducts();
         });
 
-                $(document).on('change', '.color-filter', function () {
+        $(document).on('change', '.color-filter', function () {
             colorIds = $('.color-filter:checked')
                 .map(function () {
                     return parseInt($(this).val());
                 }).get();
 
-            console.log('colorIds:', colorIds);
-
             page = 1;
             loadProducts();
         });
+
 
 
     </script>

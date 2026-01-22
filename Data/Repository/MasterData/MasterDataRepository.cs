@@ -39,5 +39,14 @@ namespace Data.Repository.MasterData
                 })
                 .ToList();
         }
+
+        public List<MasterDataEntity> GetProductTypes()
+        {
+            return _context.MasterData
+                .Where(x => !x.IsDeleted 
+                && (x.GroupId == 1 || x.GroupId == 2))
+                .OrderBy(x => x.Name)
+                .ToList();
+        }
     }
 }

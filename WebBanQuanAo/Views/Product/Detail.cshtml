@@ -1,1 +1,240 @@
-﻿
+﻿@model Data.DTO.Product.ProductDetailDTO
+
+<style>
+    :root {
+        --primary-orange: #FF9F43;
+        --light-orange: #FFF0E6;
+        --hover-orange: #ff8c1a;
+        --text-dark: #2d3436;
+        --text-muted: #636e72;
+    }
+
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-orange);
+        text-decoration: none;
+    }
+
+    .product-image-container {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eee;
+        background: #fff;
+    }
+
+    .thumb-img {
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+        border-radius: 8px;
+    }
+
+        .thumb-img:hover, .thumb-img.active {
+            border-color: var(--primary-orange);
+            opacity: 0.8;
+        }
+
+    .product-title {
+        color: var(--text-dark);
+        font-weight: 700;
+    }
+
+    .product-price {
+        color: var(--primary-orange);
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .star-rating {
+        color: #ffc107;
+        font-size: 0.9rem;
+    }
+
+    .btn-orange {
+        background-color: var(--primary-orange);
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .btn-orange:hover {
+            background-color: var(--hover-orange);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);
+        }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .feature-item i {
+        color: var(--primary-orange);
+        margin-right: 10px;
+    }
+
+    .nav-tabs .nav-link {
+        color: var(--text-muted);
+        border: none;
+        border-bottom: 3px solid transparent;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-orange);
+            border-bottom: 3px solid var(--primary-orange);
+            font-weight: 600;
+            background: none;
+        }
+
+    .thumb-img {
+        opacity: 0.6;
+        transition: 0.2s;
+    }
+
+        .thumb-img:hover,
+        .thumb-img.active {
+            opacity: 1;
+            border: 2px solid #0d6efd;
+        }
+</style>
+<body>
+    <div class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="~/Home/Index">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="~/Product/Index">Cửa hàng</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chi tiết sản phẩm</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="product-image-container mb-3 text-center">
+                    <img id="mainImage"
+                         src="@Model.Images.FirstOrDefault()"
+                         class="img-fluid border rounded"
+                         style="max-height: 400px; object-fit: contain;" />
+                </div>
+
+                <div class="row g-2 justify-content-center">
+                    @foreach (var img in Model.Images)
+                    {
+                        <div class="col-auto">
+                            <img src="@img"
+                                 class="img-thumbnail thumb-img"
+                                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                                 onclick="changeImage('@img')" />
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+                <h2 class="product-title mb-3">@Model.Name</h2>
+
+                <div class="d-flex align-items-center mb-3">
+                    <div class="star-rating me-3">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-muted">(120 đánh giá)</span>
+                </div>
+
+                <h3 class="product-price mb-4">@Model.Price.ToString("N0")đ<small class="text-muted fs-6 text-decoration-line-through">599.000đ</small></h3>
+
+                <p class="text-muted mb-4">
+                    @Html.Raw(@Model.Note)
+                </p>
+
+                <ul class="list-unstyled mb-4">
+                    <li class="feature-item mb-2"><i class="fas fa-check-circle"></i> Uy tín 100%</li>
+                    <li class="feature-item mb-2"><i class="fas fa-truck"></i>Giao hàng nhanh chóng</li>
+                    <li class="feature-item mb-2"><i class="fas fa-undo"></i> Đổi trả miễn phí nếu có sự cố</li>
+                </ul>
+
+                <div class="d-flex align-items-center mb-4">
+                    <div class="input-group me-3" style="width: 140px;">
+                        <button class="btn btn-outline-secondary" type="button">-</button>
+                        <input type="text" class="form-control text-center" value="1">
+                        <button class="btn btn-outline-secondary" type="button">+</button>
+                    </div>
+                    <button class="btn btn-orange btn-lg shadow-sm">
+                        <i class="fas fa-shopping-bag me-2"></i> Thêm vào giỏ
+                    </button>
+                </div>
+
+                <div class="border-top pt-3">
+                    <p class="mb-0 text-muted">Mã: <strong class="text-dark">@Model.TypeId</strong></p>
+                    <p class="mb-0 text-muted">Danh mục: <strong class="text-dark">@Model.TypeName</strong></p>
+                </div>
+            </div>
+        </div>
+
+        @* <div class="row mt-5">
+        <div class="col-12">
+            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button">Mô tả chi tiết</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button">Đánh giá (120)</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active p-3 bg-white rounded shadow-sm" id="desc">
+                    <p>Cam sành là loại trái cây giàu vitamin C...</p>
+                    <p>Bảo quản: Nơi khô ráo, thoáng mát hoặc trong ngăn mát tủ lạnh.</p>
+                </div>
+                <div class="tab-pane fade p-3 bg-white rounded shadow-sm" id="review">
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <img src="https://via.placeholder.com/50" class="rounded-circle" alt="...">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Nguyễn Văn A</h6>
+                            <div class="star-rating text-warning mb-1"><small><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></small></div>
+                            <p class="mb-0 text-muted">Cam rất tươi, giao hàng nhanh. Sẽ ủng hộ shop tiếp.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+@* <script>
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+</script> *@
+<script>
+    function changeImage(src) {
+        const main = document.getElementById('mainImage');
+        main.src = src;
+
+        document.querySelectorAll('.thumb-img').forEach(img => {
+            img.classList.remove('active');
+            if (img.src === src) {
+                img.classList.add('active');
+            }
+        });
+    }
+</script>
+
