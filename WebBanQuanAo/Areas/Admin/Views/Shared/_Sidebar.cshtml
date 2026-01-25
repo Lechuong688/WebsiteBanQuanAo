@@ -50,6 +50,16 @@
                     <i class="fa fa-th"></i> <span>Quản lý sản phẩm</span>
                 </a>
             </li>
+            <li class="@Html.IsSelected(controller: "Category")">
+                <a href="@Url.Action("Index", "Category")">
+                    <i class="fa fa-th"></i> <span>Quản lý danh mục</span>
+                </a>
+            </li>
+            <li class="@Html.IsSelected(controller: "Attribute")">
+                <a href="@Url.Action("Index", "Attribute")">
+                    <i class="fa fa-th"></i> <span>Quản lý thuộc tính</span>
+                </a>
+            </li>
             <li><a href="https://adminlte.io/docs"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
             <li class="header">LABELS</li>
             <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>

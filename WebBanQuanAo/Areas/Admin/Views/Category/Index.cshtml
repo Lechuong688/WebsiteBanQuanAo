@@ -1,0 +1,88 @@
+﻿@model List<Data.Entity.MasterDataEntity>
+
+<section class="content-header">
+    <h1>Quản lý danh mục</h1>
+</section>
+
+<section class="content">
+    <a href="/Admin/Category/Save" class="btn btn-primary mb-3">
+        <i class="fa fa-plus"></i> Thêm danh mục
+    </a>
+
+    <div class="box box-primary">
+        <div class="box-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th width="80">ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Code</th>
+                        <th>Danh mục</th>
+                        <th width="150">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var mainCategory = item.GroupId == 0
+                        ? item
+                        : Model.FirstOrDefault(x => x.Id == item.GroupId);
+
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>
+                                @if (item.GroupId == 0)
+                                {
+                                    <strong>@item.Name</strong>
+                                }
+                                else
+                                {
+                                    <span>@item.Name</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.GroupId == 0)
+                                {
+                                    <strong>@item.Code</strong>
+                                }
+                                else
+                                {
+                                    <span>@item.Code</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.GroupId == 0)
+                                {
+                                    <span class="label label-primary">Danh mục chính</span>
+                                }
+                                else
+                                {
+                                    var parent = Model.FirstOrDefault(x => x.Id == item.GroupId);
+                                    <span class="label label-info">
+                                        @(parent != null ? parent.Name : "Không xác định")
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <a href="/Admin/Category/Save/@item.Id"
+                                   class="btn btn-warning btn-sm">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+
+                                @* @if (item.GroupId != 0)
+                                { *@
+                                    <a href="/Admin/Category/Delete/@item.Id"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Xóa danh mục này?')">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                @* } *@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

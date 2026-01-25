@@ -2,82 +2,167 @@
 @model IEnumerable<ProductListDTO>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Quản lý sản phẩm";
 }
-<h2>Quản lý sản phẩm</h2>
 
-<p>
-    @Html.ActionLink("Thêm sản phẩm mới", "Save")
-</p>
-<table class="table table-bordered table-hover table-striped custom-table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Files)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Colors)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sizes)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @if (item.Files?.Count > 0)
-                    {
-                        <img src="@item.Files.FirstOrDefault()" class="img-thumbnail me-1" width="80" />
-                    }
-                    @* @foreach (var img in item.Files)
-                    {
-                        <img src="@img" class="img-thumbnail me-1" width="80"/>
-                    } *@
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Quantity)
-                </td>
-                <td>
-                    @string.Join(", ", item.Colors)
-                </td>
-                <td>
-                    @string.Join(", ", item.Sizes)
-                </td>
-                <td>
-                    @Html.ActionLink(
-                                "Sửa",
-                                "Save",
-                                "Product",
-                                new { area = "Admin", id = item.Id },
-                                null
-                                ) |
-                    @Html.ActionLink(
-                                "Xóa",
-                                "Delete",
-                                "Product",
-                                new { area = "Admin", id = item.Id },
-                                null
-                                )
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<style>
+    .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .action-btn {
+        min-width: 40px;
+    }
+
+    .badge-size {
+        display: inline-block;
+        background-color: #fff;
+        color: #495057;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-weight: 600;
+        font-size: 0.85em;
+        margin-right: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .badge-color {
+        display: inline-block;
+        background-color: #e3f2fd;
+        color: #0d47a1;
+        border: 1px solid #bbdefb;
+        border-radius: 50px;
+        padding: 4px 10px;
+        font-size: 0.85em;
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .price-text {
+        color: #198754;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h4 class="mb-0 text-primary fw-bold">
+                <i class="fas fa-boxes me-2"></i> Quản lý sản phẩm
+            </h4>
+            <a href="@Url.Action("Save")" class="btn btn-success btn-sm">
+                <i class="fas fa-plus-circle me-1"></i> Thêm sản phẩm mới
+            </a>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light text-secondary">
+                        <tr>
+                            <th scope="col">@Html.DisplayNameFor(model => model.Name)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.Files)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.Price)</th>
+                            <th scope="col" class="text-center">@Html.DisplayNameFor(model => model.Quantity)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.Colors)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.Sizes)</th>
+                            <th scope="col" class="text-center" style="width: 150px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-dark">
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @if (item.Files?.Count > 0)
+                                        {
+                                            <img src="@item.Files.FirstOrDefault()" class="product-img" alt="@item.Name" />
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small"><i class="fas fa-image"></i> No Image</span>
+                                        }
+                                    </td>
+
+                                    <td class="price-text">
+                                        @string.Format("{0:N0} đ", item.Price)
+                                    </td>
+
+                                    <td class="text-center">
+                                        @{
+                                            string qClass = "bg-success";
+                                            if (item.Quantity == 0) { qClass = "bg-danger"; }
+                                            else if (item.Quantity < 10) { qClass = "bg-warning text-dark"; }
+                                        }
+                                        <span class="badge @qClass rounded-pill">
+                                            @item.Quantity
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (item.Colors != null)
+                                        {
+                                            foreach (var color in item.Colors)
+                                            {
+                                                <span class="badge-color">@color</span>
+                                            }
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.Sizes != null)
+                                        {
+                                            foreach (var size in item.Sizes)
+                                            {
+                                                <span class="badge-size">@size</span>
+                                            }
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="@Url.Action("Save", "Product", new { area = "Admin", id = item.Id })"
+                                               class="btn btn-outline-primary btn-sm action-btn"
+                                               title="Sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <a href="@Url.Action("Delete", "Product", new { area = "Admin", id = item.Id })"
+                                               class="btn btn-outline-danger btn-sm action-btn"
+                                               title="Xóa"
+                                               onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    Chưa có dữ liệu sản phẩm nào.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

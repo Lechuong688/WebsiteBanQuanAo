@@ -20,6 +20,7 @@ namespace Data.Entity
         [Required, MinLength(2, ErrorMessage = "Yêu cầu nhập tên danh mục")]
         public string? Name { get; set; }
         public string? Note { get; set; }
+        public int TypeId { get; set; }
         public bool IsDeleted { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }

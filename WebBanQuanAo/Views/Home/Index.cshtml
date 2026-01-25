@@ -1,8 +1,12 @@
 ﻿@using Data.DTO
 @using Data.DTO.Product
 @model IEnumerable<ProductListDTO>
+@await Html.PartialAsync("_Carousel", null)
 
+<!-- Searvices Start -->
+@await Html.PartialAsync("_Searvices", null)
 @await Html.PartialAsync("_OurProduct", Model)
 @await Html.PartialAsync("_BestsellerProducts")
 @await Html.PartialAsync("_ProductList")
+
 

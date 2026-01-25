@@ -1,0 +1,86 @@
+﻿@model WebBanQuanAo.Areas.Admin.Models.MasterDataViewModel
+
+<section class="content-header">
+    <h1>
+        @(Model.Id > 0 ? "Sửa danh mục" : "Thêm danh mục")
+    </h1>
+</section>
+
+<section class="content">
+    <div class="col-md-6">
+        <div class="box box-primary">
+
+            <form asp-area="Admin"
+                  asp-controller="Category"
+                  asp-action="Save"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label>Danh mục cha</label>
+                        <select class="form-control" name="ParentId">
+                            <option value="0">-- Danh mục chính --</option>
+
+                            @foreach (var item in Model.ParentItems)
+                            {
+                                if (item.Id != Model.Id)
+                                {
+                                    <option value="@item.Id"
+                                            @(item.Id == Model.ParentId ? "selected" : "")>
+                                        @item.Name
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tên danh mục</label>
+                        <input type="text"
+                               name="Name"
+                               value="@Model.Name"
+                               class="form-control"
+                               placeholder="Nhập tên danh mục"
+                               required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Code</label>
+                        <input type="text"
+                               name="Code"
+                               value="@Model.Code"
+                               class="form-control"
+                               placeholder="Để trống sẽ tự sinh" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <input type="text"
+                               name="Note"
+                               value="@Model.Note"
+                               class="form-control"
+                               placeholder="Nhập ghi chú" />
+                    </div>
+
+                </div>
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">
+                        Lưu
+                    </button>
+                    <a href="/Admin/Category/Index" class="btn btn-default">
+                        Quay lại
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</section>
