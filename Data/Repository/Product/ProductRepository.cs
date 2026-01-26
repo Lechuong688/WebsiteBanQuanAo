@@ -23,8 +23,11 @@ namespace Data.Repository.Product
             from p in _context.Product
             join md in _context.MasterData
                 on p.TypeId equals md.Id
+            join parent in _context.MasterData
+                on md.GroupId equals parent.Id
             where !p.IsDeleted
                   && !md.IsDeleted
+                  && !parent.IsDeleted
             select new ProductListDTO
             {
                 Id = p.Id,
@@ -35,6 +38,7 @@ namespace Data.Repository.Product
 
                 TypeId = p.TypeId,
                 TypeName = md.Name,
+                ParentTypeName = parent.Name,
 
                 Sizes = (from pa in _context.ProductAttribute
                          join md in _context.MasterData

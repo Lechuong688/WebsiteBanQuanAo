@@ -1,5 +1,6 @@
 ﻿using Data.Entity;
 using Data.Repository;
+using Data.Repository.Collection;
 using Data.Repository.MasterData;
 using Data.Repository.Product;
 using Data.Repository.User;
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMasterDataRepository, MasterDataRepository>();
+builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddSession();
 
@@ -68,5 +70,11 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "collection",
+    pattern: "bo-suu-tap/{code}",
+    defaults: new { controller = "Collection", action = "Index" }
+);
 
 app.Run();

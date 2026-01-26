@@ -60,6 +60,11 @@
                     <i class="fa fa-th"></i> <span>Quản lý thuộc tính</span>
                 </a>
             </li>
+            <li class="@Html.IsSelected(controller: "Collection")">
+                <a href="@Url.Action("Index", "Collection")">
+                    <i class="fa fa-th"></i> <span>Quản lý bộ sưu tập</span>
+                </a>
+            </li>
             <li><a href="https://adminlte.io/docs"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
             <li class="header">LABELS</li>
             <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>

@@ -1,0 +1,107 @@
+﻿@model Data.Entity.CollectionEntity
+
+<section class="content-header">
+    <h1>
+        @(Model.Id > 0 ? "Sửa Collection" : "Thêm Collection")
+    </h1>
+</section>
+
+<section class="content">
+    <div class="col-md-6">
+        <div class="box box-primary">
+
+            <form asp-area="Admin"
+                  asp-controller="Collection"
+                  asp-action="Save"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label>Tên Collection</label>
+                        <input type="text"
+                               name="Name"
+                               value="@Model.Name"
+                               class="form-control"
+                               placeholder="Nhập tên collection"
+                               required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Code</label>
+                        <input type="text"
+                               name="Code"
+                               value="@Model.Code"
+                               class="form-control"
+                               placeholder="Để trống sẽ tự sinh" />
+                        @Html.ValidationMessage("Code", "", new { @class = "text-danger" })
+                    </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea name="Note"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Nhập ghi chú">@Model.Note</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ngày bắt đầu</label>
+                                <input type="date"
+                                       name="StartDate"
+                                       value="@(Model.StartDate.HasValue
+                                                  ? Model.StartDate.Value.ToString("yyyy-MM-dd")
+                                                  : "")"
+                                       class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ngày kết thúc</label>
+                                <input type="date"
+                                       name="EndDate"
+                                       value="@(Model.EndDate.HasValue
+                                                  ? Model.EndDate.Value.ToString("yyyy-MM-dd")
+                                                  : "")"
+                                       class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Id > 0)
+                    {
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox"
+                                       name="IsActive"
+                                       value="true"
+                                       @(Model.IsActive ? "checked" : "") />
+                                Đang hoạt động
+                            </label>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">
+                        Lưu
+                    </button>
+                    <a href="/Admin/Collection/Index" class="btn btn-default">
+                        Quay lại
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</section>

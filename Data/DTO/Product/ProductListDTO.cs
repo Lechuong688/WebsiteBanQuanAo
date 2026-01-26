@@ -25,5 +25,8 @@ namespace Data.DTO.Product
         public List<string> Sizes { get; set; } = new();
         public int TypeId { get; set; }
         public string? TypeName { get; set; }
+        [DisplayName("Danh mục cha")]
+        public string? ParentTypeName { get; set; }
+
     }
 }

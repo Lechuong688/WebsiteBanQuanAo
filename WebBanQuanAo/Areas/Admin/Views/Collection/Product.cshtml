@@ -1,0 +1,354 @@
+﻿@using Data.DTO.Product
+@using System.Text.Json
+@model Data.Entity.CollectionEntity
+
+@{
+    var products = ViewBag.Products as List<ProductListDTO>;
+    var selectedIds = ViewBag.SelectedProductIds as List<int> ?? new List<int>();
+    var selectedJson = JsonSerializer.Serialize(selectedIds);
+}
+
+<style>
+    .scrollable-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollable-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .scrollable-list::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+        .scrollable-list::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+    .scrollable-list {
+        max-height: 60vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: #fff;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+        .product-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+
+    .product-source {
+        cursor: pointer;
+    }
+
+        .product-source:hover {
+            border-color: #3c8dbc;
+            background: #f0f8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .product-source::after {
+            content: "\f067";
+            font-family: FontAwesome;
+            position: absolute;
+            right: 15px;
+            color: #3c8dbc;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .product-source:hover::after {
+            opacity: 1;
+        }
+
+    .product-selected {
+        background: #f9fff9;
+        border-left: 4px solid #00a65a;
+    }
+
+    .product-info {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .product-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #333;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .product-cate {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .btn-remove {
+        padding: 4px 8px;
+        border-radius: 4px;
+        opacity: 0.7;
+        transition: 0.2s;
+    }
+
+    .product-selected:hover .btn-remove {
+        opacity: 1;
+    }
+
+    .search-box {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 44px;
+        padding: 10px 14px 10px 40px;
+        border-radius: 999px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+        transition: all 0.25s ease;
+        background-color: #fff;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3c8dbc;
+            box-shadow: 0 0 0 3px rgba(60, 141, 188, 0.15);
+        }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 14px;
+        pointer-events: none;
+        transition: color 0.25s ease;
+    }
+
+    .search-input:focus + .search-icon,
+    .search-box:focus-within .search-icon {
+        color: #3c8dbc;
+    }
+
+</style>
+
+<form method="post">
+    <input type="hidden" name="collectionId" value="@Model.Id" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box box-primary shadow-sm" style="border-top-width: 3px;">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-cubes"></i> Danh sách sản phẩm</h3>
+
+                    <div class="search-box">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="search"
+                               id="searchKeyword"
+                               class="search-input"
+                               placeholder="Tìm sản phẩm theo tên hoặc danh mục..."
+                               autocomplete="off" />
+                    </div>
+
+
+                    <div class="box-tools pull-right">
+                        <span class="label label-primary">Có sẵn</span>
+                    </div>
+                </div>
+                <div class="box-body scrollable-list">
+
+                    @foreach (var group in products.GroupBy(x => x.ParentTypeName))
+                    {
+                        <h4 class="text-primary" style="font-size: 14px; margin: 15px 0 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+                            @group.Key
+                        </h4>
+
+                        @foreach (var p in group)
+                        {
+                            var image = (p.Files != null && p.Files.Any())
+                            ? p.Files.First()
+                            : "/admin/img/no-image.png";
+
+                            <div class="product-item product-source"
+                                 data-id="@p.Id"
+                                 data-name="@p.Name"
+                                 data-image="@image">
+
+                                <img src="@image" alt="@p.Name" />
+
+                                <div class="product-info">
+                                    <span class="product-name" title="@p.Name">@p.Name</span>
+                                    <span class="product-cate">
+                                        <i class="fa fa-tag"></i> @p.TypeName
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="box box-success shadow-sm" style="border-top-width: 3px;">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-check-circle"></i> Đã chọn</h3>
+                    <div class="box-tools pull-right">
+                        <span class="badge bg-green" style="font-size: 14px;">
+                            <span id="selectedCount">0</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="box-body scrollable-list" id="selectedList" style="background-color: #fcfcfc;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-right" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+            <a href="/Admin/Collection" class="btn btn-default btn-lg" style="margin-right: 10px;">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </a>
+            <button type="submit" class="btn btn-success btn-lg shadow">
+                <i class="fa fa-save"></i> Lưu thay đổi
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+    const selectedIds = @Html.Raw(selectedJson);
+    const selectedList = document.getElementById("selectedList");
+    const selectedCount = document.getElementById("selectedCount");
+
+    function updateCount() {
+        selectedCount.innerText = selectedList.querySelectorAll(".product-selected").length;
+    }
+
+    function addSelected(id, name, image) {
+        if (document.getElementById("selected-" + id)) return;
+
+        const div = document.createElement("div");
+        div.className = "product-item product-selected";
+        div.id = "selected-" + id;
+
+        div.innerHTML = `
+            <img src="${image}">
+            <div class="product-info">
+                <span class="product-name" title="${name}">${name}</span>
+                <input type="hidden" name="productIds" value="${id}" />
+            </div>
+            <button type="button"
+                    class="btn btn-xs btn-danger btn-remove"
+                    title="Xóa khỏi danh sách"
+                    onclick="removeSelected(${id})">
+                <i class="fa fa-times"></i>
+            </button>
+        `;
+
+        div.style.animation = "fadeIn 0.3s";
+        selectedList.appendChild(div);
+        selectedList.scrollTop = selectedList.scrollHeight;
+        updateCount();
+    }
+
+    function removeSelected(id) {
+        const el = document.getElementById("selected-" + id);
+        if (el) {
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.remove();
+                updateCount();
+            }, 200);
+        }
+    }
+
+    document.querySelectorAll(".product-source").forEach(item => {
+        item.addEventListener("click", function () {
+            addSelected(this.dataset.id, this.dataset.name, this.dataset.image);
+        });
+    });
+
+    selectedIds.forEach(id => {
+        const item = document.querySelector(`.product-source[data-id="${id}"]`);
+        if (item) {
+            addSelected(item.dataset.id, item.dataset.name, item.dataset.image);
+        }
+    });
+
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+
+    const searchInput = document.getElementById("searchKeyword");
+
+    searchInput.addEventListener("input", function () {
+        const keyword = normalizeText(this.value.trim());
+
+        document.querySelectorAll(".box-body.scrollable-list > h4").forEach(header => {
+            let hasVisibleItem = false;
+            let next = header.nextElementSibling;
+
+            while (next && !next.matches("h4")) {
+                if (next.classList.contains("product-item")) {
+                    const name = normalizeText(next.dataset.name || "");
+                    const cate = normalizeText(
+                        next.querySelector(".product-cate")?.innerText || ""
+                    );
+
+                    const matched =
+                        keyword === "" ||
+                        name.includes(keyword) ||
+                        cate.includes(keyword);
+
+                    next.style.display = matched ? "" : "none";
+
+                    if (matched) hasVisibleItem = true;
+                }
+                next = next.nextElementSibling;
+            }
+
+            header.style.display = hasVisibleItem ? "" : "none";
+        });
+    });
+
+    function normalizeText(text) {
+        return text
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/Đ/g, "d");
+    }
+</script>

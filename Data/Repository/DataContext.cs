@@ -22,5 +22,7 @@ namespace Data.Repository
         public DbSet<AttachmentEntity> Attachment { get; set; }
         public DbSet<OrderEntity> Order { get; set; }
         public DbSet<OrderDetailEntity> OrderDetail { get; set; }
+        public DbSet<CollectionEntity> Collection { get; set; }
+        public DbSet<ProductCollectionEntity> ProductCollection { get; set; }
     }
 }
