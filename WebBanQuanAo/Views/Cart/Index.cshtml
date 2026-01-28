@@ -42,7 +42,6 @@
                                     <p class="mb-0 py-4">@item.ProductName</p>
                                 </td>
 
-                                <!-- MÀU + SIZE -->
                                 <td>
                                     <p class="mb-0 py-4">
                                         @item.ColorName - @item.SizeName
@@ -108,11 +107,6 @@
                                 <span>Tạm tính</span>
                                 <span id="subTotal">@Model.SubTotal.ToString("N0") ₫</span>
                             </div>
-@* 
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Phí ship</span>
-                                <strong id="shipping">@Model.ShippingFee.ToString("N0") ₫</strong>
-                            </div> *@
                         </div>
 
                         <div class="py-3 border-top d-flex justify-content-between px-4">
@@ -136,35 +130,42 @@
 <script>
     function changeQty(productId, colorId, sizeId, delta) {
 
-    const key = `${productId}-${colorId}-${sizeId}`;
-    const input = document.querySelector(`.qty-input[data-key="${key}"]`);
+        const key = `${productId}-${colorId}-${sizeId}`;
+        const input = document.querySelector(`.qty-input[data-key="${key}"]`);
+        if (!input) return;
 
-    let qty = parseInt(input.value) || 1;
-    qty += delta;
-    if (qty < 1) qty = 1;
+        if (input.dataset.loading === "1") return;
+        input.dataset.loading = "1";
 
-    fetch('/Cart/Update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:
-            `productId=${productId}` +
-            `&colorId=${colorId}` +
-            `&sizeId=${sizeId}` +
-            `&quantity=${qty}`
-    })
-    .then(res => res.json())
-    .then(data => {
-        input.value = data.quantity;
+        const currentQty = parseInt(input.value) || 1;
+        const newQty = currentQty + delta;
 
-        document.querySelector(`.line-total[data-key="${key}"]`)
-            .innerText = data.lineTotal + ' ₫';
-
-        document.getElementById('subTotal').innerText = data.subTotal + ' ₫';
-        document.getElementById('cartTotal').innerText = data.total + ' ₫';
-    });
+        fetch('/Cart/Update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body:
+                `productId=${productId}` +
+                `&colorId=${colorId}` +
+                `&sizeId=${sizeId}` +
+                `&quantity=${newQty}`
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Update failed");
+            return res.json();
+        })
+        .then(() => {
+            reloadCartView();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Có lỗi khi cập nhật số lượng");
+        })
+        .finally(() => {
+            input.dataset.loading = "0";
+        });
     }
 
-        document.addEventListener('click', function (e) {
+    document.addEventListener('click', function (e) {
 
         const btn = e.target.closest('.btn-remove');
         if (!btn) return;
@@ -180,9 +181,31 @@
                 `&sizeId=${btn.dataset.sizeid}`
         })
         .then(res => {
-            if (res.ok) location.reload();
+            if (!res.ok) throw new Error("Remove failed");
+            reloadCartView();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Có lỗi khi xoá sản phẩm");
         });
     });
+
+    function reloadCartView() {
+        fetch('/Cart')
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newCart = doc.querySelector('.container.py-5');
+                const currentCart = document.querySelector('.container.py-5');
+
+                if (newCart && currentCart) {
+                    currentCart.innerHTML = newCart.innerHTML;
+                }
+            });
+    }
 </script>
+
 
 

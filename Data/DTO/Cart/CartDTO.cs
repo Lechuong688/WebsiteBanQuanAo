@@ -12,7 +12,7 @@ namespace Data.DTO.Cart
 
         public decimal SubTotal { get; set; }
 
-        //public decimal ShippingFee { get; set; }
+        public decimal ShippingFee { get; set; }
 
         public decimal Total { get; set; }
     }

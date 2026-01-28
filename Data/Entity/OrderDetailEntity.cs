@@ -11,15 +11,21 @@ namespace Data.Entity
     {
         [Key]
         public int Id { get; set; }
-        [Required(ErrorMessage = "Mã sản phẩm không được để trống")]
+        [Required]
+        public int OrderId { get; set; }
+        [Required]
         public int ProductId { get; set; }
-        [Required(ErrorMessage = "Mã đơn hàng không được để trống")]
-        public int OrdelId { get; set; }
+        public int ColorId { get; set; }
+        public int SizeId { get; set; }
+        [Required]
+        public int Quantity { get; set; }
+        [Required]
+        public decimal Price { get; set; }
         public string? Note { get; set; }
-        public bool IsDeleted { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public Guid? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
     }
+
 }

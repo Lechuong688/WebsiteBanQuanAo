@@ -2,6 +2,7 @@
 using Data.Repository;
 using Data.Repository.Collection;
 using Data.Repository.MasterData;
+using Data.Repository.Order;
 using Data.Repository.Product;
 using Data.Repository.User;
 using Data.Service.Auth;
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMasterDataRepository, MasterDataRepository>();
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddSession();
 

@@ -1,6 +1,7 @@
 ﻿using Data.DTO.Cart;
 using Data.Repository;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 using WebBanQuanAo.helpers;
 using WebBanQuanAo.Helpers;
 using WebBanQuanAo.Models;
@@ -37,8 +38,12 @@ namespace WebBanQuanAo.Controllers
                 .ToList();
 
             var masterData = _context.MasterData
-                .Where(x => !x.IsDeleted)
-                .ToList();
+            .Where(x =>
+                !x.IsDeleted &&
+                (x.GroupId == 18 || x.GroupId == 19)
+            )
+            .ToList();
+
 
             cartDto.Items = (
                 from c in cartCookie
@@ -97,11 +102,15 @@ namespace WebBanQuanAo.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(int productId, int quantity)
+        public IActionResult Update(int productId, int colorId, int sizeId, int quantity)
         {
             var cart = CartCookieHelper.GetCart(Request);
 
-            var item = cart.FirstOrDefault(x => x.ProductId == productId);
+            var item = cart.FirstOrDefault(x =>
+                x.ProductId == productId &&
+                x.ColorId == colorId &&
+                x.SizeId == sizeId);
+
             if (item == null)
                 return BadRequest();
 
@@ -109,33 +118,25 @@ namespace WebBanQuanAo.Controllers
 
             CartCookieHelper.SaveCart(Response, cart);
 
-            var product = _context.Product
-                .Where(p => p.Id == productId && !p.IsDeleted)
-                .Select(p => p.Price)
-                .FirstOrDefault();
+            var productIds = cart.Select(x => x.ProductId).Distinct().ToList();
 
-            var subTotal = cart.Sum(x =>
-            {
-                var price = _context.Product
-                    .Where(p => p.Id == x.ProductId)
-                    .Select(p => p.Price)
-                    .FirstOrDefault();
+            var prices = _context.Product
+                .Where(p => productIds.Contains(p.Id) && !p.IsDeleted)
+                .Select(p => new { p.Id, p.Price })
+                .ToList()
+                .ToDictionary(x => x.Id, x => x.Price);
 
-                return price * x.Quantity;
-            });
-
-            //var shipping = 30000;
-            var total = subTotal;
+            var subTotal = cart.Sum(x => prices[x.ProductId] * x.Quantity);
+            var lineTotal = prices[item.ProductId] * item.Quantity;
 
             return Json(new
             {
                 quantity = item.Quantity,
-                lineTotal = (item.Quantity * product).ToString("N0"),
+                lineTotal = lineTotal.ToString("N0"),
                 subTotal = subTotal.ToString("N0"),
-                total = total.ToString("N0")
+                total = subTotal.ToString("N0")
             });
         }
-
         [HttpPost]
         public IActionResult Remove(int productId, int colorId, int sizeId)
         {
