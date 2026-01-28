@@ -1,5 +1,7 @@
-﻿using Data.DTO.Product;
+﻿using Data.DTO.Attribute;
+using Data.DTO.Product;
 using Data.Entity;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -404,45 +406,135 @@ namespace Data.Repository.Product
         public ProductDetailDTO? GetDetail(int id)
         {
             return (
+                from p in _context.Product
+                join md in _context.MasterData
+                    on p.TypeId equals md.Id
+                where p.Id == id && !p.IsDeleted && !md.IsDeleted
+                select new ProductDetailDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    Note = p.Note,
+                    TypeId = p.TypeId,
+                    TypeName = md.Name,
+
+                    Images = _context.Attachment
+                        .Where(a => a.EntityId == p.Id
+                                    && a.EntityType == "Product"
+                                    && a.IsDeleted != true)
+                        .Select(a => a.FilePath!)
+                        .ToList(),
+
+                    Colors = (
+                        from pa in _context.ProductAttribute
+                        join mdc in _context.MasterData
+                            on pa.ValueId equals mdc.Id
+                        where pa.ProductId == p.Id
+                              && mdc.GroupId == 18
+                              && !mdc.IsDeleted
+                        select new AttributeDTO
+                        {
+                            Id = mdc.Id,
+                            Name = mdc.Name
+                        }
+                    ).ToList(),
+
+                    Sizes = (
+                        from pa in _context.ProductAttribute
+                        join mds in _context.MasterData
+                            on pa.ValueId equals mds.Id
+                        where pa.ProductId == p.Id
+                              && mds.GroupId == 19
+                              && !mds.IsDeleted
+                        select new AttributeDTO
+                        {
+                            Id = mds.Id,
+                            Name = mds.Name
+                        }
+                    ).ToList()
+                }
+            ).FirstOrDefault();
+        }
+
+        public PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
+        {
+            var query =
         from p in _context.Product
+        join pc in _context.ProductCollection
+            on p.Id equals pc.ProductId
+        join c in _context.Collection
+            on pc.CollectionId equals c.Id
         join md in _context.MasterData
             on p.TypeId equals md.Id
-        where p.Id == id && !p.IsDeleted && !md.IsDeleted
-        select new ProductDetailDTO
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price,
-            Note = p.Note,
-            TypeId = p.TypeId,
-            TypeName = md.Name,
+        where !p.IsDeleted
+              && !md.IsDeleted
+              && c.Code == collectionCode
+        select new { p, md };
 
-            Images = _context.Attachment
-                .Where(a => a.EntityId == p.Id
-                            && a.EntityType == "Product"
-                            && a.IsDeleted != true)
-                .Select(a => a.FilePath!)
-                .ToList(),
+            if (typeId.HasValue)
+            {
+                query = query.Where(x => x.p.TypeId == typeId.Value);
+            }
 
-            Colors = (
-                from pa in _context.ProductAttribute
-                join mdc in _context.MasterData
-                    on pa.ValueId equals mdc.Id
-                where pa.ProductId == p.Id
-                      && mdc.GroupId == 18
-                select mdc.Name
-            ).ToList(),
+            if (colorIds != null && colorIds.Any())
+            {
+                query = query.Where(x =>
+                    _context.ProductAttribute.Any(pa =>
+                        pa.ProductId == x.p.Id &&
+                        colorIds.Contains(pa.ValueId)
+                    ));
+            }
 
-            Sizes = (
-                from pa in _context.ProductAttribute
-                join mds in _context.MasterData
-                    on pa.ValueId equals mds.Id
-                where pa.ProductId == p.Id
-                      && mds.GroupId == 19
-                select mds.Name
-            ).ToList()
-        }
-    ).FirstOrDefault();
+            if (maxPrice.HasValue && maxPrice.Value > 0)
+            {
+                query = query.Where(x => x.p.Price <= maxPrice.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(x => x.p.Name.Contains(keyword));
+            }
+            query = sort switch
+            {
+                "price_asc" => query.OrderBy(x => x.p.Price),
+                "price_desc" => query.OrderByDescending(x => x.p.Price),
+                "name_asc" => query.OrderBy(x => x.p.Name),
+                "name_desc" => query.OrderByDescending(x => x.p.Name),
+                "newest" => query.OrderByDescending(x => x.p.CreatedDate),
+                _ => query.OrderByDescending(x => x.p.Id)
+            };
+
+            var total = query.Count();
+
+            var items = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new ProductListDTO
+                {
+                    Id = x.p.Id,
+                    Name = x.p.Name,
+                    Price = x.p.Price,
+                    TypeName = x.md.Name,
+                    Note = x.p.Note,
+                    Files = _context.Attachment
+                        .Where(a =>
+                            a.EntityId == x.p.Id &&
+                            a.EntityType == "Product" &&
+                            a.IsDeleted != true)
+                        .Select(a => a.FilePath!)
+                        .ToList()
+                })
+                .ToList();
+
+            return new PagedResult<ProductListDTO>
+            {
+                Items = items,
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = total
+            };
         }
     }
 }

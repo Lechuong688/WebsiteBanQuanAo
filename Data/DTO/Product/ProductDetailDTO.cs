@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.DTO.Attribute;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace Data.DTO.Product
         public string TypeName { get; set; } = null!;
 
         public List<string> Images { get; set; } = new();
-        public List<string> Colors { get; set; } = new();
-        public List<string> Sizes { get; set; } = new();
+        public List<AttributeDTO> Colors { get; set; } = new();
+        public List<AttributeDTO> Sizes { get; set; } = new();
     }
 }

@@ -22,7 +22,8 @@ namespace Data.Repository.Product
         List<CategoryDTO> GetCategories();
         List<CategoryDTO> GetColors();
         ProductDetailDTO? GetDetail(int id);
-
+        PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
 
     }
 }

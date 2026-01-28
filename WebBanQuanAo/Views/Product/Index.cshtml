@@ -12,16 +12,12 @@
             <div class="col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="product-categories mb-4">
                     <h4>Danh mục sản phẩm</h4>
+                    <button id="resetFilters"
+                            type="button"
+                            class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="fas fa-undo me-1"></i> Danh sách
+                    </button>
                     <ul class="list-unstyled">
-                        @* @foreach (var item in Model)
-                        {
-                            <li>
-                                <div class="categories-item">
-                                    <a href="#" class="text-dark"><i class="fas fa-list text-secondary me-2"></i>@item.TypeName</a>
-                                    <span>(3)</span>
-                                </div>
-                            </li>
-                        } *@
                         @foreach (var item in categories)
                         {
                             <li>
@@ -134,6 +130,9 @@
                         </ul>
                     </div>
                 </div>
+                <div id="active-filters"
+                     class="mb-3 d-flex flex-wrap gap-2">
+                </div>
                 <div id="product-container" class="mt-4">
                 </div>
             </div>
@@ -225,7 +224,102 @@
             loadProducts();
         });
 
+        //resetFilters
+                $('#resetFilters').click(function () {
+            page = 1;
+            typeId = null;
+            maxPrice = null;
+            keyword = '';
+            sort = '';
+            colorIds = [];
 
+            // Reset UI
+            $('#searchKeyword').val('');
+            $('#sortSelect').val('');
+            $('#rangeInput').val(0);
+            $('#amount').text('0 đ');
+            $('.color-filter').prop('checked', false);
+
+            renderActiveFilters();
+            loadProducts();
+        });
+        //Render các filter
+                function renderActiveFilters() {
+            let html = '';
+
+            if (typeId) {
+                let name = $('.category-filter[data-typeid="' + typeId + '"]').text().trim();
+                html += filterTag('Danh mục', name, 'type');
+            }
+
+            colorIds.forEach(id => {
+                let name = $('label[for="color-' + id + '"] span').text();
+                html += filterTag('Màu', name, 'color', id);
+            });
+
+            if (maxPrice && maxPrice > 0) {
+                html += filterTag('Giá ≤', maxPrice.toLocaleString() + ' đ', 'price');
+            }
+
+            if (keyword) {
+                html += filterTag('Từ khóa', keyword, 'keyword');
+            }
+
+            $('#active-filters').html(html);
+        }
+
+        //Hàm tạo tag
+                function filterTag(label, value, type, id = null) {
+            return `
+                <span class="badge bg-secondary d-flex align-items-center">
+                    ${label}: ${value}
+                    <i class="fas fa-times ms-2 remove-filter"
+                       data-type="${type}"
+                       data-id="${id}"
+                       style="cursor:pointer"></i>
+                </span>
+            `;
+        }
+
+        //XÓA TỪNG FILTER
+                $(document).on('click', '.remove-filter', function () {
+            let type = $(this).data('type');
+            let id = $(this).data('id');
+
+            switch (type) {
+                case 'type':
+                    typeId = null;
+                    break;
+
+                case 'color':
+                    colorIds = colorIds.filter(x => x !== id);
+                    $('#color-' + id).prop('checked', false);
+                    break;
+
+                case 'price':
+                    maxPrice = null;
+                    $('#rangeInput').val(0);
+                    $('#amount').text('0 đ');
+                    break;
+
+                case 'keyword':
+                    keyword = '';
+                    $('#searchKeyword').val('');
+                    break;
+            }
+
+            page = 1;
+            renderActiveFilters();
+            loadProducts();
+        });
+
+        // Gọi render mỗi khi filter thay đổi
+                $('.category-filter').click(function () {
+            typeId = $(this).data('typeid');
+            page = 1;
+            renderActiveFilters();
+            loadProducts();
+        });
 
     </script>
 }

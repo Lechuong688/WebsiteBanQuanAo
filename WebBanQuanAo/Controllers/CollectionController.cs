@@ -39,16 +39,11 @@ namespace WebBanQuanAo.Controllers
         }
 
 
-        public IActionResult LoadProducts(
-        int page = 1,
-        int pageSize = 8,
-        int? typeId = null,
-        List<int> colorIds = null,
-        decimal? maxPrice = null,
-        string keyword = "",
-        string sort = "")
+        public IActionResult LoadProducts(string collectionCode, int page = 1, int pageSize = 8, int? typeId = null,
+            List<int> colorIds = null, decimal? maxPrice = null, string keyword = "", string sort = "")
         {
-            var result = _productRepository.GetForShopPaged(
+            var result = _productRepository.GetForCollectionPaged(
+                collectionCode,
                 page,
                 pageSize,
                 typeId,
@@ -58,13 +53,8 @@ namespace WebBanQuanAo.Controllers
                 sort
             );
 
-            System.Diagnostics.Debug.WriteLine(
-            colorIds == null
-        ? "COLOR IDS = NULL"
-        : "COLOR IDS = " + string.Join(",", colorIds)
-        );
-
-            return PartialView("Index", result);
+            return PartialView("_ProductCollectionItems", result);
         }
+
     }
 }
