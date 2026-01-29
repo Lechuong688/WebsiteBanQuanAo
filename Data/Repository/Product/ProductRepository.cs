@@ -2,8 +2,10 @@
 using Data.DTO.Product;
 using Data.Entity;
 using Microsoft.CodeAnalysis;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,9 +15,11 @@ namespace Data.Repository.Product
     public class ProductRepository : IProductRepository
     {
         private readonly DataContext _context;
-        public ProductRepository(DataContext context)
+        private readonly IDatabaseSql _databaseSql;
+        public ProductRepository(DataContext context, IDatabaseSql databaseSql)
         {
             _context = context;
+            _databaseSql = databaseSql;
         }
 
         //GetAllProductAdmin
@@ -138,6 +142,25 @@ namespace Data.Repository.Product
                 Page = page,
                 PageSize = pageSize,
                 TotalItems = total
+            };
+        }
+
+        public async Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize, int? typeId = null,
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
+        {
+            var par = new List<SqlParameter>()
+            {
+                     new SqlParameter("@page", page),
+                     new SqlParameter("@pageSize", pageSize),
+            };
+            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList", par);
+
+            return new PagedResult<ProductListDTO>
+            {
+                Items = result?.ToList() ?? new List<ProductListDTO>(),
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = result?.FirstOrDefault()?.TotalRecord ?? 0,
             };
         }
 

@@ -13,6 +13,8 @@ namespace Data.Repository.Product
         IEnumerable<ProductListDTO> GetAll();
         PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
+        Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize, int? typeId = null,
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
 
         ProductUpdateDTO? GetById(int id);
         List<AttachmentEntity> GetImagesByProductId(int productId);

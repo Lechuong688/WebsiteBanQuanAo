@@ -27,6 +27,7 @@ namespace Data.DTO.Product
         public string? TypeName { get; set; }
         [DisplayName("Danh mục cha")]
         public string? ParentTypeName { get; set; }
+        public int TotalRecord { get; set; }
 
     }
 }
