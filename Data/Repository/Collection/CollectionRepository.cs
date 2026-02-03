@@ -2,6 +2,7 @@
 using Data.Entity;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,9 +15,11 @@ namespace Data.Repository.Collection
     public class CollectionRepository : ICollectionRepository
     {
         private readonly DataContext _dataContext;
-        public CollectionRepository(DataContext dataContext)
+        private readonly IDatabaseSql _databaseSql;
+        public CollectionRepository(DataContext dataContext, IDatabaseSql databaseSql)
         {
             _dataContext = dataContext;
+            _databaseSql = databaseSql;
         }
         public List<CollectionEntity> GetAll()
         {
@@ -153,48 +156,64 @@ namespace Data.Repository.Collection
                     x.IsActive);
         }
 
-        public List<ProductListDTO> GetProductsByCollection(int collectionId)
+        //public List<ProductListDTO> GetProductsByCollection(int collectionId)
+        //{
+        //    var productIds = _dataContext.ProductCollection
+        //        .Where(x => x.CollectionId == collectionId)
+        //        .Select(x => x.ProductId)
+        //        .Distinct()
+        //        .ToList();
+
+        //    return (
+        //        from p in _dataContext.Product
+        //        join md in _dataContext.MasterData
+        //            on p.TypeId equals md.Id
+        //        where productIds.Contains(p.Id)
+        //              && !p.IsDeleted
+        //              && !md.IsDeleted
+        //        select new ProductListDTO
+        //        {
+        //            Id = p.Id,
+        //            Name = p.Name,
+        //            Price = p.Price,
+        //            Quantity = p.Quantity,
+        //            Note = p.Note,
+
+        //            TypeId = p.TypeId,
+        //            TypeName = md.Name,
+
+        //            Files = _dataContext.Attachment
+        //                .Where(a =>
+        //                    a.EntityId == p.Id &&
+        //                    a.EntityType == "Product" &&
+        //                    a.IsDeleted != true &&
+        //                    a.FilePath != null)
+        //                .Select(a => a.FilePath!)
+        //                .ToList()
+        //        }
+        //    )
+        //    .OrderByDescending(x => x.Id)
+        //    .ToList();
+        //}
+
+        public async Task<List<ProductListDTO>> GetProductsByCollection(int collectionId)
         {
-            var productIds = _dataContext.ProductCollection
-                .Where(x => x.CollectionId == collectionId)
-                .Select(x => x.ProductId)
-                .Distinct()
-                .ToList();
+            var param = new List<SqlParameter>
+    {
+        new SqlParameter("@CollectionId", collectionId)
+    };
 
-            return (
-                from p in _dataContext.Product
-                join md in _dataContext.MasterData
-                    on p.TypeId equals md.Id
-                where productIds.Contains(p.Id)
-                      && !p.IsDeleted
-                      && !md.IsDeleted
-                select new ProductListDTO
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Quantity = p.Quantity,
-                    Note = p.Note,
+            var result = await _databaseSql.ExecuteProcXmlToList<ProductListDTO>(
+                "Product_GetByCollection",
+                param
+            );
 
-                    TypeId = p.TypeId,
-                    TypeName = md.Name,
-
-                    Files = _dataContext.Attachment
-                        .Where(a =>
-                            a.EntityId == p.Id &&
-                            a.EntityType == "Product" &&
-                            a.IsDeleted != true &&
-                            a.FilePath != null)
-                        .Select(a => a.FilePath!)
-                        .ToList()
-                }
-            )
-            .OrderByDescending(x => x.Id)
-            .ToList();
+            return result?.ToList() ?? new List<ProductListDTO>();
         }
 
-        public (CollectionEntity collection, List<ProductListDTO> products)?
-    GetCollectionForUser(string slug)
+
+        public async Task<(CollectionEntity collection, List<ProductListDTO> products)?>
+GetCollectionForUser(string slug)
         {
             if (string.IsNullOrWhiteSpace(slug))
                 return null;
@@ -205,10 +224,11 @@ namespace Data.Repository.Collection
             if (collection == null)
                 return null;
 
-            var products = GetProductsByCollection(collection.Id);
+            var products = await GetProductsByCollection(collection.Id);
 
             return (collection, products);
         }
+
 
     }
 }

@@ -2,6 +2,7 @@
 using Data.DTO.CheckOut;
 using Data.Entity;
 using Data.Repository;
+using Data.Repository.Order;
 using Microsoft.AspNetCore.Mvc;
 using WebBanQuanAo.helpers;
 using WebBanQuanAo.Models;
@@ -11,10 +12,12 @@ namespace WebBanQuanAo.Controllers
     public class CheckOutController : Controller
     {
         private readonly DataContext _context;
+        private readonly IOrderRepository _orderRepository;
 
-        public CheckOutController(DataContext context)
+        public CheckOutController(DataContext context, IOrderRepository orderRepository)
         {
             _context = context;
+            _orderRepository = orderRepository;
         }
         public IActionResult Index()
         {
@@ -78,36 +81,30 @@ namespace WebBanQuanAo.Controllers
         {
             var cart = CartCookieHelper.GetCart(Request);
             if (!cart.Any())
-                return BadRequest("Cart empty");
+                return RedirectToAction("Index", "Cart");
 
-            var order = new OrderEntity
+            var dto = new OrderCreateDTO
             {
                 FullName = model.FullName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
                 Note = model.Note,
-                Status = 0,
-                CreatedDate = DateTime.Now
+
+                Items = cart.Select(x => new OrderItemDTO
+                {
+                    ProductId = x.ProductId,
+                    ColorId = x.ColorId,
+                    SizeId = x.SizeId,
+                    Quantity = x.Quantity
+                }).ToList()
             };
 
-            _context.Order.Add(order);
-            _context.SaveChanges();
-
-            var details = cart.Select(c => new OrderDetailEntity
-            {
-                OrderId = order.Id,
-                ProductId = c.ProductId,
-                Note = $"Color:{c.ColorId} | Size:{c.SizeId}",
-                CreatedDate = DateTime.Now
-            });
-
-            _context.OrderDetail.AddRange(details);
-            _context.SaveChanges();
+            var orderId = _orderRepository.CreateOrder(dto);
 
             CartCookieHelper.ClearCart(Response);
 
-            return RedirectToAction("Success");
+            return RedirectToAction("Success", new { id = orderId });
         }
 
         public IActionResult Success()

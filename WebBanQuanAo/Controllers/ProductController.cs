@@ -25,14 +25,16 @@ namespace WebBanQuanAo.Controllers
             return View(products);
         }
 
-        public IActionResult Detail(int id)
+        public async Task<IActionResult> Detail(int id)
         {
-            var product = _productRepository.GetDetail(id);
+            var product = await _productRepository.GetDetail(id);
+
             if (product == null)
                 return NotFound();
 
             return View(product);
         }
+
         public IActionResult LoadProducts(
         int page = 1,
         int pageSize = 8,

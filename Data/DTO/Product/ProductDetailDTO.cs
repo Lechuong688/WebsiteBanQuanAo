@@ -1,4 +1,6 @@
 ﻿using Data.DTO.Attribute;
+using Data.Helper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +18,11 @@ namespace Data.DTO.Product
 
         public int TypeId { get; set; }
         public string TypeName { get; set; } = null!;
-
+        [JsonProperty("Images"), JsonConverter(typeof(SafeCollectionConverter))]
         public List<string> Images { get; set; } = new();
+        [JsonProperty("Colors"), JsonConverter(typeof(SafeCollectionConverter))]
         public List<AttributeDTO> Colors { get; set; } = new();
+        [JsonProperty("Sizes"), JsonConverter(typeof(SafeCollectionConverter))]
         public List<AttributeDTO> Sizes { get; set; } = new();
     }
 }

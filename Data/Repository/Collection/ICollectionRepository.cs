@@ -19,9 +19,10 @@ namespace Data.Repository.Collection
         string GenerateCode(string value);
         bool IsCodeExists(string code, int currentId = 0);
         CollectionEntity? GetByCode(string code);
-        List<ProductListDTO> GetProductsByCollection(int collectionId);
-        (CollectionEntity collection, List<ProductListDTO> products)?
-        GetCollectionForUser(string slug);
+        Task<List<ProductListDTO>> GetProductsByCollection(int collectionId);
+        Task<(CollectionEntity collection, List<ProductListDTO> products)?>
+GetCollectionForUser(string slug);
+
 
 
     }

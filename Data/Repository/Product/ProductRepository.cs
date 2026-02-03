@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -145,15 +146,26 @@ namespace Data.Repository.Product
             };
         }
 
-        public async Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize, int? typeId = null,
-            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
+        public async Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize)
         {
             var par = new List<SqlParameter>()
             {
-                     new SqlParameter("@page", page),
-                     new SqlParameter("@pageSize", pageSize),
+                     new SqlParameter("@Page", page),
+                     new SqlParameter("@PageSize", pageSize),
             };
-            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList", par);
+            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList",par) ?? new List<ProductListDTO>();
+
+            foreach (var item in result)
+            {
+                if (!string.IsNullOrWhiteSpace(item.FilesRaw))
+                    item.Files = item.FilesRaw.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                if (!string.IsNullOrWhiteSpace(item.ColorsRaw))
+                    item.Colors = item.ColorsRaw.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                if (!string.IsNullOrWhiteSpace(item.SizesRaw))
+                    item.Sizes = item.SizesRaw.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
 
             return new PagedResult<ProductListDTO>
             {
@@ -321,7 +333,7 @@ namespace Data.Repository.Product
                 .ToList();
         }
 
-        
+
         public void Delete(int id)
         {
             var product = _context.Product
@@ -426,59 +438,72 @@ namespace Data.Repository.Product
             .OrderBy(x => x.Name)
             .ToList();
         }
-        public ProductDetailDTO? GetDetail(int id)
+        //public async Task<ProductDetailDTO?> GetDetail(int id)
+        //{
+        //    var param = new List<SqlParameter>
+        //    {
+        //        new SqlParameter("@Id", id)
+        //    };
+
+        //    var ds = await _databaseSql.ExecuteProcDataSet(
+        //        "Product_GetDetail",
+        //        param
+        //    );
+
+        //    if (ds == null || ds.Tables.Count < 4 || ds.Tables[0].Rows.Count == 0)
+        //        return null;
+
+        //    var product = ds.Tables[0].AsEnumerable().Select(r => new ProductDetailDTO
+        //    {
+        //        Id = r.Field<int>("Id"),
+        //        Name = r.Field<string>("Name"),
+        //        Price = r.Field<decimal>("Price"),
+        //        Note = r.Field<string?>("Note"),
+        //        TypeId = r.Field<int>("TypeId"),
+        //        TypeName = r.Field<string>("TypeName"),
+        //    }).First();
+
+        //    product.Images = ds.Tables[1]
+        //        .AsEnumerable()
+        //        .Select(r => r.Field<string>("FilePath"))
+        //        .ToList();
+
+        //    product.Colors = ds.Tables[2]
+        //        .AsEnumerable()
+        //        .Select(r => new AttributeDTO
+        //        {
+        //            Id = r.Field<int>("Id"),
+        //            Name = r.Field<string>("Name")
+        //        })
+        //        .ToList();
+
+        //    product.Sizes = ds.Tables[3]
+        //        .AsEnumerable()
+        //        .Select(r => new AttributeDTO
+        //        {
+        //            Id = r.Field<int>("Id"),
+        //            Name = r.Field<string>("Name")
+        //        })
+        //        .ToList();
+
+        //    return product;
+        //}
+
+        public async Task<ProductDetailDTO?> GetDetail(int id)
         {
-            return (
-                from p in _context.Product
-                join md in _context.MasterData
-                    on p.TypeId equals md.Id
-                where p.Id == id && !p.IsDeleted && !md.IsDeleted
-                select new ProductDetailDTO
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Note = p.Note,
-                    TypeId = p.TypeId,
-                    TypeName = md.Name,
+            var param = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", id)
+            };
 
-                    Images = _context.Attachment
-                        .Where(a => a.EntityId == p.Id
-                                    && a.EntityType == "Product"
-                                    && a.IsDeleted != true)
-                        .Select(a => a.FilePath!)
-                        .ToList(),
-
-                    Colors = (
-                        from pa in _context.ProductAttribute
-                        join mdc in _context.MasterData
-                            on pa.ValueId equals mdc.Id
-                        where pa.ProductId == p.Id
-                              && mdc.GroupId == 18
-                              && !mdc.IsDeleted
-                        select new AttributeDTO
-                        {
-                            Id = mdc.Id,
-                            Name = mdc.Name
-                        }
-                    ).ToList(),
-
-                    Sizes = (
-                        from pa in _context.ProductAttribute
-                        join mds in _context.MasterData
-                            on pa.ValueId equals mds.Id
-                        where pa.ProductId == p.Id
-                              && mds.GroupId == 19
-                              && !mds.IsDeleted
-                        select new AttributeDTO
-                        {
-                            Id = mds.Id,
-                            Name = mds.Name
-                        }
-                    ).ToList()
-                }
-            ).FirstOrDefault();
+            var ds = await _databaseSql.ExecuteProcXmlToList<ProductDetailDTO>(
+                "Product_GetDetail_XML",
+                param
+            );
+            return ds?.FirstOrDefault() ?? new ProductDetailDTO();
         }
+
+
 
         public PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)

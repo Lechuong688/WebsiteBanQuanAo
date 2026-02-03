@@ -14,18 +14,17 @@ namespace WebBanQuanAo.Controllers
             _collectionRepository = collectionRepository;
             _productRepository = productRepository;
         }
-        public IActionResult Index(string code)
+        public async Task<IActionResult> Index(string code)
         {
             ViewBag.Categories = _productRepository.GetCategories();
             ViewBag.Colors = _productRepository.GetColors();
 
-            var data = _collectionRepository.GetCollectionForUser(code);
+            var data = await _collectionRepository.GetCollectionForUser(code);
             if (data == null)
                 return NotFound();
+            var (collection, products) = data.Value;
 
-            ViewBag.Collection = data.Value.collection;
-
-            var products = data.Value.products;
+            ViewBag.Collection = collection;
 
             var model = new PagedResult<ProductListDTO>
             {

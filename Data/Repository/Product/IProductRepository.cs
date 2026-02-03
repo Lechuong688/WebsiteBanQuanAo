@@ -13,8 +13,7 @@ namespace Data.Repository.Product
         IEnumerable<ProductListDTO> GetAll();
         PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
-        Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize, int? typeId = null,
-            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
+        Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize);
 
         ProductUpdateDTO? GetById(int id);
         List<AttachmentEntity> GetImagesByProductId(int productId);
@@ -23,7 +22,7 @@ namespace Data.Repository.Product
         ProductListDTO? GetForDelete(int id);
         List<CategoryDTO> GetCategories();
         List<CategoryDTO> GetColors();
-        ProductDetailDTO? GetDetail(int id);
+        Task<ProductDetailDTO?> GetDetail(int id);
         PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
 

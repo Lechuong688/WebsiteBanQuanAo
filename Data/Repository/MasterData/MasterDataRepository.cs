@@ -20,7 +20,6 @@ namespace Data.Repository.MasterData
         {
             _context = context;
         }
-
         public List<MasterDataEntity> GetColors()
         {
             return _context.MasterData
@@ -168,7 +167,6 @@ namespace Data.Repository.MasterData
 
             _context.SaveChanges();
         }
-
 
         public List<MasterDataEntity> GetAttributes()
         {

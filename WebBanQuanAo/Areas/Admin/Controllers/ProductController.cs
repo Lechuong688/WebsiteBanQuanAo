@@ -3,6 +3,7 @@ using Data.Repository.MasterData;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using WebBanQuanAo.Areas.Admin.Models;
 
 namespace WebBanQuanAo.Areas.Admin.Controllers
@@ -19,10 +20,10 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             _productRepository = productRepository;
             _masterDataRepository = masterDataRepository;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var products = _productRepository.GetAll();
-            return View(products);
+            var products = await _productRepository.GetList(1, 20);
+            return View(products?.Items ?? new List<ProductListDTO>());
         }
 
         [HttpGet]

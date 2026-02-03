@@ -1,4 +1,5 @@
-﻿using Data.Entity;
+﻿using Data.DTO.CheckOut;
+using Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace Data.Repository.Order
 {
     public interface IOrderRepository
     {
+        int CreateOrder(OrderCreateDTO dto);
     }
 }

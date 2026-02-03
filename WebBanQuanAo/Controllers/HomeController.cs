@@ -1,3 +1,4 @@
+using Data.DTO.Product;
 using Data.Entity;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Authorization;
@@ -21,10 +22,12 @@ namespace WebBanQuanAo.Controllers
             _productRepository = productRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var products = _productRepository.GetAll();
-            return View(products);
+            //var products = _productRepository.GetAll();
+            //return View(products);
+            var products = await _productRepository.GetList(1, 20);
+            return View(products?.Items ?? new List<ProductListDTO>());
         }
 
         public IActionResult Privacy()
