@@ -1,7 +1,11 @@
 ﻿using Data.DTO.CheckOut;
+using Data.DTO.Order;
+using Data.DTO.Product;
 using Data.Entity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,77 +15,79 @@ namespace Data.Repository.Order
     public class OrderRepository : IOrderRepository
     {
         private readonly DataContext _context;
-        public OrderRepository(DataContext context)
+        private readonly IDatabaseSql _databaseSql;
+        public OrderRepository(DataContext context, IDatabaseSql databaseSql)
         {
             _context = context;
+            _databaseSql = databaseSql;
         }
-        public int CreateOrder(OrderCreateDTO dto)
+
+        public async Task<int> CreateOrder(OrderCreateDTO dto)
         {
-            if (dto.Items == null || !dto.Items.Any())
-                throw new Exception("Danh sách sản phẩm trống");
-
-            using var transaction = _context.Database.BeginTransaction();
-
-            try
+            var json = JsonConvert.SerializeObject(dto);
+            var xmlData = JsonConvert.DeserializeXmlNode(json, "XMLData");
+            var param = new List<SqlParameter>
             {
-                var productIds = dto.Items
-                    .Select(x => x.ProductId)
-                    .Distinct()
-                    .ToList();
+                new SqlParameter("@XMLData", xmlData.InnerXml),
+            };
 
-                var prices = _context.Product
-                    .Where(p => productIds.Contains(p.Id) && !p.IsDeleted)
-                    .Select(p => new { p.Id, p.Price })
-                    .ToDictionary(x => x.Id, x => x.Price);
+            var result = await _databaseSql.ExecuteProcNonQuery(
+                "Order_Save",
+                param
+            );
+            return result;
+        }
 
-                decimal subTotal = dto.Items.Sum(x =>
-                    prices[x.ProductId] * x.Quantity
-                );
-
-                decimal shippingFee = subTotal >= 500000 ? 0 : 30000;
-                decimal total = subTotal + shippingFee;
-
-                var order = new OrderEntity
-                {
-                    UserId = dto.UserId,
-                    FullName = dto.FullName,
-                    Email = dto.Email,
-                    PhoneNumber = dto.PhoneNumber,
-                    Address = dto.Address,
-                    Note = dto.Note,
-
-                    SubTotal = subTotal,
-                    ShippingFee = shippingFee,
-                    Total = total,
-
-                    Status = 0,
-                    CreatedDate = DateTime.Now
-                };
-
-                _context.Order.Add(order);
-                _context.SaveChanges();
-
-                var orderDetails = dto.Items.Select(i => new OrderDetailEntity
-                {
-                    OrderId = order.Id,
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    ColorId = i.ColorId,
-                    SizeId = i.SizeId,
-                    CreatedDate = DateTime.Now
-                }).ToList();
-
-                _context.OrderDetail.AddRange(orderDetails);
-                _context.SaveChanges();
-
-                transaction.Commit();
-                return order.Id;
-            }
-            catch
+        public async Task<List<OrderAdminDTO>> GetOrders(int? status)
+        {
+            var param = new List<SqlParameter>
             {
-                transaction.Rollback();
-                throw;
-            }
+                new SqlParameter("@Status", status ?? (object)DBNull.Value)
+            };
+
+            var data = await _databaseSql.ExecuteProcXmlToList<OrderAdminDTO>(
+                "Order_Admin_GetList",
+                param
+            );
+            return data?.ToList() ?? new List<OrderAdminDTO>();
+        }
+
+        public async Task<OrderAdminDetailDTO?> GetOrderDetail(int orderId)
+        {
+            var param = new List<SqlParameter>
+            {
+                new SqlParameter("@OrderId", orderId)
+            };
+
+            var order = (await _databaseSql.ExecuteProcXmlToList<OrderAdminDetailDTO>(
+                "Order_Admin_GetDetail",
+                param
+            ))?.FirstOrDefault();
+
+            if (order == null)
+                return null;
+
+            order.Items = (await _databaseSql.ExecuteProcXmlToList<OrderItemAdminDTO>(
+            "Order_Admin_GetItems",
+            param
+            ))?.ToList() ?? new List<OrderItemAdminDTO>();
+
+            return order;
+        }
+
+        public async Task UpdateStatus(int orderId, int status, string updatedBy)
+        {
+            var param = new List<SqlParameter>
+            {
+                new SqlParameter("@OrderId", orderId),
+                new SqlParameter("@Status", status),
+                new SqlParameter("@UpdatedBy", updatedBy),
+            };
+
+            await _databaseSql.ExecuteProcNonQuery(
+                "Order_Admin_UpdateStatus",
+                param
+            );
         }
     }
 }

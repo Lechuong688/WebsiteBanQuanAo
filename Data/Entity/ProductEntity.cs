@@ -21,9 +21,9 @@ namespace Data.Entity
         //public int? Size { get; set; }
         public string? Note { get; set; }
         public bool IsDeleted { get; set; }
-        public Guid? CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public Guid? UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }

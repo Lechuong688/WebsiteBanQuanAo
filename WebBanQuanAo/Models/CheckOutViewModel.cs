@@ -5,19 +5,18 @@ namespace WebBanQuanAo.Models
 {
     public class CheckOutViewModel
     {
-        [Required]
-        public string FullName { get; set; }
+        public bool IsAuthenticated { get; set; }
+        public string? FullName { get; set; }
 
-        [Required, EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
-        [Required]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Required]
         public string Address { get; set; }
 
         public string? Note { get; set; }
+        public string? CreatedBy { get; set; }
 
         public CartDTO Cart { get; set; } = new();
     }

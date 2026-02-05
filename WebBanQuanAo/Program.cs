@@ -67,12 +67,8 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+);
 
 app.MapControllerRoute(
     name: "collection",
@@ -80,4 +76,10 @@ app.MapControllerRoute(
     defaults: new { controller = "Collection", action = "Index" }
 );
 
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
+
+app.MapControllers();
 app.Run();

@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -19,4 +19,243 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+/*Detail Admin*/
+/* Custom CSS nhỏ để làm đẹp thêm */
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* Đổ bóng mềm mại */
+}
+
+.card-header-custom {
+    background-color: #fff;
+    border-bottom: 2px solid #f0f2f5;
+    padding: 1.5rem;
+    border-radius: 12px 12px 0 0;
+}
+
+.table-custom th {
+    background-color: #f8f9fa;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.table-custom td {
+    padding: 1rem;
+    vertical-align: middle;
+    font-size: 1.05rem; /* Chữ trong bảng to hơn */
+}
+
+.label-title {
+    color: #6c757d;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.info-content {
+    font-size: 1.1rem; /* Chữ thông tin to hơn */
+    font-weight: 500;
+    color: #212529;
+}
+
+
+/*Product index*/
+.product-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.action-btn {
+    min-width: 40px;
+}
+
+.badge-size {
+    display: inline-block;
+    background-color: #fff;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: 600;
+    font-size: 0.85em;
+    margin-right: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.badge-color {
+    display: inline-block;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border: 1px solid #bbdefb;
+    border-radius: 50px;
+    padding: 4px 10px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.price-text {
+    color: #198754;
+    font-weight: 500;
+}
+
+/*Product Collection*/
+.scrollable-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollable-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.scrollable-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+    .scrollable-list::-webkit-scrollbar-thumb:hover {
+        background: #aaa;
+    }
+
+.scrollable-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+    .product-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #f0f0f0;
+        flex-shrink: 0;
+    }
+
+.product-source {
+    cursor: pointer;
+}
+
+    .product-source:hover {
+        border-color: #3c8dbc;
+        background: #f0f8ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .product-source::after {
+        content: "\f067";
+        font-family: FontAwesome;
+        position: absolute;
+        right: 15px;
+        color: #3c8dbc;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .product-source:hover::after {
+        opacity: 1;
+    }
+
+.product-selected {
+    background: #f9fff9;
+    border-left: 4px solid #00a65a;
+}
+
+.product-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.product-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-cate {
+    font-size: 12px;
+    color: #888;
+}
+
+.btn-remove {
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.product-selected:hover .btn-remove {
+    opacity: 1;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+}
+
+.search-input {
+    width: 100%;
+    height: 44px;
+    padding: 10px 14px 10px 40px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: all 0.25s ease;
+    background-color: #fff;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3c8dbc;
+        box-shadow: 0 0 0 3px rgba(60, 141, 188, 0.15);
+    }
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+    pointer-events: none;
+    transition: color 0.25s ease;
+}
+
+.search-input:focus + .search-icon,
+.search-box:focus-within .search-icon {
+    color: #3c8dbc;
 }

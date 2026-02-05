@@ -4,6 +4,7 @@ using Data.Entity;
 using Data.Repository;
 using Data.Repository.Order;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebBanQuanAo.helpers;
 using WebBanQuanAo.Models;
 
@@ -22,7 +23,6 @@ namespace WebBanQuanAo.Controllers
         public IActionResult Index()
         {
             var cart = CartCookieHelper.GetCart(Request);
-
             if (!cart.Any())
                 return RedirectToAction("Index", "Cart");
 
@@ -37,14 +37,14 @@ namespace WebBanQuanAo.Controllers
                 .Where(x => !x.IsDeleted)
                 .ToList();
 
-            var cartDto = new Data.DTO.Cart.CartDTO
+            var cartDto = new CartDTO
             {
                 Items = (
                     from c in cart
                     join p in products on c.ProductId equals p.Id
                     join color in masterData on c.ColorId equals color.Id
                     join size in masterData on c.SizeId equals size.Id
-                    select new Data.DTO.Cart.CartItemDTO
+                    select new CartItemDTO
                     {
                         ProductId = p.Id,
                         ProductName = p.Name,
@@ -60,36 +60,83 @@ namespace WebBanQuanAo.Controllers
 
             cartDto.SubTotal = cartDto.Items.Sum(x => x.Price * x.Quantity);
             cartDto.ShippingFee = 30000;
-            //cartDto.Total = cartDto.SubTotal + cartDto.ShippingFee;
-            if (cartDto.SubTotal >= 500000)
+            cartDto.Total = cartDto.SubTotal >= 500000
+                ? cartDto.SubTotal
+                : cartDto.SubTotal + cartDto.ShippingFee;
+
+            var model = new CheckOutViewModel
             {
-                cartDto.Total = cartDto.SubTotal;
-            }
-            else
+                Cart = cartDto,
+                IsAuthenticated = User.Identity != null && User.Identity.IsAuthenticated
+            };
+
+            if (model.IsAuthenticated)
             {
-                cartDto.Total = cartDto.SubTotal + cartDto.ShippingFee;
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = _context.Users.FirstOrDefault(x => x.Id == userId);
+                model.FullName = user.Name;
+                model.Email = user.Email;
+                model.PhoneNumber = user.PhoneNumber;
+
+                if (user != null)
+                {
+                    model.FullName = user.Name;
+                    model.Email = user.Email;
+                    model.PhoneNumber = user.PhoneNumber;
+                    //model.Address = user.Address;
+                }
             }
 
-            return View(new CheckOutViewModel
-            {
-                Cart = cartDto
-            });
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult PlaceOrder(CheckOutViewModel model)
+        public async Task<IActionResult> PlaceOrder(CheckOutViewModel model)
         {
             var cart = CartCookieHelper.GetCart(Request);
             if (!cart.Any())
                 return RedirectToAction("Index", "Cart");
 
+            string? userId = null;
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+
+            string fullName = model.FullName;
+            string email = model.Email;
+            string phone = model.PhoneNumber;
+
+            if(userId != null)
+            {
+                var user = _context.Users.FirstOrDefault(x => x.Id == userId);
+                if (user == null)
+                    return Unauthorized();
+
+                fullName = string.IsNullOrWhiteSpace(fullName) ? user.Name : fullName;
+                email = string.IsNullOrWhiteSpace(email) ? user.Email : email;
+                phone = string.IsNullOrWhiteSpace(phone) ? user.PhoneNumber : phone;
+            }
+
+            if(string.IsNullOrWhiteSpace(fullName)||
+            string.IsNullOrWhiteSpace(email)||
+            string.IsNullOrWhiteSpace(phone))
+
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ thông tin người nhận");
+                return RedirectToAction("Index");
+            }
+
             var dto = new OrderCreateDTO
             {
-                FullName = model.FullName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
+                UserId = userId,
+                FullName = fullName,
+                Email = email,
+                PhoneNumber = phone,
                 Address = model.Address,
                 Note = model.Note,
+                CreatedBy = userId,
 
                 Items = cart.Select(x => new OrderItemDTO
                 {
@@ -100,12 +147,13 @@ namespace WebBanQuanAo.Controllers
                 }).ToList()
             };
 
-            var orderId = _orderRepository.CreateOrder(dto);
+            var orderId = await _orderRepository.CreateOrder(dto);
 
             CartCookieHelper.ClearCart(Response);
 
             return RedirectToAction("Success", new { id = orderId });
         }
+
 
         public IActionResult Success()
         {

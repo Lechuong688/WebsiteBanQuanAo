@@ -11,7 +11,7 @@ namespace Data.Entity
     {
         [Key]
         public int Id { get; set; }
-        public Guid? UserId { get; set; }
+        public string? UserId { get; set; }
         [Required]
         public string FullName { get; set; }
         [Required]
@@ -26,9 +26,9 @@ namespace Data.Entity
         public decimal Total { get; set; }
         public decimal ShippingFee { get; set; }
         public decimal SubTotal { get; set; }
-        public Guid? CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public Guid? UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
     }
 }

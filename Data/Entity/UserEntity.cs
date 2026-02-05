@@ -23,8 +23,9 @@ namespace Data.Entity
         //public string? Email { get; set; }
         //[DataType(DataType.Password), Required(ErrorMessage = "Yêu cầu nhập mật khẩu")]
         //public string Password { get; set; }
+        //public string Address { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public Guid? CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }

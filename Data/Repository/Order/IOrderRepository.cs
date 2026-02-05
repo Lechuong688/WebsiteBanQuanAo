@@ -1,4 +1,5 @@
 ﻿using Data.DTO.CheckOut;
+using Data.DTO.Order;
 using Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ namespace Data.Repository.Order
 {
     public interface IOrderRepository
     {
-        int CreateOrder(OrderCreateDTO dto);
+        Task<int> CreateOrder(OrderCreateDTO dto);
+        Task<List<OrderAdminDTO>> GetOrders(int? status);
+        Task<OrderAdminDetailDTO?> GetOrderDetail(int orderId);
+        Task UpdateStatus(int orderId, int status, string updatedBy);
     }
 }
