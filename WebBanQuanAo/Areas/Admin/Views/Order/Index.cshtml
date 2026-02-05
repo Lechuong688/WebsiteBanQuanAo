@@ -1,181 +1,25 @@
-﻿@using Data.Entity.Enums
-@model List<Data.DTO.Order.OrderAdminDTO>
+﻿@using Data.DTO.Common
+@using Data.Entity.Enums
+@model PagedResult<Data.DTO.Order.OrderAdminDTO>
 
 @{
     ViewData["Title"] = "Quản lý đơn hàng";
+
     var currentStatus = Context.Request.Query["status"].ToString();
 
     string GetStatusStyle(int statusId)
     {
         return statusId switch
         {
-            0 => "status-new",       // Mới (Vàng nhạt)
-            1 => "status-info",      // Đã xác nhận (Xanh dương nhạt)
-            2 => "status-shipping",  // Đang giao (Tím/Indigo)
-            3 => "status-success",   // Hoàn thành (Xanh lá)
-            4 => "status-danger",    // Hủy (Đỏ)
+            0 => "status-new",
+            1 => "status-info",
+            2 => "status-shipping",
+            3 => "status-success",
+            4 => "status-danger",
             _ => "status-default"
         };
     }
 }
-
-<style>
-    :root {
-        --bg-body: #f3f4f6;
-        --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
-        --hover-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
-        --primary-color: #4f46e5; /* Màu tím hiện đại hơn xanh blue thường */
-    }
-
-    body {
-        background-color: var(--bg-body);
-    }
-
-    /* Card Container */
-    .dashboard-card {
-        background: #fff;
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
-    }
-
-    /* Filter Bar */
-    .filter-bar {
-        background: #fff;
-        border-radius: 50px;
-        padding: 6px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        border: 1px solid #eee;
-    }
-
-    .filter-select {
-        border: none;
-        background: transparent;
-        font-size: 0.95rem;
-        padding-left: 1rem;
-    }
-
-        .filter-select:focus {
-            box-shadow: none;
-            background: #f9fafb;
-        }
-
-    .table-modern {
-        margin-bottom: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-        .table-modern thead th {
-            background-color: #f9fafb;
-            color: #6b7280;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .table-modern tbody td {
-            padding: 1.25rem 1.5rem;
-            vertical-align: middle;
-            border-bottom: 1px solid #f3f4f6;
-            color: #374151;
-            font-size: 0.95rem;
-            transition: background 0.2s;
-        }
-
-        .table-modern tbody tr:hover td {
-            background-color: #f9fafb; /* Hover row effect */
-        }
-
-        .table-modern tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-    .status-badge {
-        padding: 6px 12px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-        .status-badge::before {
-            content: '';
-            display: block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-    .status-new {
-        background-color: #fffbeb;
-        color: #b45309;
-    }
-
-        .status-new::before {
-            background-color: #f59e0b;
-        }
-
-    .status-info {
-        background-color: #eff6ff;
-        color: #1d4ed8;
-    }
-
-        .status-info::before {
-            background-color: #3b82f6;
-        }
-
-    .status-shipping {
-        background-color: #eef2ff;
-        color: #4338ca;
-    }
-
-        .status-shipping::before {
-            background-color: #6366f1;
-        }
-
-    .status-success {
-        background-color: #ecfdf5;
-        color: #047857;
-    }
-
-        .status-success::before {
-            background-color: #10b981;
-        }
-
-    .status-danger {
-        background-color: #fef2f2;
-        color: #b91c1c;
-    }
-
-        .status-danger::before {
-            background-color: #ef4444;
-        }
-
-    .btn-action {
-        color: var(--primary-color);
-        background: #eef2ff;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.2s;
-    }
-
-        .btn-action:hover {
-            background: var(--primary-color);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-</style>
 
 <div class="container-fluid py-5">
 
@@ -192,19 +36,15 @@
                 <option value="">Tất cả trạng thái</option>
                 @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
                 {
-                    var isSelected = currentStatus == ((int)s).ToString() ? "selected" : "";
-                    if (!string.IsNullOrEmpty(isSelected))
-                    {
-                        <option value="@((int)s)" selected>@s</option>
-                    }
-                    else
-                    {
-                        <option value="@((int)s)">@s</option>
-                    }
+                    <option value="@((int)s)" selected="@(currentStatus == ((int)s).ToString())">
+                        @s
+                    </option>
                 }
             </select>
 
-            <button class="btn btn-primary rounded-pill px-4" type="submit" style="background: var(--primary-color); border:none;">
+            <button class="btn btn-primary rounded-pill px-4"
+                    type="submit"
+                    style="background: var(--primary-color); border:none;">
                 Lọc
             </button>
         </form>
@@ -225,35 +65,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model != null && Model.Any())
+                    @if (Model.Items != null && Model.Items.Any())
                     {
-                        @foreach (var o in Model)
+                        foreach (var o in Model.Items)
                         {
                             <tr>
-                                <td class="ps-4">
-                                    <span class="fw-bold" style="color: var(--primary-color)">#@o.Id</span>
-                                </td>
-                                <td>
-                                    <div class="fw-bold text-dark">@o.FullName</div>
-                                    @if (string.IsNullOrEmpty(o.FullName))
-                                    {
-                                        <span class="text-muted fst-italic">Khách vãng lai</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="small">@o.PhoneNumber</div>
-                                </td>
-                                <td class="text-end fw-bold">
-                                    @o.Total.ToString("N0") <span class="text-muted fw-normal" style="font-size: 0.8em">đ</span>
-                                </td>
+                                <td class="ps-4 fw-bold" style="color: var(--primary-color)">#@o.Id</td>
+                                <td>@(string.IsNullOrEmpty(o.FullName) ? "Khách vãng lai" : o.FullName)</td>
+                                <td>@o.PhoneNumber</td>
+                                <td class="text-end fw-bold">@o.Total.ToString("N0") đ</td>
                                 <td class="text-center">
                                     <span class="status-badge @GetStatusStyle(o.Status)">
                                         @((OrderStatus)o.Status)
                                     </span>
                                 </td>
                                 <td class="text-muted small">
-                                    @o.CreatedDate?.ToString("dd/MM/yyyy")
-                                    <br>
+                                    @o.CreatedDate?.ToString("dd/MM/yyyy")<br />
                                     <span style="font-size: 0.75em">@o.CreatedDate?.ToString("HH:mm")</span>
                                 </td>
                                 <td class="text-end pe-4">
@@ -267,11 +94,8 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
-                                    <span>Chưa có đơn hàng nào trong trạng thái này.</span>
-                                </div>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                Không có đơn hàng nào
                             </td>
                         </tr>
                     }
@@ -279,4 +103,29 @@
             </table>
         </div>
     </div>
+
+    @if (Model.TotalItems > Model.PageSize)
+    {
+        var totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?status=@currentStatus&page=@(Model.Page - 1)">‹</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" href="?status=@currentStatus&page=@i">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?status=@currentStatus&page=@(Model.Page + 1)">›</a>
+                </li>
+            </ul>
+        </nav>
+    }
+
 </div>

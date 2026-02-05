@@ -1,6 +1,6 @@
 ﻿using Data.DTO.CheckOut;
+using Data.DTO.Common;
 using Data.DTO.Order;
-using Data.DTO.Product;
 using Data.Entity;
 using Newtonsoft.Json;
 using System;
@@ -37,20 +37,28 @@ namespace Data.Repository.Order
             );
             return result;
         }
-
-        public async Task<List<OrderAdminDTO>> GetOrders(int? status)
+        public async Task<PagedResult<OrderAdminDTO>> GetOrders(int? status, int page, int pageSize)
         {
             var param = new List<SqlParameter>
             {
-                new SqlParameter("@Status", status ?? (object)DBNull.Value)
+                new SqlParameter("@Status", status ?? (object)DBNull.Value),
+                new SqlParameter("@Page", page),
+                new SqlParameter("@PageSize", pageSize)
             };
 
-            var data = await _databaseSql.ExecuteProcXmlToList<OrderAdminDTO>(
-                "Order_Admin_GetList",
-                param
-            );
-            return data?.ToList() ?? new List<OrderAdminDTO>();
+            var result = await _databaseSql
+                .ExecuteProcXmlToList<OrderAdminDTO>("Order_Admin_GetList", param)
+                ?? new List<OrderAdminDTO>();
+
+            return new PagedResult<OrderAdminDTO>
+            {
+                Items = result.ToList(),
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = result.FirstOrDefault()?.TotalRecord ?? 0
+            };
         }
+
 
         public async Task<OrderAdminDetailDTO?> GetOrderDetail(int orderId)
         {

@@ -1,4 +1,4 @@
-﻿namespace Data.DTO.Product
+﻿namespace Data.DTO.Common
 {
     public class PagedResult<T>
     {

@@ -18,5 +18,6 @@ namespace Data.DTO.Order
         public decimal Total { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public int TotalRecord { get; set; }
     }
 }

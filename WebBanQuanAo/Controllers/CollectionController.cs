@@ -1,4 +1,5 @@
-﻿using Data.DTO.Product;
+﻿using Data.DTO.Common;
+using Data.DTO.Product;
 using Data.Repository.Collection;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Mvc;

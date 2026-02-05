@@ -17,12 +17,17 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             _orderRepository = orderRepository;
         }
 
-        public async Task<IActionResult> Index(int? status)
+        public async Task<IActionResult> Index(int? status, int page = 1, int pageSize = 10)
         {
-            var orders = await _orderRepository.GetOrders(status);
+            var result = await _orderRepository.GetOrders(status, page, pageSize);
+
             ViewBag.Status = status;
-            return View(orders);
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+
+            return View(result);
         }
+
 
         public async Task<IActionResult> Detail(int id)
         {

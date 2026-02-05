@@ -1,4 +1,5 @@
-﻿using Data.DTO.Product;
+﻿using Data.DTO.Common;
+using Data.DTO.Product;
 using Data.Entity;
 using System;
 using System.Collections.Generic;
