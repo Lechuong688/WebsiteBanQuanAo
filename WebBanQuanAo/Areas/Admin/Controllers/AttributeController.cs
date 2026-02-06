@@ -1,13 +1,15 @@
-﻿using Data.Repository.MasterData;
+﻿using Data.Entity.Enums;
+using Data.Repository.MasterData;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebBanQuanAo.Areas.Admin.Models;
-using Data.Entity.Enums;
 
 namespace WebBanQuanAo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class AttributeController : Controller
     {
         private readonly IMasterDataRepository _masterDataRepository;
@@ -56,6 +58,7 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Save(MasterDataViewModel model)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!ModelState.IsValid)
             {
                 model.Type = MasterDataType.Attribute;
@@ -69,7 +72,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     model.Name,
                     model.Code,
                     model.Note,
-                    model.ParentId
+                    model.ParentId,
+                    userId
                 );
             }
             else
@@ -79,7 +83,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     model.Name,
                     model.Code,
                     model.Note,
-                    model.ParentId
+                    model.ParentId,
+                    userId
                 );
             }
 

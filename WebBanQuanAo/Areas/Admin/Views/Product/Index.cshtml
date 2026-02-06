@@ -1,8 +1,10 @@
 ﻿@using Data.DTO.Product
-@model IEnumerable<ProductListDTO>
+@using Data.DTO.Common
+@model PagedResult<Data.DTO.Product.ProductListDTO>
 
 @{
     ViewBag.Title = "Quản lý sản phẩm";
+    var currentStatus = Context.Request.Query["status"].ToString();
 }
 
 <div class="container-fluid py-4">
@@ -21,19 +23,19 @@
                 <table class="table table-hover table-striped mb-0">
                     <thead class="table-light text-secondary">
                         <tr>
-                            <th scope="col">@Html.DisplayNameFor(model => model.Name)</th>
-                            <th scope="col">@Html.DisplayNameFor(model => model.Files)</th>
-                            <th scope="col">@Html.DisplayNameFor(model => model.Price)</th>
-                            <th scope="col" class="text-center">@Html.DisplayNameFor(model => model.Quantity)</th>
-                            <th scope="col">@Html.DisplayNameFor(model => model.Colors)</th>
-                            <th scope="col">@Html.DisplayNameFor(model => model.Sizes)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Name)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Files)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Price)</th>
+                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().Quantity)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Colors)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Sizes)</th>
                             <th scope="col" class="text-center" style="width: 150px;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model != null && Model.Any())
+                        @if (Model?.Items != null && Model.Items.Any())
                         {
-                            foreach (var item in Model)
+                            foreach (var item in Model.Items)
                             {
                                 <tr>
                                     <td class="fw-bold text-dark">
@@ -116,5 +118,28 @@
                 </table>
             </div>
         </div>
+        @if (Model.TotalItems > Model.PageSize)
+        {
+            var totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?status=@currentStatus&page=@(Model.Page - 1)">‹</a>
+                    </li>
+
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link" href="?status=@currentStatus&page=@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?status=@currentStatus&page=@(Model.Page + 1)">›</a>
+                    </li>
+                </ul>
+            </nav>
+        }
     </div>
 </div>

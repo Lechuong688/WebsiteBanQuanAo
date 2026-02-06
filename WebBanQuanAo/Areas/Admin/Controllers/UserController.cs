@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WebBanQuanAo.Areas.Admin.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -104,6 +105,7 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser(CreateUserViewModel createmodel)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
             {
                 if (!ModelState.IsValid)
@@ -125,6 +127,7 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     Email = createmodel.Email,
                     Name = createmodel.Name,
                     PhoneNumber = createmodel.PhoneNumber,
+                    CreatedBy = userId,
                     CreatedDate = DateTime.Now
                     //EmailConfirmed = true
                 };
@@ -205,10 +208,14 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                 if (user == null)
                     return NotFound();
 
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
                 user.Name = model.Name;
                 user.Email = model.Email;
                 user.UserName = model.UserName;
                 user.PhoneNumber = model.PhoneNumber;
+                user.UpdatedBy = userId;
+                user.UpdatedDate = DateTime.Now;
 
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
@@ -236,7 +243,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("Có lỗi xảy ra: " + ex.Message);
+                var error = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest("Có lỗi xảy ra: " + error);
             }
         }
 

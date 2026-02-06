@@ -21,6 +21,7 @@ namespace Data.DTO.Product
         public List<int> DeletedImageIds { get; set; } = new();
         public int TypeId { get; set; }
         public string? TypeName { get; set; }
+        public string UserId { get; set; }
     }
 
 }

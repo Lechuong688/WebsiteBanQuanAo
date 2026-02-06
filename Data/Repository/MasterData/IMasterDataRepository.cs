@@ -15,13 +15,13 @@ namespace Data.Repository.MasterData
         List<MasterDataEntity> GetCategories();
         MasterDataEntity? GetCategoryById(int id);
         List<MasterDataEntity> GetMainCategories();
-        void CreateCategory(string name, string code, string note, int parentId);
-        void UpdateCategory(int id, string name, string code, string note, int parentId);
+        void CreateCategory(string name, string code, string note, int parentId, string userId);
+        void UpdateCategory(int id, string name, string code, string note, int parentId, string userId);
         void DeleteCategory(int id);
 
         List<MasterDataEntity> GetAttributes();
-        void CreateAttribute(string name, string code, string note, int parentId);
-        void UpdateAttribute(int id, string name, string note, string code, int parentId);
+        void CreateAttribute(string name, string code, string note, int parentId, string userId);
+        void UpdateAttribute(int id, string name, string note, string code, int parentId, string userId);
         void DeleteAttribute(int id);
         List<MasterDataEntity> GetMainAttributes();
         MasterDataEntity? GetAttributeById(int id);

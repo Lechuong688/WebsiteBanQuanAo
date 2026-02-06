@@ -61,6 +61,7 @@ namespace Data.Repository.Collection
                 dbEntity.StartDate = entity.StartDate;
                 dbEntity.EndDate = entity.EndDate;
                 dbEntity.IsActive = entity.IsActive;
+                dbEntity.UpdatedBy = entity.UpdatedBy;
                 dbEntity.UpdatedDate = DateTime.Now;
             }
 
@@ -108,7 +109,6 @@ namespace Data.Repository.Collection
 
                 _dataContext.ProductCollection.AddRange(newData);
             }
-
             _dataContext.SaveChanges();
         }
 

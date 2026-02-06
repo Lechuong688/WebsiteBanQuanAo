@@ -243,6 +243,7 @@ namespace Data.Repository.Product
                     product.Quantity = dto.Quantity;
                     product.Note = dto.Note;
                     product.TypeId = dto.TypeId;
+                    product.UpdatedBy = dto.UserId;
                     product.UpdatedDate = DateTime.Now;
                 }
                 else
@@ -255,6 +256,7 @@ namespace Data.Repository.Product
                         Note = dto.Note,
                         TypeId = dto.TypeId,
                         IsDeleted = false,
+                        CreatedBy = dto.UserId,
                         CreatedDate = DateTime.Now
                     };
 

@@ -39,7 +39,8 @@ namespace Data.Repository.MasterData
         public List<MasterDataEntity> GetProductTypes()
         {
             return _context.MasterData
-                .Where(x => !x.IsDeleted && x.GroupId == 0)
+                .Where(x => !x.IsDeleted && x.GroupId != 0 &&
+                x.TypeId == (int)MasterDataType.Category)
                 .OrderBy(x => x.Name)
                 .ToList();
         }
@@ -103,8 +104,9 @@ namespace Data.Repository.MasterData
                 .Trim('_');
         }
 
-        public void CreateCategory(string name, string code, string note, int parentId)
+        public void CreateCategory(string name, string code, string note, int parentId, string userId)
         {
+
             var finalCode = string.IsNullOrWhiteSpace(code)
                 ? GenerateCode(name)
                 : GenerateCode(code);
@@ -115,6 +117,8 @@ namespace Data.Repository.MasterData
                 Code = finalCode,
                 Note = note,
                 GroupId = parentId,
+                TypeId = (int)MasterDataType.Category,
+                CreatedBy = userId,
                 IsDeleted = false,
                 CreatedDate = DateTime.Now
             };
@@ -123,9 +127,12 @@ namespace Data.Repository.MasterData
             _context.SaveChanges();
         }
 
-        public void UpdateCategory(int id, string name, string code, string note, int parentId)
+        public void UpdateCategory(int id, string name, string code, string note, int parentId, string userId)
         {
-            var entity = _context.MasterData.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
+            var entity = _context.MasterData.FirstOrDefault(
+                x => x.Id == id &&
+                !x.IsDeleted &&
+                x.TypeId == (int)MasterDataType.Category);
             if (entity == null) return;
 
             entity.Name = name;
@@ -135,6 +142,7 @@ namespace Data.Repository.MasterData
 
             entity.Note = note;
             entity.GroupId = parentId;
+            entity.UpdatedBy = userId;
             entity.UpdatedDate = DateTime.Now;
 
             _context.SaveChanges();
@@ -179,7 +187,7 @@ namespace Data.Repository.MasterData
                 .ThenBy(x => x.Name)
                 .ToList();
         }
-        public void CreateAttribute(string name, string code, string note, int parentId)
+        public void CreateAttribute(string name, string code, string note, int parentId, string userId)
         {
             var finalCode = string.IsNullOrWhiteSpace(code)
                 ? GenerateCode(name)
@@ -193,6 +201,7 @@ namespace Data.Repository.MasterData
                 GroupId = parentId,
                 TypeId = (int)MasterDataType.Attribute,
                 IsDeleted = false,
+                CreatedBy = userId,
                 CreatedDate = DateTime.Now
             };
 
@@ -200,7 +209,7 @@ namespace Data.Repository.MasterData
             _context.SaveChanges();
         }
 
-        public void UpdateAttribute(int id, string name, string note, string code, int parentId)
+        public void UpdateAttribute(int id, string name, string code, string note, int parentId, string userId)
         {
             var entity = _context.MasterData
                 .FirstOrDefault(x =>
@@ -217,6 +226,7 @@ namespace Data.Repository.MasterData
                 : GenerateCode(code);
             entity.Note = note;
             entity.GroupId = parentId;
+            entity.UpdatedBy = userId;
             entity.UpdatedDate = DateTime.Now;
 
             _context.SaveChanges();

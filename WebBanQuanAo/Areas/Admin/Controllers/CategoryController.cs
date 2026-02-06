@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using WebBanQuanAo.Areas.Admin.Models;
+﻿using Data.Entity.Enums;
 using Data.Repository.MasterData;
-using Data.Entity.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using WebBanQuanAo.Areas.Admin.Models;
 
 namespace WebBanQuanAo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class CategoryController : Controller
     {
         private readonly IMasterDataRepository _masterDataRepository;
@@ -56,15 +58,18 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Save(MasterDataViewModel model)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (!ModelState.IsValid)
             {
+                model.Type = MasterDataType.Category;
                 model.ParentItems = _masterDataRepository.GetMainCategories();
                 return View(model);
             }
 
             if (model.Id == 0)
             {
-                _masterDataRepository.CreateCategory(model.Name, model.Code, model.Note, model.ParentId);
+                _masterDataRepository.CreateCategory(model.Name, model.Code, model.Note, model.ParentId, userId);
             }
             else
             {
@@ -73,7 +78,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     model.Name,
                     model.Code,
                     model.Note,
-                    model.ParentId
+                    model.ParentId,
+                    userId
                 );
             }
 

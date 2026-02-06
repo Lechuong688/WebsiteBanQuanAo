@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebBanQuanAo.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class DashboardController : Controller
     {
         // GET: Dashboard

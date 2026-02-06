@@ -3,13 +3,15 @@ using Data.Repository.MasterData;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WebBanQuanAo.Areas.Admin.Models;
 
 namespace WebBanQuanAo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -20,10 +22,15 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             _productRepository = productRepository;
             _masterDataRepository = masterDataRepository;
         }
-        public async Task<IActionResult> Index()
+        
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var products = await _productRepository.GetList(1, 20);
-            return View(products?.Items ?? new List<ProductListDTO>());
+            var result = await _productRepository.GetList(page, pageSize);
+
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+
+            return View(result);
         }
 
         [HttpGet]
@@ -74,11 +81,11 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             return View(vm);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Save(UpdateProductViewModel vm)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!ModelState.IsValid)
             {
                 vm.Colors = _masterDataRepository.GetColors();
@@ -100,9 +107,20 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                 ColorIds = vm.ColorIds,
                 SizeIds = vm.SizeIds,
                 ImagePaths = imagePaths,
-                DeletedImageIds = vm.DeletedImageIds
+                DeletedImageIds = vm.DeletedImageIds,
+                UserId = userId
             };
 
+            if (vm.Price <= 0)
+            {
+                ModelState.AddModelError(nameof(vm.Price), "Giá sản phẩm phải lớn hơn 0");
+
+                vm.Colors = _masterDataRepository.GetColors();
+                vm.Sizes = _masterDataRepository.GetSizes();
+                vm.Types = _masterDataRepository.GetProductTypes();
+
+                return View(vm);
+            }
             try
             {
                 if (vm.newImages != null)
@@ -141,7 +159,6 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             }
         }
 
-
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -150,7 +167,6 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
 
             return View(product);
         }
-
 
         [HttpPost]
         [ActionName("Delete")]

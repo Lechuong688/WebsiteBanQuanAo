@@ -7,7 +7,8 @@ using System.Security.Claims;
 namespace WebBanQuanAo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class OrderController : Controller
     {
         private readonly IOrderRepository _orderRepository;

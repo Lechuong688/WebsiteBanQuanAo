@@ -3,11 +3,13 @@ using Data.Repository.Collection;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebBanQuanAo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class CollectionController : Controller
     {
         private readonly ICollectionRepository _collectionRepository;
@@ -59,6 +61,16 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 return View(entity);
+            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (isCreate)
+            {
+                entity.CreatedBy = userId;
+            }
+            else
+            {
+                entity.UpdatedBy = userId;
             }
 
             _collectionRepository.Save(entity);
