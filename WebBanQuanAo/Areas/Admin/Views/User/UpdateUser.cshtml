@@ -63,14 +63,17 @@
                             <select name="SelectedRoles"
                                     class="form-control select2"
                                     data-placeholder="Chọn quyền"
-                                    style="width: 100%;">
+                                    style="width: 100%;"
+                                    multiple>
+
                                 @foreach (var role in Model.AllRoles)
                                 {
                                     <option value="@role"
-                                            @(Model.SelectedRoles.Contains(role) ? "selected" : "")>
-                                        @role
-                                    </option>
-                                }
+                                            selected="@(Model.SelectedRoles != null
+                                                                                                                    && Model.SelectedRoles.Contains(role))">
+                                    @role
+                                </option>
+                                                                }
                             </select>
                         </div>
                     </div>

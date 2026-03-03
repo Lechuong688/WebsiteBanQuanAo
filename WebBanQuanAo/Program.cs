@@ -1,5 +1,6 @@
 ﻿using Data.Entity;
 using Data.Repository;
+using Data.Repository.Banner;
 using Data.Repository.Collection;
 using Data.Repository.MasterData;
 using Data.Repository.Order;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMasterDataRepository, MasterDataRepository>();
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddSession();
 

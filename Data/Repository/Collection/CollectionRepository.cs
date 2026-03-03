@@ -68,8 +68,6 @@ namespace Data.Repository.Collection
             _dataContext.SaveChanges();
         }
 
-
-
         public void Delete(int id)
         {
             var entity = _dataContext.Collection

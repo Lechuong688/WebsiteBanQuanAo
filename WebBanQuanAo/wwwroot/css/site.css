@@ -431,3 +431,31 @@ body {
 .pagination .page-link:hover {
     background: #eef2ff;
 }
+
+/*Quản lý banner*/
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+}
+
+.table th {
+    background-color: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+}
+
+.action-btns .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.text-truncate-custom {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

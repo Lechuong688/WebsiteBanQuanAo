@@ -25,9 +25,10 @@
                             <select class="form-control" name="TypeId">
                                 @foreach (var item in Model.Types)
                                 {
-                                    <option value="@item.Id" @(Model.TypeId == item.Id ? "selected" : "")>
+                                    <option value="@item.Id"
+                                            selected="@(Model.TypeId == item.Id)">
                                         @item.Name
-                                    </option>         
+                                    </option>
                                 }
                             </select>
                         </div>

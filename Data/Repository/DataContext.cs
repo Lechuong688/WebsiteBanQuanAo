@@ -24,5 +24,6 @@ namespace Data.Repository
         public DbSet<OrderDetailEntity> OrderDetail { get; set; }
         public DbSet<CollectionEntity> Collection { get; set; }
         public DbSet<ProductCollectionEntity> ProductCollection { get; set; }
+        public DbSet<BannerEntity> Banner { get; set; }
     }
 }

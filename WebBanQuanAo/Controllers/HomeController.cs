@@ -1,5 +1,6 @@
 using Data.DTO.Product;
 using Data.Entity;
+using Data.Repository.Banner;
 using Data.Repository.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,24 +10,33 @@ using WebBanQuanAo.Models;
 
 namespace WebBanQuanAo.Controllers
 {
-    //[Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SignInManager<UserEntity> _signInManager;
         private readonly IProductRepository _productRepository;
-        public HomeController(SignInManager<UserEntity> signInManager, ILogger<HomeController> logger, IProductRepository productRepository)
+        private readonly IBannerRepository _bannerRepository;
+
+        public HomeController(
+            SignInManager<UserEntity> signInManager,
+            ILogger<HomeController> logger,
+            IProductRepository productRepository,
+            IBannerRepository bannerRepository)
         {
             _logger = logger;
             _signInManager = signInManager;
             _productRepository = productRepository;
+            _bannerRepository = bannerRepository;
         }
-
         public async Task<IActionResult> Index()
         {
             //var products = _productRepository.GetAll();
             //return View(products);
             var products = await _productRepository.GetList(1, 20);
+            var bannerResult = await _bannerRepository
+        .GetList(1, 10, null, true);
+
+            ViewBag.Banners = bannerResult.Items;
             return View(products?.Items ?? new List<ProductListDTO>());
         }
 

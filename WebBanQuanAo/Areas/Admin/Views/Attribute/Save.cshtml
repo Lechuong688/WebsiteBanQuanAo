@@ -32,7 +32,7 @@
                                 if (item.Id != Model.Id)
                                 {
                                     <option value="@item.Id"
-                                            @(item.Id == Model.ParentId ? "selected" : "")>
+                                            selected="@(item.Id == Model.ParentId)">
                                         @item.Name
                                     </option>
                                 }
