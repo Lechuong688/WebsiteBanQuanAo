@@ -144,19 +144,34 @@
 @section Scripts {
     <script>
         let page = 1;
-        let pageSize = 8;                                                             
+        let pageSize = 8;
+
         let typeId = null;
         let maxPrice = null;
         let keyword = '';
         let sort = '';
         let colorIds = [];
+
+        let viewMode = "grid";
+
         let priceTimer;
+        let searchTimer;
 
         $(document).ready(function () {
+
             loadProducts();
+
         });
 
-                function loadProducts() {
+
+        /* ===============================
+           LOAD PRODUCTS
+        ================================ */
+
+        function loadProducts() {
+
+            $('#product-container').css("opacity", "0.4");
+
             $.ajax({
                 url: '/Product/LoadProducts',
                 type: 'GET',
@@ -171,61 +186,169 @@
                 },
                 traditional: true,
                 success: function (html) {
+
                     $('#product-container').html(html);
+
+                    $('#product-container').css("opacity", "1");
+
+                    if (viewMode === "list") {
+                        $('.nav-pills a[href="#tab-6"]').tab('show');
+                    }
+                    else {
+                        $('.nav-pills a[href="#tab-5"]').tab('show');
+                    }
+
                 }
             });
+
         }
 
 
+        /* ===============================
+           PAGINATION
+        ================================ */
+
         $(document).on('click', '.page-link', function (e) {
+
             e.preventDefault();
+
             page = $(this).data('page');
+
             loadProducts();
+
+            $('html, body').animate({
+                scrollTop: $("#product-container").offset().top - 120
+            }, 300);
+
         });
 
-        $('.category-filter').click(function () {
-            typeId = $(this).data('typeid');
-            page = 1;
-            loadProducts();
+
+        /* ===============================
+           TAB VIEW MODE
+        ================================ */
+
+        $('.nav-pills a').on('shown.bs.tab', function (e) {
+
+            let target = $(e.target).attr("href");
+
+            if (target === "#tab-5") viewMode = "grid";
+
+            if (target === "#tab-6") viewMode = "list";
+
         });
+
+
+        /* ===============================
+           CATEGORY FILTER
+        ================================ */
+
+        $('.category-filter').click(function (e) {
+
+            e.preventDefault();
+
+            typeId = $(this).data('typeid');
+
+            page = 1;
+
+            renderActiveFilters();
+
+            loadProducts();
+
+        });
+
+
+        /* ===============================
+           PRICE FILTER
+        ================================ */
 
         $('#rangeInput').on('input', function () {
+
             clearTimeout(priceTimer);
 
             maxPrice = parseInt(this.value);
-            $('#amount').text(maxPrice);
 
-            priceTimer = setTimeout(() => {
+            $('#amount').text(maxPrice.toLocaleString() + " đ");
+
+            priceTimer = setTimeout(function () {
+
                 page = 1;
+
+                renderActiveFilters();
+
                 loadProducts();
+
             }, 300);
+
         });
 
+
+        /* ===============================
+           SEARCH
+        ================================ */
 
         $('#searchKeyword').on('keyup', function () {
-            keyword = $(this).val();
-            page = 1;
-            loadProducts();
+
+            clearTimeout(searchTimer);
+
+            searchTimer = setTimeout(function () {
+
+                keyword = $('#searchKeyword').val();
+
+                page = 1;
+
+                renderActiveFilters();
+
+                loadProducts();
+
+            }, 400);
+
         });
+
+
+        /* ===============================
+           SORT
+        ================================ */
 
         $('#sortSelect').change(function () {
+
             sort = $(this).val();
+
             page = 1;
+
+            renderActiveFilters();
+
             loadProducts();
+
         });
 
+
+        /* ===============================
+           COLOR FILTER
+        ================================ */
+
         $(document).on('change', '.color-filter', function () {
+
             colorIds = $('.color-filter:checked')
                 .map(function () {
                     return parseInt($(this).val());
-                }).get();
+                })
+                .get();
 
             page = 1;
+
+            renderActiveFilters();
+
             loadProducts();
+
         });
 
-        //resetFilters
-                $('#resetFilters').click(function () {
+
+        /* ===============================
+           RESET FILTER
+        ================================ */
+
+        $('#resetFilters').click(function () {
+
             page = 1;
             typeId = null;
             maxPrice = null;
@@ -233,7 +356,6 @@
             sort = '';
             colorIds = [];
 
-            // Reset UI
             $('#searchKeyword').val('');
             $('#sortSelect').val('');
             $('#rangeInput').val(0);
@@ -241,35 +363,59 @@
             $('.color-filter').prop('checked', false);
 
             renderActiveFilters();
+
             loadProducts();
+
         });
-        //Render các filter
-                function renderActiveFilters() {
+
+
+        /* ===============================
+           RENDER ACTIVE FILTERS
+        ================================ */
+
+        function renderActiveFilters() {
+
             let html = '';
 
             if (typeId) {
+
                 let name = $('.category-filter[data-typeid="' + typeId + '"]').text().trim();
+
                 html += filterTag('Danh mục', name, 'type');
+
             }
 
-            colorIds.forEach(id => {
+            colorIds.forEach(function (id) {
+
                 let name = $('label[for="color-' + id + '"] span').text();
+
                 html += filterTag('Màu', name, 'color', id);
+
             });
 
             if (maxPrice && maxPrice > 0) {
+
                 html += filterTag('Giá ≤', maxPrice.toLocaleString() + ' đ', 'price');
+
             }
 
             if (keyword) {
+
                 html += filterTag('Từ khóa', keyword, 'keyword');
+
             }
 
             $('#active-filters').html(html);
+
         }
 
-        //Hàm tạo tag
-                function filterTag(label, value, type, id = null) {
+
+        /* ===============================
+           CREATE FILTER TAG
+        ================================ */
+
+        function filterTag(label, value, type, id = null) {
+
             return `
                 <span class="badge bg-secondary d-flex align-items-center">
                     ${label}: ${value}
@@ -279,20 +425,30 @@
                        style="cursor:pointer"></i>
                 </span>
             `;
+
         }
 
-        //XÓA TỪNG FILTER
-                $(document).on('click', '.remove-filter', function () {
+
+        /* ===============================
+           REMOVE FILTER
+        ================================ */
+
+        $(document).on('click', '.remove-filter', function () {
+
             let type = $(this).data('type');
             let id = $(this).data('id');
 
             switch (type) {
+
                 case 'type':
                     typeId = null;
                     break;
 
                 case 'color':
-                    colorIds = colorIds.filter(x => x !== id);
+                    colorIds = colorIds.filter(function (x) {
+                        return x !== id;
+                    });
+
                     $('#color-' + id).prop('checked', false);
                     break;
 
@@ -309,17 +465,11 @@
             }
 
             page = 1;
-            renderActiveFilters();
-            loadProducts();
-        });
 
-        // Gọi render mỗi khi filter thay đổi
-                $('.category-filter').click(function () {
-            typeId = $(this).data('typeid');
-            page = 1;
             renderActiveFilters();
-            loadProducts();
-        });
 
+            loadProducts();
+
+        });
     </script>
 }

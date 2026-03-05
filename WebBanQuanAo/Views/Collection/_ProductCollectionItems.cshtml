@@ -60,16 +60,51 @@
                     </div>
                 </div>
             }
+            @{
+                int totalPages = Model.TotalPages;
+                int currentPage = Model.Page;
+
+                int windowSize = 5;
+                int half = windowSize / 2;
+
+                int startPage = currentPage - half;
+                int endPage = currentPage + half;
+
+                if (startPage < 1)
+                {
+                    startPage = 1;
+                    endPage = Math.Min(windowSize, totalPages);
+                }
+
+                if (endPage > totalPages)
+                {
+                    endPage = totalPages;
+                    startPage = Math.Max(1, totalPages - windowSize + 1);
+                }
+            }
+
             <div class="col-12 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="pagination d-flex justify-content-center mt-5">
-                    <a href="#" class="rounded">&laquo;</a>
-                    @for (int i = 1; i <= Model.TotalPages; i++)
+
+                    <!-- Trang đầu -->
+                    <a href="#" class="page-link" data-page="1">&laquo;&laquo;</a>
+
+                    <!-- Trang trước -->
+                    <a href="#" class="page-link" data-page="@(currentPage - 1 <= 1 ? 1 : currentPage - 1)">&laquo;</a>
+
+                    @for (int i = startPage; i <= endPage; i++)
                     {
                         <a href="#"
-                           class="page-link @(i == Model.Page ? "active" : "")"
+                           class="page-link @(i == currentPage ? "active" : "")"
                            data-page="@i">@i</a>
                     }
-                    <a href="#" class="rounded">&raquo;</a>
+
+                    <!-- Trang sau -->
+                    <a href="#" class="page-link" data-page="@(currentPage + 1 >= totalPages ? totalPages : currentPage + 1)">&raquo;</a>
+
+                    <!-- Trang cuối -->
+                    <a href="#" class="page-link" data-page="@totalPages">&raquo;&raquo;</a>
+
                 </div>
             </div>
         </div>
@@ -113,14 +148,26 @@
             }
             <div class="col-12 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="pagination d-flex justify-content-center mt-5">
-                    <a href="#" class="rounded">&laquo;</a>
-                    @for (int i = 1; i <= Model.TotalPages; i++)
+
+                    <!-- Trang đầu -->
+                    <a href="#" class="page-link" data-page="1">&laquo;&laquo;</a>
+
+                    <!-- Trang trước -->
+                    <a href="#" class="page-link" data-page="@(currentPage - 1 <= 1 ? 1 : currentPage - 1)">&laquo;</a>
+
+                    @for (int i = startPage; i <= endPage; i++)
                     {
                         <a href="#"
-                           class="page-link @(i == Model.Page ? "active" : "")"
+                           class="page-link @(i == currentPage ? "active" : "")"
                            data-page="@i">@i</a>
                     }
-                    <a href="#" class="rounded">&raquo;</a>
+
+                    <!-- Trang sau -->
+                    <a href="#" class="page-link" data-page="@(currentPage + 1 >= totalPages ? totalPages : currentPage + 1)">&raquo;</a>
+
+                    <!-- Trang cuối -->
+                    <a href="#" class="page-link" data-page="@totalPages">&raquo;&raquo;</a>
+
                 </div>
             </div>
         </div>
