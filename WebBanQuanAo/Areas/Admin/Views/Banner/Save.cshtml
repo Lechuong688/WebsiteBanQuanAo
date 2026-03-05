@@ -56,13 +56,16 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Bộ sưu tập</label>
+                                <label class="form-label fw-semibold d-block">Bộ sưu tập</label>
 
                                 <select asp-for="CollectionId"
-                                        class="form-select"
+                                        class="form-select w-100 shadow-none"
+                                        style="height: 30px;margin-top: 10px;"
                                         asp-items="ViewBag.Collections">
-                                    <option value="">-- Chọn bộ sưu tập --</option>
+                                    <option value="" class="text-muted">-- Chọn bộ sưu tập --</option>
                                 </select>
+
+                                <span asp-validation-for="CollectionId" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">

@@ -104,28 +104,48 @@
         </div>
     </div>
 
-    @if (Model.TotalItems > Model.PageSize)
-    {
-        var totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+    @{
+        var totalPages = Model.TotalPages;
 
+        int windowSize = 5;
+        int half = windowSize / 2;
+
+        int startPage = Model.Page - half;
+        int endPage = Model.Page + half;
+
+        if (startPage < 1)
+        {
+            startPage = 1;
+            endPage = Math.Min(windowSize, totalPages);
+        }
+
+        if (endPage > totalPages)
+        {
+            endPage = totalPages;
+            startPage = Math.Max(1, totalPages - windowSize + 1);
+        }
+    }
+    @if (Model.TotalPages > 1)
+    {
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
+
                 <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                    <a class="page-link" href="?status=@currentStatus&page=@(Model.Page - 1)">‹</a>
+                    <a class="page-link" href="?status=@ViewBag.Status&page=@(Model.Page - 1)">‹</a>
                 </li>
 
-                @for (int i = 1; i <= totalPages; i++)
+                @for (int i = startPage; i <= endPage; i++)
                 {
                     <li class="page-item @(i == Model.Page ? "active" : "")">
-                        <a class="page-link" href="?status=@currentStatus&page=@i">@i</a>
+                        <a class="page-link" href="?status=@ViewBag.Status&page=@i">@i</a>
                     </li>
                 }
 
                 <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
-                    <a class="page-link" href="?status=@currentStatus&page=@(Model.Page + 1)">›</a>
+                    <a class="page-link" href="?status=@ViewBag.Status&page=@(Model.Page + 1)">›</a>
                 </li>
+
             </ul>
         </nav>
     }
-
 </div>

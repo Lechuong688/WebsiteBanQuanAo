@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Data.DTO.Dashboard.DashboardSummaryDTO
+@{
     ViewBag.Title = "Dashboardv1";
     // Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -9,10 +10,10 @@
     <section class="content-header">
         <h1>
             Dashboard
-            <small>Control panel</small>
+            <small>Bảng điều khiển</small>
         </h1>
         <ol class="breadcrumb">
-            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="/Admin/Dashboard/Dashboardv1"><i class="fa fa-dashboard"></i> Home</a></li>
             <li class="active">Dashboard</li>
         </ol>
     </section>
@@ -24,13 +25,13 @@
                 <!-- small box -->
                 <div class="small-box bg-aqua">
                     <div class="inner">
-                        <h3>150</h3>
-                        <p>New Orders</p>
+                    <h3>@Model.TotalOrders</h3>
+                        <p>Total Orders</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-bag"></i>
                     </div>
-                    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="/Admin/Order" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             <!-- ./col -->
@@ -38,8 +39,8 @@
                 <!-- small box -->
                 <div class="small-box bg-green">
                     <div class="inner">
-                        <h3>53<sup style="font-size: 20px">%</sup></h3>
-                        <p>Bounce Rate</p>
+                    <h3>@Model.TotalRevenue.ToString("N0") đ</h3>
+                    <p>Total Revenue</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-stats-bars"></i>
@@ -52,13 +53,13 @@
                 <!-- small box -->
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <h3>44</h3>
-                        <p>User Registrations</p>
+                    <h3>@Model.NewUsers</h3>
+                        <p>User</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-person-add"></i>
                     </div>
-                    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="/Admin/User" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             <!-- ./col -->
@@ -66,8 +67,8 @@
                 <!-- small box -->
                 <div class="small-box bg-red">
                     <div class="inner">
-                        <h3>65</h3>
-                        <p>Unique Visitors</p>
+                    <h3>@Model.ProductsSold</h3>
+                    <p>Products Sold</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-pie-graph"></i>
@@ -88,8 +89,13 @@
                     <ul class="nav nav-tabs pull-right">
                         <li class="active"><a href="#revenue-chart" data-toggle="tab">Area</a></li>
                         <li><a href="#sales-chart" data-toggle="tab">Donut</a></li>
-                        <li class="pull-left header"><i class="fa fa-inbox"></i> Sales</li>
+                        <li class="pull-left header"><i class="fa fa-inbox"></i> Thống kê doanh thu theo tháng</li>
                     </ul>
+                @* <div style="padding:10px">
+                    <select id="yearSelect" class="form-control" style="width:150px"></select>
+                </div>
+
+                <div class="chart tab-pane active" id="revenue-chart" style="height:300px;"></div> *@
                     <div class="tab-content no-padding">
                         <!-- Morris chart - Sales -->
                         <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
@@ -98,7 +104,7 @@
                 </div>
                 <!-- /.nav-tabs-custom -->
                 <!-- Chat box -->
-                <div class="box box-success">
+                @* <div class="box box-success">
                     <div class="box-header">
                         <i class="fa fa-comments-o"></i>
                         <h3 class="box-title">Chat</h3>
@@ -174,7 +180,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> *@
                 <!-- /.box (chat box) -->
                 <!-- TO DO List -->
                 <div class="box box-primary">
@@ -326,7 +332,7 @@
             <!-- right col (We are only adding the ID to make the widgets sortable)-->
             <section class="col-lg-5 connectedSortable">
                 <!-- Map box -->
-                <div class="box box-solid bg-light-blue-gradient">
+                @* <div class="box box-solid bg-light-blue-gradient">
                     <div class="box-header">
                         <!-- tools box -->
                         <div class="pull-right box-tools">
@@ -369,7 +375,7 @@
                         </div>
                         <!-- /.row -->
                     </div>
-                </div>
+                </div> *@
                 <!-- /.box -->
                 <!-- solid sales graph -->
                 <div class="box box-solid bg-teal-gradient">
@@ -501,5 +507,5 @@
 <!-- /.content-wrapper -->
 @section Scripts
 {
-    <script src="~/bundles/dashboard1"></script>
+    <script src="~/webbanquanao/js/pages/dashboard.js"></script>
 }

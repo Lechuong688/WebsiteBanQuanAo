@@ -124,29 +124,37 @@ $(document).ready(function () {
     height: '250px'
   });
 
-  /* Morris.js Charts */
+    /* Morris.js Charts */
+    var area;
   // Sales chart
-  var area = new Morris.Area({
-    element   : 'revenue-chart',
-    resize    : true,
-    data      : [
-      { y: '2011 Q1', item1: 2666, item2: 2666 },
-      { y: '2011 Q2', item1: 2778, item2: 2294 },
-      { y: '2011 Q3', item1: 4912, item2: 1969 },
-      { y: '2011 Q4', item1: 3767, item2: 3597 },
-      { y: '2012 Q1', item1: 6810, item2: 1914 },
-      { y: '2012 Q2', item1: 5670, item2: 4293 },
-      { y: '2012 Q3', item1: 4820, item2: 3795 },
-      { y: '2012 Q4', item1: 15073, item2: 5967 },
-      { y: '2013 Q1', item1: 10687, item2: 4460 },
-      { y: '2013 Q2', item1: 8432, item2: 5713 }
-    ],
-    xkey      : 'y',
-    ykeys     : ['item1', 'item2'],
-    labels    : ['Item 1', 'Item 2'],
-    lineColors: ['#a0d0e0', '#3c8dbc'],
-    hideHover : 'auto'
-  });
+    fetch('/Admin/Dashboard/GetRevenueChart?year=2025')
+        .then(res => res.json())
+        .then(data => {
+
+            console.log(data);
+
+            var chartData = [];
+
+            data.forEach(x => {
+                chartData.push({
+                    y: 'T' + x.month,
+                    item1: parseFloat(x.revenue)
+                });
+            });
+
+            area = new Morris.Area({
+                element: 'revenue-chart',
+                resize: true,
+                data: chartData,
+                xkey: 'y',
+                ykeys: ['item1'],
+                labels: ['Revenue'],
+                lineColors: ['#3c8dbc'],
+                hideHover: 'auto',
+                parseTime: false
+            });
+
+        });
   var line = new Morris.Line({
     element          : 'line-chart',
     resize           : true,
@@ -177,25 +185,28 @@ $(document).ready(function () {
     gridTextSize     : 10
   });
 
-  // Donut Chart
-  var donut = new Morris.Donut({
-    element  : 'sales-chart',
-    resize   : true,
-    colors   : ['#3c8dbc', '#f56954', '#00a65a'],
-    data     : [
-      { label: 'Download Sales', value: 12 },
-      { label: 'In-Store Sales', value: 30 },
-      { label: 'Mail-Order Sales', value: 20 }
-    ],
-    hideHover: 'auto'
-  });
+    // Donut Chart
+    var donut;
+    fetch('/Admin/Dashboard/GetOrderStatusChart')
+        .then(res => res.json())
+        .then(data => {
+
+            donut = new Morris.Donut({
+                element: 'sales-chart',
+                resize: true,
+                colors: ['#559CC6', '#f39c12', '#00a65a', '#f56954'],
+                data: data,
+                hideHover: 'auto'
+            });
+
+        });
 
   // Fix for charts under tabs
-  $('.box ul.nav a').on('shown.bs.tab', function () {
-    area.redraw();
-    donut.redraw();
-    line.redraw();
-  });
+    $('.box ul.nav a').on('shown.bs.tab', function () {
+        if (area) area.redraw();
+        if (donut) donut.redraw();
+        if (line) line.redraw();
+    });
 
   /* The todo list plugin */
   $('.todo-list').todoList({

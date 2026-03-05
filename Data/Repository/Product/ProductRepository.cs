@@ -441,57 +441,6 @@ namespace Data.Repository.Product
             .OrderBy(x => x.Name)
             .ToList();
         }
-        //public async Task<ProductDetailDTO?> GetDetail(int id)
-        //{
-        //    var param = new List<SqlParameter>
-        //    {
-        //        new SqlParameter("@Id", id)
-        //    };
-
-        //    var ds = await _databaseSql.ExecuteProcDataSet(
-        //        "Product_GetDetail",
-        //        param
-        //    );
-
-        //    if (ds == null || ds.Tables.Count < 4 || ds.Tables[0].Rows.Count == 0)
-        //        return null;
-
-        //    var product = ds.Tables[0].AsEnumerable().Select(r => new ProductDetailDTO
-        //    {
-        //        Id = r.Field<int>("Id"),
-        //        Name = r.Field<string>("Name"),
-        //        Price = r.Field<decimal>("Price"),
-        //        Note = r.Field<string?>("Note"),
-        //        TypeId = r.Field<int>("TypeId"),
-        //        TypeName = r.Field<string>("TypeName"),
-        //    }).First();
-
-        //    product.Images = ds.Tables[1]
-        //        .AsEnumerable()
-        //        .Select(r => r.Field<string>("FilePath"))
-        //        .ToList();
-
-        //    product.Colors = ds.Tables[2]
-        //        .AsEnumerable()
-        //        .Select(r => new AttributeDTO
-        //        {
-        //            Id = r.Field<int>("Id"),
-        //            Name = r.Field<string>("Name")
-        //        })
-        //        .ToList();
-
-        //    product.Sizes = ds.Tables[3]
-        //        .AsEnumerable()
-        //        .Select(r => new AttributeDTO
-        //        {
-        //            Id = r.Field<int>("Id"),
-        //            Name = r.Field<string>("Name")
-        //        })
-        //        .ToList();
-
-        //    return product;
-        //}
-
         public async Task<ProductDetailDTO?> GetDetail(int id)
         {
             var param = new List<SqlParameter>

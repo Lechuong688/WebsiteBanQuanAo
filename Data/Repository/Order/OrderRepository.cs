@@ -40,11 +40,11 @@ namespace Data.Repository.Order
         public async Task<PagedResult<OrderAdminDTO>> GetOrders(int? status, int page, int pageSize)
         {
             var param = new List<SqlParameter>
-            {
-                new SqlParameter("@Status", status ?? (object)DBNull.Value),
-                new SqlParameter("@Page", page),
-                new SqlParameter("@PageSize", pageSize)
-            };
+    {
+        new SqlParameter("@Status", status ?? (object)DBNull.Value),
+        new SqlParameter("@Page", page),
+        new SqlParameter("@PageSize", pageSize)
+    };
 
             var result = await _databaseSql
                 .ExecuteProcXmlToList<OrderAdminDTO>("Order_Admin_GetList", param)

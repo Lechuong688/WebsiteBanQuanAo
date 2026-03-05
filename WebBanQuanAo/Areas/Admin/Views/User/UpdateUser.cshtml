@@ -70,7 +70,7 @@
                                 {
                                     <option value="@role"
                                             selected="@(Model.SelectedRoles != null
-                                                                                                                    && Model.SelectedRoles.Contains(role))">
+                                            && Model.SelectedRoles.Contains(role))">
                                     @role
                                 </option>
                                                                 }
@@ -78,7 +78,7 @@
                         </div>
                     </div>
 
-                    <div class="box-footer">
+                    <div class="box-footer" style="margin-top: 30px">
                         <button type="submit" class="btn btn-primary">Lưu</button>
                         <a href="/Admin/User/Index" class="btn btn-default" style="position:relative; z-index:9999">
                             Quay lại
@@ -90,10 +90,13 @@
     </div>
 </section>
 @* </div> *@
-<script>
-    $(function () {
-        $('.select2').select2({
-            closeOnSelect: false
+@section scripts {
+    <script>
+        $(function () {
+            $('.select2').select2({
+                closeOnSelect: false,
+                width: '100%'
+            });
         });
-    });
-</script>
+    </script>
+}
