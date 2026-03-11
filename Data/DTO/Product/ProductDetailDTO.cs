@@ -24,5 +24,8 @@ namespace Data.DTO.Product
         public List<AttributeDTO> Colors { get; set; } = new();
         [JsonProperty("Sizes"), JsonConverter(typeof(SafeCollectionConverter))]
         public List<AttributeDTO> Sizes { get; set; } = new();
+        public int? DiscountPercent { get; set; }
+
+        public decimal FinalPrice { get; set; }
     }
 }

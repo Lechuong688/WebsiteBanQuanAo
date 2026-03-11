@@ -27,15 +27,31 @@ namespace WebBanQuanAo.Controllers
 
             var productIds = cartCookie.Select(x => x.ProductId).Distinct().ToList();
 
-            var products = _context.Product
-                .Where(p => productIds.Contains(p.Id) && !p.IsDeleted)
-                .Select(p => new
+            var products = (
+                from p in _context.Product
+                where productIds.Contains(p.Id) && !p.IsDeleted
+
+                let discount = (
+                    from pd in _context.ProductDiscount
+                    join d in _context.Discount
+                        on pd.DiscountId equals d.Id
+                    where pd.ProductId == p.Id
+                          && d.IsActive
+                          && (d.StartDate == null || d.StartDate <= DateTime.Now)
+                          && (d.EndDate == null || d.EndDate >= DateTime.Now)
+                    select (int?)d.Percent
+                ).Max()
+
+                select new
                 {
                     p.Id,
                     p.Name,
-                    p.Price
-                })
-                .ToList();
+
+                    Price = discount != null
+                        ? p.Price - (p.Price * discount.Value / 100)
+                        : p.Price
+                }
+            ).ToList();
 
             var masterData = _context.MasterData
             .Where(x =>
@@ -120,11 +136,31 @@ namespace WebBanQuanAo.Controllers
 
             var productIds = cart.Select(x => x.ProductId).Distinct().ToList();
 
-            var prices = _context.Product
-                .Where(p => productIds.Contains(p.Id) && !p.IsDeleted)
-                .Select(p => new { p.Id, p.Price })
-                .ToList()
-                .ToDictionary(x => x.Id, x => x.Price);
+            var prices = (
+                from p in _context.Product
+                where productIds.Contains(p.Id) && !p.IsDeleted
+
+                let discount = (
+                    from pd in _context.ProductDiscount
+                    join d in _context.Discount
+                        on pd.DiscountId equals d.Id
+                    where pd.ProductId == p.Id
+                              && d.IsActive
+                              && (d.StartDate == null || d.StartDate <= DateTime.Now)
+                              && (d.EndDate == null || d.EndDate >= DateTime.Now)
+                    select (int?)d.Percent
+                ).Max()
+
+                select new
+                {
+                    p.Id,
+                    Price = discount != null
+                        ? p.Price - (p.Price * discount.Value / 100)
+                        : p.Price
+                }
+            )
+            .ToList()
+            .ToDictionary(x => x.Id, x => x.Price);
 
             var subTotal = cart.Sum(x => prices[x.ProductId] * x.Quantity);
             var lineTotal = prices[item.ProductId] * item.Quantity;

@@ -110,6 +110,18 @@
                             <input type="file" name="newImages" multiple class="form-control" />
                         </div>
 
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   name="IsPinned"
+                                   value="true"
+                                   class="form-check-input"
+                                   @(Model.IsPinned ? "checked" : "") />
+
+                            <label class="form-check-label">
+                                Ghim sản phẩm lên banner
+                            </label>
+
+                        </div>
                     </div>
 
                     <div class="box-footer">

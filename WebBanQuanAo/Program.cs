@@ -3,6 +3,7 @@ using Data.Repository;
 using Data.Repository.Banner;
 using Data.Repository.Collection;
 using Data.Repository.Dashboard;
+using Data.Repository.Discount;
 using Data.Repository.MasterData;
 using Data.Repository.Order;
 using Data.Repository.Product;
@@ -46,6 +47,7 @@ builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddSession();
 

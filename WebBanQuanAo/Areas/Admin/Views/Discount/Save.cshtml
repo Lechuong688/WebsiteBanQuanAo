@@ -1,0 +1,95 @@
+﻿@model Data.Entity.DiscountEntity
+
+<section class="content-header">
+    <h1>
+        @(Model.Id > 0 ? "Sửa Discount" : "Thêm Discount")
+    </h1>
+</section>
+
+<section class="content">
+    <div class="col-md-6">
+        <div class="box box-primary">
+
+            <form asp-area="Admin"
+                  asp-controller="Discount"
+                  asp-action="Save"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label>Tên Discount</label>
+                        <input type="text"
+                               name="Name"
+                               value="@Model.Name"
+                               class="form-control"
+                               placeholder="Nhập tên Discount"
+                               required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phần trăm giảm (%)</label>
+                        <input type="number"
+                               name="Percent"
+                               value="@Model.Percent"
+                               class="form-control"
+                               min="0"
+                               max="100"
+                               placeholder="Nhập % giảm giá"
+                               required />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ngày bắt đầu</label>
+                                <input type="date"
+                                       name="StartDate"
+                                       value="@(Model.StartDate.HasValue? Model.StartDate.Value.ToString("yyyy-MM-dd"): "")"
+                                       class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ngày kết thúc</label>
+                                <input type="date"
+                                       name="EndDate"
+                                       value="@(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd"): "")"
+                                       class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Id > 0)
+                    {
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox"
+                                       name="IsActive"
+                                       value="true"
+                                       @(Model.IsActive ? "checked" : "") />
+                                Đang hoạt động
+                            </label>
+                        </div>
+                    }
+                </div>
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">
+                        Lưu
+                    </button>
+                    <a href="/Admin/Discount/Index" class="btn btn-default">
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</section>

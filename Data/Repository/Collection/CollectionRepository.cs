@@ -41,17 +41,27 @@ namespace Data.Repository.Collection
                 entity.Code = GenerateCode(entity.Name);
             }
 
+            var now = DateTime.Now;
+
+            bool isActive = true;
+
+            if (entity.StartDate != null && entity.StartDate > now)
+                isActive = false;
+
+            if (entity.EndDate != null && entity.EndDate < now)
+                isActive = false;
+
             if (entity.Id == 0)
             {
-                entity.CreatedDate = DateTime.Now;
-                entity.IsActive = true;
+                entity.CreatedDate = now;
+                entity.IsActive = isActive;
 
                 _dataContext.Collection.Add(entity);
             }
             else
             {
                 var dbEntity = _dataContext.Collection
-                                           .FirstOrDefault(x => x.Id == entity.Id);
+                    .FirstOrDefault(x => x.Id == entity.Id);
 
                 if (dbEntity == null) return;
 
@@ -60,9 +70,9 @@ namespace Data.Repository.Collection
                 dbEntity.Note = entity.Note;
                 dbEntity.StartDate = entity.StartDate;
                 dbEntity.EndDate = entity.EndDate;
-                dbEntity.IsActive = entity.IsActive;
+                dbEntity.IsActive = isActive;
                 dbEntity.UpdatedBy = entity.UpdatedBy;
-                dbEntity.UpdatedDate = DateTime.Now;
+                dbEntity.UpdatedDate = now;
             }
 
             _dataContext.SaveChanges();
@@ -143,15 +153,47 @@ namespace Data.Repository.Collection
                 .Any(x => x.Code == code && x.Id != currentId);
         }
 
+        public void UpdateCollectionStatus()
+        {
+            var now = DateTime.Now;
+
+            var collections = _dataContext.Collection.ToList();
+
+            foreach (var item in collections)
+            {
+                bool shouldActive = true;
+
+                if (item.StartDate != null && item.StartDate > now)
+                    shouldActive = false;
+
+                if (item.EndDate != null && item.EndDate < now)
+                    shouldActive = false;
+
+                if (item.IsActive != shouldActive)
+                {
+                    item.IsActive = shouldActive;
+                    item.UpdatedDate = now;
+                }
+            }
+
+            _dataContext.SaveChanges();
+        }
+
         public CollectionEntity? GetByCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
                 return null;
 
+            UpdateCollectionStatus();
+            var now = DateTime.Now;
+
             return _dataContext.Collection
                 .FirstOrDefault(x =>
                     x.Code == code &&
-                    x.IsActive);
+                    x.IsActive &&
+                    (x.StartDate == null || x.StartDate <= now) &&
+                    (x.EndDate == null || x.EndDate >= now)
+                );
         }
 
         //public List<ProductListDTO> GetProductsByCollection(int collectionId)

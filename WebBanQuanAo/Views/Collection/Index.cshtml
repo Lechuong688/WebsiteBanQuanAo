@@ -5,6 +5,8 @@
 @{
     var categories = ViewBag.Categories as List<CategoryDTO>;
     var colors = ViewBag.Colors as List<CategoryDTO>;
+    var collection = ViewBag.Collection;
+}
 }
 <!-- Shop Page Start -->
 <div class="container-fluid shop py-5">
@@ -126,6 +128,7 @@
 
         let priceTimer;
         let searchTimer;
+        let collectionCode = '@collection.Code';
 
         $(document).ready(function () {
 
@@ -142,34 +145,27 @@
 
             $('#product-container').css("opacity", "0.4");
 
-            $.ajax({
-                url: '/Product/LoadProducts',
-                type: 'GET',
-                data: {
-                    page: page,
-                    pageSize: pageSize,
-                    typeId: typeId,
-                    maxPrice: maxPrice,
-                    keyword: keyword,
-                    sort: sort,
-                    colorIds: colorIds
-                },
-                traditional: true,
-                success: function (html) {
+                    $.ajax({
+            url: '/Collection/LoadProducts',
+            type: 'GET',
+            data: {
+                collectionCode: collectionCode,
+                page: page,
+                pageSize: pageSize,
+                typeId: typeId,
+                maxPrice: maxPrice,
+                keyword: keyword,
+                sort: sort,
+                colorIds: colorIds
+            },
+            traditional: true,
+            success: function (html) {
 
-                    $('#product-container').html(html);
+                $('#product-container').html(html);
+                $('#product-container').css("opacity", "1");
 
-                    $('#product-container').css("opacity", "1");
-
-                    if (viewMode === "list") {
-                        $('.nav-pills a[href="#tab-6"]').tab('show');
-                    }
-                    else {
-                        $('.nav-pills a[href="#tab-5"]').tab('show');
-                    }
-
-                }
-            });
+            }
+        });
 
         }
 

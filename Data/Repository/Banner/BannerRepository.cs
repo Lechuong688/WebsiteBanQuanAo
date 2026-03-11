@@ -1,5 +1,6 @@
 ﻿using Data.DTO.Banner;
 using Data.DTO.Common;
+using Data.DTO.Product;
 using Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,12 +25,12 @@ namespace Data.Repository.Banner
         public async Task<PagedResult<BannerListDTO>> GetList(int page, int pageSize, string? keyword, bool? status)
         {
             var par = new List<SqlParameter>()
-    {
-        new SqlParameter("@Page", page),
-        new SqlParameter("@PageSize", pageSize),
-        new SqlParameter("@Keyword", (object?)keyword ?? DBNull.Value),
-        new SqlParameter("@Status", (object?)status ?? DBNull.Value)
-    };
+            {
+                new SqlParameter("@Page", page),
+                new SqlParameter("@PageSize", pageSize),
+                new SqlParameter("@Keyword", (object?)keyword ?? DBNull.Value),
+                new SqlParameter("@Status", (object?)status ?? DBNull.Value)
+            };
 
             var result = await _databaseSql
                 .ExecuteProcToList<BannerListDTO>("Banner_Admin_GetList", par);
@@ -70,12 +71,38 @@ namespace Data.Repository.Banner
                     banner.Description = dto.Description;
                     banner.CollectionId = dto.CollectionId;
                     banner.DisplayOrder = dto.DisplayOrder;
-                    banner.IsActive = dto.IsActive;
+
+                    bool isActive = dto.IsActive;
+
+                    if (dto.CollectionId != null)
+                    {
+                        var collection = _context.Collection
+                            .FirstOrDefault(x => x.Id == dto.CollectionId);
+
+                        if (collection != null && collection.IsActive == false)
+                        {
+                            isActive = false;
+                        }
+                    }
+                    banner.IsActive = isActive;
                     banner.UpdatedBy = dto.UserId;
                     banner.UpdatedDate = DateTime.Now;
                 }
                 else
                 {
+                    bool isActive = dto.IsActive;
+
+                    if (dto.CollectionId != null)
+                    {
+                        var collection = _context.Collection
+                            .FirstOrDefault(x => x.Id == dto.CollectionId);
+
+                        if (collection != null && collection.IsActive == false)
+                        {
+                            isActive = false;
+                        }
+                    }
+
                     banner = new BannerEntity
                     {
                         Title = dto.Title,
@@ -84,7 +111,7 @@ namespace Data.Repository.Banner
                         Description = dto.Description,
                         CollectionId = dto.CollectionId,
                         DisplayOrder = dto.DisplayOrder,
-                        IsActive = dto.IsActive,
+                        IsActive = isActive,
                         CreatedBy = dto.UserId,
                         CreatedDate = DateTime.Now
                     };

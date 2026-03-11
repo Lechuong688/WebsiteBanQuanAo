@@ -54,6 +54,9 @@ namespace Data.DTO.Product
         public string? ParentTypeName { get; set; }
 
         public int TotalRecord { get; set; }
+        public int? DiscountPercent { get; set; }
+
+        public decimal FinalPrice { get; set; }
     }
 
 }

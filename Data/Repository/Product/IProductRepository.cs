@@ -15,6 +15,8 @@ namespace Data.Repository.Product
         PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
         Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize);
+        Task<ProductListDTO?> GetPinned();
+        Task SetPinned(int id);
 
         ProductUpdateDTO? GetById(int id);
         List<AttachmentEntity> GetImagesByProductId(int productId);
@@ -27,5 +29,6 @@ namespace Data.Repository.Product
         PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
 
+        Task<List<ProductBestsellerDTO>> GetBestseller();
     }
 }

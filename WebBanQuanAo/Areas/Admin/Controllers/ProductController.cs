@@ -61,6 +61,7 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     Quantity = dto.Quantity,
                     Note = dto.Note,
                     TypeId = dto.TypeId,
+                    IsPinned = dto.IsPinned,
                     ColorIds = dto.ColorIds,
                     SizeIds = dto.SizeIds,
 
@@ -83,8 +84,9 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Save(UpdateProductViewModel vm)
+        public async Task<IActionResult> Save(UpdateProductViewModel vm)
         {
+            //ModelState.Remove("IsPinned");
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!ModelState.IsValid)
             {
@@ -104,6 +106,7 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                 Quantity = vm.Quantity,
                 Note = vm.Note,
                 TypeId = vm.TypeId,
+                IsPinned = vm.IsPinned,
                 ColorIds = vm.ColorIds,
                 SizeIds = vm.SizeIds,
                 ImagePaths = imagePaths,
@@ -144,7 +147,12 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
                     }
                 }
 
-                _productRepository.Save(dto);
+                var product = _productRepository.Save(dto);
+
+                if (vm.IsPinned)
+                {
+                    await _productRepository.SetPinned(product.Id);
+                }
 
                 TempData["Success"] = vm.Id > 0
                     ? "Cập nhật sản phẩm thành công"

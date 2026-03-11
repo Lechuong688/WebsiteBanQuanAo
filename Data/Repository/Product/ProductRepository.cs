@@ -33,15 +33,35 @@ namespace Data.Repository.Product
                 on p.TypeId equals md.Id
             join parent in _context.MasterData
                 on md.GroupId equals parent.Id
+
             where !p.IsDeleted
                   && !md.IsDeleted
                   && !parent.IsDeleted
+
+            let discountPercent = (
+                from pd in _context.ProductDiscount
+                join d in _context.Discount
+                    on pd.DiscountId equals d.Id
+                where pd.ProductId == p.Id
+                      && d.IsActive
+                      && (d.StartDate == null || d.StartDate <= DateTime.Now)
+                      && (d.EndDate == null || d.EndDate >= DateTime.Now)
+                select (int?)d.Percent
+            ).Max()
+
             select new ProductListDTO
             {
                 Id = p.Id,
                 Name = p.Name,
                 Quantity = p.Quantity,
                 Price = p.Price,
+
+                DiscountPercent = discountPercent,
+
+                FinalPrice = discountPercent != null
+                    ? p.Price - (p.Price * discountPercent.Value / 100)
+                    : p.Price,
+
                 Note = p.Note,
 
                 TypeId = p.TypeId,
@@ -49,29 +69,28 @@ namespace Data.Repository.Product
                 ParentTypeName = parent.Name,
 
                 Sizes = (from pa in _context.ProductAttribute
-                         join md in _context.MasterData
-                         on pa.ValueId equals md.Id
+                         join md2 in _context.MasterData
+                         on pa.ValueId equals md2.Id
                          where pa.ProductId == p.Id
-                         && md.GroupId == 19
-                         && !md.IsDeleted
-                         select md.Name
-                                 ).ToList(),
+                         && md2.GroupId == 19
+                         && !md2.IsDeleted
+                         select md2.Name).ToList(),
+
                 Colors = (from pa in _context.ProductAttribute
-                          join md in _context.MasterData
-                      on pa.ValueId equals md.Id
+                          join md3 in _context.MasterData
+                          on pa.ValueId equals md3.Id
                           where pa.ProductId == p.Id
-                      && md.GroupId == 18
-                      && !md.IsDeleted
-                          select md.Name
-                                 ).ToList(),
+                          && md3.GroupId == 18
+                          && !md3.IsDeleted
+                          select md3.Name).ToList(),
 
                 Files = _context.Attachment
                                 .Where(a => a.EntityId == p.Id
                                 && a.EntityType == "Product"
-                                && a.FilePath != null && a.IsDeleted != true)
+                                && a.FilePath != null
+                                && a.IsDeleted != true)
                                 .Select(a => a.FilePath!)
                                 .ToList()
-
             }).ToList();
         }
 
@@ -122,21 +141,45 @@ namespace Data.Repository.Product
             var total = query.Count();
 
             var items = query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(x => new ProductListDTO
-                {
-                    Id = x.p.Id,
-                    Name = x.p.Name,
-                    Price = x.p.Price,
-                    TypeName = x.md.Name,
-                    Note = x.p.Note,
-                    Files = _context.Attachment
-                        .Where(a => a.EntityId == x.p.Id && a.IsDeleted != true)
-                        .Select(a => a.FilePath!)
-                        .ToList()
-                })
-                .ToList();
+    .Skip((page - 1) * pageSize)
+    .Take(pageSize)
+    .ToList()
+    .Select(x =>
+    {
+        var discount = (
+            from pd in _context.ProductDiscount
+            join d in _context.Discount
+                on pd.DiscountId equals d.Id
+            where pd.ProductId == x.p.Id
+                && d.IsActive
+                && (d.StartDate == null || d.StartDate <= DateTime.Now)
+                && (d.EndDate == null || d.EndDate >= DateTime.Now)
+            select d.Percent
+        ).DefaultIfEmpty().Max();
+
+        return new ProductListDTO
+        {
+            Id = x.p.Id,
+            Name = x.p.Name,
+            Price = x.p.Price,
+            TypeName = x.md.Name,
+            Note = x.p.Note,
+
+            DiscountPercent = discount == 0 ? null : discount,
+
+            FinalPrice = discount > 0
+                ? x.p.Price - (x.p.Price * discount / 100)
+                : x.p.Price,
+
+            Files = _context.Attachment
+                .Where(a => a.EntityId == x.p.Id
+                    && a.EntityType == "Product"
+                    && a.IsDeleted != true)
+                .Select(a => a.FilePath!)
+                .ToList()
+        };
+    })
+    .ToList();
 
             return new PagedResult<ProductListDTO>
             {
@@ -154,7 +197,7 @@ namespace Data.Repository.Product
                      new SqlParameter("@Page", page),
                      new SqlParameter("@PageSize", pageSize),
             };
-            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList",par) ?? new List<ProductListDTO>();
+            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList", par) ?? new List<ProductListDTO>();
 
             foreach (var item in result)
             {
@@ -177,6 +220,33 @@ namespace Data.Repository.Product
             };
         }
 
+        public async Task<ProductListDTO?> GetPinned()
+        {
+            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>(
+                "Product_GetPinned",
+                new List<SqlParameter>());
+
+            var product = result?.FirstOrDefault();
+
+            if (product != null && !string.IsNullOrWhiteSpace(product.FilesRaw))
+            {
+                product.Files = product.FilesRaw
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .ToList();
+            }
+
+            return product;
+        }
+
+        public async Task SetPinned(int id)
+        {
+            var par = new List<SqlParameter>()
+    {
+        new SqlParameter("@Id", id)
+    };
+
+            await _databaseSql.ExecuteProcToList<int>("Product_SetPinned", par);
+        }
         public ProductUpdateDTO? GetById(int id)
         {
             var product = _context.Product.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
@@ -193,6 +263,7 @@ namespace Data.Repository.Product
                 Quantity = product.Quantity,
                 Note = product.Note,
                 TypeId = product.TypeId,
+                IsPinned = product.IsPinned,
 
                 ColorIds = _context.ProductAttribute
                 .Where(x => x.ProductId == id)
@@ -243,6 +314,7 @@ namespace Data.Repository.Product
                     product.Quantity = dto.Quantity;
                     product.Note = dto.Note;
                     product.TypeId = dto.TypeId;
+                    product.IsPinned = dto.IsPinned;
                     product.UpdatedBy = dto.UserId;
                     product.UpdatedDate = DateTime.Now;
                 }
@@ -255,6 +327,7 @@ namespace Data.Repository.Product
                         Quantity = dto.Quantity,
                         Note = dto.Note,
                         TypeId = dto.TypeId,
+                        IsPinned = dto.IsPinned,
                         IsDeleted = false,
                         CreatedBy = dto.UserId,
                         CreatedDate = DateTime.Now
@@ -455,8 +528,6 @@ namespace Data.Repository.Product
             return ds?.FirstOrDefault() ?? new ProductDetailDTO();
         }
 
-
-
         public PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
         {
@@ -535,6 +606,16 @@ namespace Data.Repository.Product
                 PageSize = pageSize,
                 TotalItems = total
             };
+        }
+
+        public async Task<List<ProductBestsellerDTO>> GetBestseller()
+        {
+            var result = await _databaseSql.ExecuteProcToList<ProductBestsellerDTO>(
+                "Product_Bestseller",
+                new List<SqlParameter>()
+            );
+
+            return result?.ToList() ?? new List<ProductBestsellerDTO>();
         }
     }
 }

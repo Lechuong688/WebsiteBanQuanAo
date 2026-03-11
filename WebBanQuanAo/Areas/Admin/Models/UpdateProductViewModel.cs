@@ -22,6 +22,7 @@ namespace WebBanQuanAo.Areas.Admin.Models
         public int TypeId { get; set; }
         public string? TypeName { get; set; }
         public List<MasterDataEntity> Types { get; set; } = new();
+        public bool IsPinned { get; set; }
 
     }
 

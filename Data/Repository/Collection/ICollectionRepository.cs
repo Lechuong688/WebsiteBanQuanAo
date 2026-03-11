@@ -18,6 +18,7 @@ namespace Data.Repository.Collection
         void SaveProducts(int collectionId, List<int> productIds);
         string GenerateCode(string value);
         bool IsCodeExists(string code, int currentId = 0);
+        void UpdateCollectionStatus();
         CollectionEntity? GetByCode(string code);
         Task<List<ProductListDTO>> GetProductsByCollection(int collectionId);
         Task<(CollectionEntity collection, List<ProductListDTO> products)?>

@@ -65,9 +65,28 @@
                                                 <span class="d-block mb-2">@item.TypeName</span>
                                                 <span class="d-block h4">@item.Name</span>
 
-                                                <span class="text-primary fs-5">
-                                                    @item.Price.ToString("N0") ₫
-                                                </span>
+                                                @if (item.DiscountPercent.HasValue && item.DiscountPercent > 0)
+                                                {
+                                                    <div>
+                                                        <span class="text-muted text-decoration-line-through me-2">
+                                                            @item.Price.ToString("N0") ₫
+                                                        </span>
+
+                                                        <span class="text-primary fs-5 fw-bold">
+                                                            @item.FinalPrice.ToString("N0") ₫
+                                                        </span>
+                                                    </div>
+
+                                                    <span class="badge bg-danger">
+                                                        -@item.DiscountPercent%
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-primary fs-5">
+                                                        @item.Price.ToString("N0") ₫
+                                                    </span>
+                                                }
                                             </div>
                                         </div>
                                     </a>

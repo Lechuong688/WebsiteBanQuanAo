@@ -195,7 +195,28 @@
                     <span class="text-muted">(120 đánh giá)</span>
                 </div>
 
-                <h3 class="product-price mb-4">@Model.Price.ToString("N0")đ<small class="text-muted fs-6 text-decoration-line-through">599.000đ</small></h3>
+                <h3 class="product-price mb-4">
+
+                    @if (Model.DiscountPercent.HasValue && Model.DiscountPercent > 0)
+                    {
+                        <span class="text-muted text-decoration-line-through me-2">
+                            @Model.Price.ToString("N0")đ
+                        </span>
+
+                        <span class="text-primary fw-bold">
+                            @Model.FinalPrice.ToString("N0")đ
+                        </span>
+
+                        <span class="badge bg-danger">
+                            -@Model.DiscountPercent%
+                        </span>
+                    }
+                    else
+                    {
+                        <span>@Model.Price.ToString("N0")đ</span>
+                    }
+
+                </h3>
                 <div class="mb-3">
                     <div class="fw-bold mb-2">Màu sắc:</div>
                     <div class="option-group">

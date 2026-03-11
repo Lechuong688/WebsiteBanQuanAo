@@ -55,6 +55,5 @@ namespace WebBanQuanAo.Controllers
 
             return PartialView("_ProductCollectionItems", result);
         }
-
     }
 }

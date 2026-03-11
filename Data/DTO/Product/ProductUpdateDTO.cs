@@ -22,6 +22,7 @@ namespace Data.DTO.Product
         public int TypeId { get; set; }
         public string? TypeName { get; set; }
         public string UserId { get; set; }
+        public bool IsPinned { get; set; }
     }
 
 }

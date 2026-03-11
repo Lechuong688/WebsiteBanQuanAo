@@ -20,6 +20,7 @@ namespace Data.Repository.MasterData
         {
             _context = context;
         }
+
         public List<MasterDataEntity> GetColors()
         {
             return _context.MasterData
@@ -187,6 +188,7 @@ namespace Data.Repository.MasterData
                 .ThenBy(x => x.Name)
                 .ToList();
         }
+
         public void CreateAttribute(string name, string code, string note, int parentId, string userId)
         {
             var finalCode = string.IsNullOrWhiteSpace(code)
@@ -260,7 +262,6 @@ namespace Data.Repository.MasterData
             _context.SaveChanges();
         }
 
-
         public List<MasterDataEntity> GetMainAttributes()
         {
             return _context.MasterData
@@ -282,7 +283,5 @@ namespace Data.Repository.MasterData
                     x.TypeId == (int)MasterDataType.Attribute
                 );
         }
-
-
     }
 }

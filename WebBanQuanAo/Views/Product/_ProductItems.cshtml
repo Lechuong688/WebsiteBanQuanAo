@@ -35,9 +35,22 @@
                                     <span class="d-block mb-2">@item.TypeName</span>
                                     <span class="d-block h4">@item.Name</span>
 
-                                    <span class="text-primary fs-5">
-                                        @item.Price.ToString("N0") ₫
-                                    </span>
+                                    @if (item.DiscountPercent.HasValue && item.DiscountPercent > 0)
+                                    {
+                                        <span class="text-muted text-decoration-line-through">
+                                            @item.Price.ToString("N0") ₫
+                                        </span>
+
+                                        <span class="text-primary fs-5">
+                                            @item.FinalPrice.ToString("N0") ₫
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-primary fs-5">
+                                            @item.Price.ToString("N0") ₫
+                                        </span>
+                                    }
                                 </div>
                             </div>
                         </a>
@@ -133,7 +146,22 @@
                                     <a href="#" class="d-block mb-2">@item.TypeName</a>
                                     <a href="#" class="d-block h4">@item.Name</a>
                                     @* <del class="me-2 fs-5">$1,250.00</del> *@
-                                    <span class="text-primary fs-5">@item.Price</span>
+                                    @if (item.DiscountPercent.HasValue && item.DiscountPercent > 0)
+                                    {
+                                        <span class="text-muted text-decoration-line-through">
+                                            @item.Price.ToString("N0") ₫
+                                        </span>
+
+                                        <span class="text-primary fs-5">
+                                            @item.FinalPrice.ToString("N0") ₫
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-primary fs-5">
+                                            @item.Price.ToString("N0") ₫
+                                        </span>
+                                    }
                                 </div>
                             </div>
                         </div>
