@@ -4,7 +4,7 @@
 @model PagedResult<ProductListDTO>
 
 <div class="tab-content">
-    <div id="tab-5" class="tab-pane fade show p-0 active">
+    <div id="tab-5" class="tab-pane fade show active p-0">
         <div class="row g-4 product">
             @foreach (var item in Model.Items)
             {
@@ -24,6 +24,14 @@
                                              alt="">
                                     }
 
+                                    @if (item.DiscountPercent > 0)
+                                    {
+                                        <div class="badge bg-danger position-absolute"
+                                             style="top: 20px; left: 20px; z-index: 10; font-size: 0.8rem; padding: 8px 8px;">
+                                            -@item.DiscountPercent%
+                                        </div>
+                                    }
+
                                     <div class="product-new">New</div>
 
                                     <div class="product-details">
@@ -35,7 +43,7 @@
                                     <span class="d-block mb-2">@item.TypeName</span>
                                     <span class="d-block h4">@item.Name</span>
 
-                                    @if (item.DiscountPercent.HasValue && item.DiscountPercent > 0)
+                                    @if (item.DiscountPercent > 0)
                                     {
                                         <span class="text-muted text-decoration-line-through">
                                             @item.Price.ToString("N0") ₫
@@ -136,6 +144,15 @@
                                     {
                                         <img src="@item.Files?.FirstOrDefault()" class="img-fluid w-100 h-100" alt="">
                                     }
+
+                                    @if (item.DiscountPercent.HasValue && item.DiscountPercent > 0)
+                                    {
+                                        <div class="badge bg-danger position-absolute"
+                                             style="top: 5px; left: 10px; z-index: 10; font-size: 0.8rem; padding: 4px 8px;">
+                                            -@item.DiscountPercent%
+                                        </div>
+                                    }
+
                                     <div class="products-mini-icon rounded-circle bg-primary">
                                         <a href="#"><i class="fa fa-eye fa-1x text-white"></i></a>
                                     </div>

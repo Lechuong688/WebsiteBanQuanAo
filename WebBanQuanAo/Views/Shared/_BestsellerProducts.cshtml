@@ -18,10 +18,8 @@
                             <div class="row g-0">
                                 @* Cột chứa ảnh *@
                                 <div class="col-5">
-                                    @* Thêm style position: relative để định vị nhãn giảm giá *@
                                     <div class="products-mini-img border-end h-100" style="position: relative;">
 
-                                        @* --- Nhãn giảm giá nằm trên góc ảnh --- *@
                                         @if (item.DiscountPercent.HasValue && item.DiscountPercent > 0)
                                         {
                                             <div class="badge bg-danger position-absolute"
@@ -38,7 +36,6 @@
                                     </div>
                                 </div>
 
-                                @* Cột chứa nội dung *@
                                 <div class="col-7">
                                     <div class="products-mini-content p-3">
                                         <a href="#" class="d-block mb-2 text-muted">@item.TypeName</a>

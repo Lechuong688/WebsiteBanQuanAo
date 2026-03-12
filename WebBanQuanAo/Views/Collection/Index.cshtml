@@ -164,6 +164,19 @@
                 $('#product-container').html(html);
                 $('#product-container').css("opacity", "1");
 
+                if (viewMode === "list") {
+                        // Xóa active của grid, thêm active cho list
+                        $('#tab-5').removeClass('show active');
+                        $('#tab-6').addClass('show active');
+                        // Cập nhật trạng thái nút bấm trên điều hướng (nếu cần)
+                        $('.nav-pills a[href="#tab-6"]').addClass('active');
+                        $('.nav-pills a[href="#tab-5"]').removeClass('active');
+                    } else {
+                        $('#tab-6').removeClass('show active');
+                        $('#tab-5').addClass('show active');
+                        $('.nav-pills a[href="#tab-5"]').addClass('active');
+                        $('.nav-pills a[href="#tab-6"]').removeClass('active');
+                    }
             }
         });
 

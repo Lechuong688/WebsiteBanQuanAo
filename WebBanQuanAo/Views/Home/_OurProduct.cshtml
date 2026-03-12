@@ -54,11 +54,19 @@
                                                          alt="">
                                                 }
 
+                                                @if (item.DiscountPercent > 0)
+                                                {
+                                                    <div class="badge bg-danger position-absolute"
+                                                         style="top: 20px; left: 20px; z-index: 10; font-size: 0.8rem; padding: 8px 8px;">
+                                                        -@item.DiscountPercent%
+                                                    </div>
+                                                }
                                                 <div class="product-new">New</div>
 
                                                 <div class="product-details">
                                                     <span><i class="fa fa-eye fa-1x"></i></span>
                                                 </div>
+                                                
                                             </div>
 
                                             <div class="text-center rounded-bottom p-4">
@@ -76,10 +84,6 @@
                                                             @item.FinalPrice.ToString("N0") ₫
                                                         </span>
                                                     </div>
-
-                                                    <span class="badge bg-danger">
-                                                        -@item.DiscountPercent%
-                                                    </span>
                                                 }
                                                 else
                                                 {
