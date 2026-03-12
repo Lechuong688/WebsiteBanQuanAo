@@ -32,7 +32,7 @@ namespace WebBanQuanAo.Controllers
         {
             //var products = _productRepository.GetAll();
             //return View(products);
-            var products = await _productRepository.GetList(1, 20);
+            var products = await _productRepository.GetList(1, 8);
             var bannerResult = await _bannerRepository.GetList(1, 10, null, true);
             var pinned = await _productRepository.GetPinned();
             var bestSeller = await _productRepository.GetBestseller();
@@ -40,6 +40,7 @@ namespace WebBanQuanAo.Controllers
             ViewBag.Banners = bannerResult.Items;
             ViewBag.PinnedProduct = pinned;
             ViewBag.BestSeller = bestSeller;
+            //Console.WriteLine(bestSeller.Count);
             return View(products?.Items ?? new List<ProductListDTO>());
         }
 

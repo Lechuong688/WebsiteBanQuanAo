@@ -9,10 +9,20 @@ namespace Data.DTO.Product
     public class ProductBestsellerDTO
     {
         public int Id { get; set; }
-        public string CategoryName { get; set; }
-        public string ProductName { get; set; }
+
+        public string TypeName { get; set; }
+
+        public string Name { get; set; }
+
+        public decimal Price { get; set; }
+
         public decimal? DiscountPercent { get; set; }
+
         public decimal FinalPrice { get; set; }
+
+        public string Files { get; set; }
+
         public int TotalSold { get; set; }
+
     }
 }
