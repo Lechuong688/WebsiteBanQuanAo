@@ -243,17 +243,30 @@ namespace Data.Repository.Collection
         new SqlParameter("@CollectionId", collectionId)
     };
 
-            var result = await _databaseSql.ExecuteProcXmlToList<ProductListDTO>(
+            var result = await _databaseSql.ExecuteProcToList<ProductListDTO>(
                 "Product_GetByCollection",
                 param
             );
 
-            return result?.ToList() ?? new List<ProductListDTO>();
+            var list = result?.ToList() ?? new List<ProductListDTO>();
+
+            foreach (var item in list)
+            {
+                if (!string.IsNullOrWhiteSpace(item.FilesRaw))
+                {
+                    item.Files = new List<string>
+            {
+                item.FilesRaw.Trim()
+            };
+                }
+            }
+
+            return list;
         }
 
 
         public async Task<(CollectionEntity collection, List<ProductListDTO> products)?>
-GetCollectionForUser(string slug)
+        GetCollectionForUser(string slug)
         {
             if (string.IsNullOrWhiteSpace(slug))
                 return null;

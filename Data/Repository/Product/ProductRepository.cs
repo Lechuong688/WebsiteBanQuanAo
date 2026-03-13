@@ -529,44 +529,31 @@ namespace Data.Repository.Product
         }
 
         public PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
-            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
+    List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
         {
-            var query =
-        from p in _context.Product
-        join pc in _context.ProductCollection
-            on p.Id equals pc.ProductId
-        join c in _context.Collection
-            on pc.CollectionId equals c.Id
-        join md in _context.MasterData
-            on p.TypeId equals md.Id
-        where !p.IsDeleted
-              && !md.IsDeleted
-              && c.Code == collectionCode
-        select new { p, md };
+            var now = DateTime.Now;
 
-            if (typeId.HasValue)
-            {
-                query = query.Where(x => x.p.TypeId == typeId.Value);
-            }
+            var query =
+                from p in _context.Product
+                join pc in _context.ProductCollection on p.Id equals pc.ProductId
+                join c in _context.Collection on pc.CollectionId equals c.Id
+                join md in _context.MasterData on p.TypeId equals md.Id
+                where !p.IsDeleted
+                      && !md.IsDeleted
+                      && c.Code == collectionCode
+                select new { p, md };
+
+            // --- Giữ nguyên các bộ lọc cũ của bạn ---
+            if (typeId.HasValue) query = query.Where(x => x.p.TypeId == typeId.Value);
 
             if (colorIds != null && colorIds.Any())
             {
-                query = query.Where(x =>
-                    _context.ProductAttribute.Any(pa =>
-                        pa.ProductId == x.p.Id &&
-                        colorIds.Contains(pa.ValueId)
-                    ));
+                query = query.Where(x => _context.ProductAttribute.Any(pa =>
+                    pa.ProductId == x.p.Id && colorIds.Contains(pa.ValueId)));
             }
 
-            if (maxPrice.HasValue && maxPrice.Value > 0)
-            {
-                query = query.Where(x => x.p.Price <= maxPrice.Value);
-            }
+            if (!string.IsNullOrWhiteSpace(keyword)) query = query.Where(x => x.p.Name.Contains(keyword));
 
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                query = query.Where(x => x.p.Name.Contains(keyword));
-            }
             query = sort switch
             {
                 "price_asc" => query.OrderBy(x => x.p.Price),
@@ -579,25 +566,54 @@ namespace Data.Repository.Product
 
             var total = query.Count();
 
-            var items = query
+            // --- Phần lấy dữ liệu: Chỉ thêm logic tính Discount ---
+            var rawItems = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => new ProductListDTO
+                .Select(x => new
+                {
+                    x.p,
+                    x.md,
+                    // Lấy danh sách các % giảm giá đang hiệu lực (trả về List số nguyên)
+                    DiscountPercents = _context.ProductDiscount
+                        .Where(pd => pd.ProductId == x.p.Id)
+                        .Join(_context.Discount, pd => pd.DiscountId, d => d.Id, (pd, d) => d)
+                        .Where(d => d.IsActive &&
+                                   (d.StartDate == null || d.StartDate <= now) &&
+                                   (d.EndDate == null || d.EndDate >= now))
+                        .Select(d => d.Percent)
+                        .ToList()
+                })
+                .ToList();
+
+            var items = rawItems.Select(x => {
+                // Tính toán an toàn bằng C#
+                int maxDiscount = x.DiscountPercents.Any() ? x.DiscountPercents.Max() : 0;
+                decimal finalPrice = maxDiscount > 0
+                                     ? x.p.Price - (x.p.Price * maxDiscount / 100)
+                                     : x.p.Price;
+
+                return new ProductListDTO
                 {
                     Id = x.p.Id,
                     Name = x.p.Name,
                     Price = x.p.Price,
                     TypeName = x.md.Name,
                     Note = x.p.Note,
+                    DiscountPercent = maxDiscount,
+                    FinalPrice = finalPrice,
                     Files = _context.Attachment
-                        .Where(a =>
-                            a.EntityId == x.p.Id &&
-                            a.EntityType == "Product" &&
-                            a.IsDeleted != true)
+                        .Where(a => a.EntityId == x.p.Id && a.EntityType == "Product" && a.IsDeleted != true)
                         .Select(a => a.FilePath!)
                         .ToList()
-                })
-                .ToList();
+                };
+            }).ToList();
+
+            // Lọc theo giá cuối cùng nếu có yêu cầu
+            if (maxPrice.HasValue && maxPrice.Value > 0)
+            {
+                items = items.Where(x => x.FinalPrice <= maxPrice.Value).ToList();
+            }
 
             return new PagedResult<ProductListDTO>
             {
