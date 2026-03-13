@@ -29,25 +29,61 @@
             <p class="text-muted mb-0">Theo dõi và xử lý các đơn đặt hàng mới nhất.</p>
         </div>
 
-        <form method="get" class="d-flex align-items-center filter-bar">
-            <i class="bi bi-funnel text-muted ms-3"></i>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body py-3">
 
-            <select name="status" class="form-select filter-select" style="width: 220px;">
-                <option value="">Tất cả trạng thái</option>
-                @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
-                {
-                    <option value="@((int)s)" selected="@(currentStatus == ((int)s).ToString())">
-                        @s
-                    </option>
-                }
-            </select>
+                <form method="get" class="row g-2 align-items-center">
 
-            <button class="btn btn-primary rounded-pill px-4"
-                    type="submit"
-                    style="background: var(--primary-color); border:none;">
-                Lọc
-            </button>
-        </form>
+                    <div class="col-auto">
+                        <span class="fw-semibold text-muted">
+                            <i class="bi bi-funnel me-1"></i> Bộ lọc
+                        </span>
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="status" class="form-select">
+                            <option value="">Tất cả trạng thái</option>
+                            @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
+                            {
+                                <option value="@((int)s)" selected="@(currentStatus == ((int)s).ToString())">
+                                    @s
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="text"
+                               name="keyword"
+                               value="@Context.Request.Query["keyword"]"
+                               class="form-control"
+                               placeholder="Tên khách hàng..." />
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="date"
+                               name="fromDate"
+                               value="@Context.Request.Query["fromDate"]"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="date"
+                               name="toDate"
+                               value="@Context.Request.Query["toDate"]"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-auto">
+                        <button class="btn btn-primary px-4">
+                            <i class="bi bi-search me-1"></i> Lọc
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
     </div>
 
     <div class="dashboard-card overflow-hidden">
@@ -130,19 +166,46 @@
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
 
+                <!-- First -->
                 <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                    <a class="page-link" href="?status=@ViewBag.Status&page=@(Model.Page - 1)">‹</a>
+                    <a class="page-link"
+                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=1">
+                        «
+                    </a>
+                </li>
+
+                <!-- Previous -->
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@(Model.Page - 1)">
+                        ‹
+                    </a>
                 </li>
 
                 @for (int i = startPage; i <= endPage; i++)
                 {
                     <li class="page-item @(i == Model.Page ? "active" : "")">
-                        <a class="page-link" href="?status=@ViewBag.Status&page=@i">@i</a>
+                        <a class="page-link"
+                           href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@i">
+                            @i
+                        </a>
                     </li>
                 }
 
+                <!-- Next -->
                 <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
-                    <a class="page-link" href="?status=@ViewBag.Status&page=@(Model.Page + 1)">›</a>
+                    <a class="page-link"
+                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@(Model.Page + 1)">
+                        ›
+                    </a>
+                </li>
+
+                <!-- Last -->
+                <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@totalPages">
+                        »
+                    </a>
                 </li>
 
             </ul>

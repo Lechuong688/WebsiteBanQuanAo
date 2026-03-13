@@ -108,6 +108,15 @@ body {
     margin-right: 4px;
 }
 
+.badge-more {
+    background: #e9ecef;
+    color: #555;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-left: 3px;
+}
+
 .price-text {
     color: #198754;
     font-weight: 500;

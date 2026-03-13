@@ -37,11 +37,20 @@ namespace Data.Repository.Order
             );
             return result;
         }
-        public async Task<PagedResult<OrderAdminDTO>> GetOrders(int? status, int page, int pageSize)
+        public async Task<PagedResult<OrderAdminDTO>> GetOrders(
+    int? status,
+    string keyword,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int page,
+    int pageSize)
         {
             var param = new List<SqlParameter>
     {
         new SqlParameter("@Status", status ?? (object)DBNull.Value),
+        new SqlParameter("@Keyword", string.IsNullOrEmpty(keyword) ? (object)DBNull.Value : keyword),
+        new SqlParameter("@FromDate", fromDate ?? (object)DBNull.Value),
+        new SqlParameter("@ToDate", toDate ?? (object)DBNull.Value),
         new SqlParameter("@Page", page),
         new SqlParameter("@PageSize", pageSize)
     };

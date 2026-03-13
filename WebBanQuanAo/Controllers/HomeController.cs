@@ -36,10 +36,14 @@ namespace WebBanQuanAo.Controllers
             var bannerResult = await _bannerRepository.GetList(1, 10, null, true);
             var pinned = await _productRepository.GetPinned();
             var bestSeller = await _productRepository.GetBestseller();
+            var topSelling = await _productRepository.GetTopSelling();
+            var newArrival = await _productRepository.GetNewArrival();
 
             ViewBag.Banners = bannerResult.Items;
             ViewBag.PinnedProduct = pinned;
             ViewBag.BestSeller = bestSeller;
+            ViewBag.TopSelling = topSelling;
+            ViewBag.NewArrival = newArrival;
             //Console.WriteLine(bestSeller.Count);
             return View(products?.Items ?? new List<ProductListDTO>());
         }

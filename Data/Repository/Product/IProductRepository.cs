@@ -30,5 +30,8 @@ namespace Data.Repository.Product
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
 
         Task<List<ProductBestsellerDTO>> GetBestseller();
+        Task<List<ProductTopSellingDTO>> GetTopSelling();
+        Task<List<ProductNewArrivalDTO>> GetNewArrival();
+
     }
 }

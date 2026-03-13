@@ -18,11 +18,21 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             _orderRepository = orderRepository;
         }
 
-        public async Task<IActionResult> Index(int? status, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(
+    int? status,
+    string keyword,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int page = 1,
+    int pageSize = 10)
         {
-            var result = await _orderRepository.GetOrders(status, page, pageSize);
+            var result = await _orderRepository.GetOrders(status, keyword, fromDate, toDate, page, pageSize);
 
             ViewBag.Status = status;
+            ViewBag.Keyword = keyword;
+            ViewBag.FromDate = fromDate;
+            ViewBag.ToDate = toDate;
+
             ViewBag.Page = page;
             ViewBag.PageSize = pageSize;
 

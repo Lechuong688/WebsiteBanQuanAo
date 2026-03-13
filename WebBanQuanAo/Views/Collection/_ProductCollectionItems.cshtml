@@ -32,7 +32,10 @@
                                         </div>
                                     }
 
-                                    <div class="product-new">New</div>
+                                    @if (item.CreatedDate >= DateTime.Now.AddDays(-15))
+                                    {
+                                        <div class="product-new">New</div>
+                                    }
 
                                     <div class="product-details">
                                         <span><i class="fa fa-eye fa-1x"></i></span>

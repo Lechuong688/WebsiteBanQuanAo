@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Data.DTO.Product
 {
-    public class ProductBestsellerDTO
+    public class ProductTopSellingDTO
     {
         public int Id { get; set; }
 
@@ -23,7 +23,7 @@ namespace Data.DTO.Product
         public string Files { get; set; }
 
         public int TotalSold { get; set; }
-        public DateTime CreatedDate { get; set; }
 
+        public DateTime CreatedDate {  get; set; }
     }
 }

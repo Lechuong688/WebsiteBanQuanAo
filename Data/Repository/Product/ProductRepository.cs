@@ -628,5 +628,25 @@ namespace Data.Repository.Product
 
             return result?.ToList() ?? new List<ProductBestsellerDTO>();
         }
+
+        public async Task<List<ProductTopSellingDTO>> GetTopSelling()
+        {
+            var result = await _databaseSql.ExecuteProcToList<ProductTopSellingDTO>(
+                "Product_TopSelling",
+                new List<SqlParameter>()
+            );
+
+            return result?.ToList() ?? new List<ProductTopSellingDTO>();
+        }
+
+        public async Task<List<ProductNewArrivalDTO>> GetNewArrival()
+        {
+            var result = await _databaseSql.ExecuteProcToList<ProductNewArrivalDTO>(
+                "Product_NewArrival",
+                new List<SqlParameter>()
+            );
+
+            return result?.ToList() ?? new List<ProductNewArrivalDTO>();
+        }
     }
 }

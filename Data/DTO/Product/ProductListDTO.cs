@@ -33,6 +33,7 @@ namespace Data.DTO.Product
         public int TotalRecord { get; set; }
         public int? DiscountPercent { get; set; }
         public decimal FinalPrice { get; set; }
+        public DateTime CreatedDate {  get; set; }
     }
 
 }
