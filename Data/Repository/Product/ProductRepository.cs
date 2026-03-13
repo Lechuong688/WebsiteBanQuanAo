@@ -543,7 +543,6 @@ namespace Data.Repository.Product
                       && c.Code == collectionCode
                 select new { p, md };
 
-            // --- Giữ nguyên các bộ lọc cũ của bạn ---
             if (typeId.HasValue) query = query.Where(x => x.p.TypeId == typeId.Value);
 
             if (colorIds != null && colorIds.Any())
@@ -566,7 +565,6 @@ namespace Data.Repository.Product
 
             var total = query.Count();
 
-            // --- Phần lấy dữ liệu: Chỉ thêm logic tính Discount ---
             var rawItems = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -574,7 +572,6 @@ namespace Data.Repository.Product
                 {
                     x.p,
                     x.md,
-                    // Lấy danh sách các % giảm giá đang hiệu lực (trả về List số nguyên)
                     DiscountPercents = _context.ProductDiscount
                         .Where(pd => pd.ProductId == x.p.Id)
                         .Join(_context.Discount, pd => pd.DiscountId, d => d.Id, (pd, d) => d)
@@ -587,7 +584,6 @@ namespace Data.Repository.Product
                 .ToList();
 
             var items = rawItems.Select(x => {
-                // Tính toán an toàn bằng C#
                 int maxDiscount = x.DiscountPercents.Any() ? x.DiscountPercents.Max() : 0;
                 decimal finalPrice = maxDiscount > 0
                                      ? x.p.Price - (x.p.Price * maxDiscount / 100)
@@ -609,7 +605,6 @@ namespace Data.Repository.Product
                 };
             }).ToList();
 
-            // Lọc theo giá cuối cùng nếu có yêu cầu
             if (maxPrice.HasValue && maxPrice.Value > 0)
             {
                 items = items.Where(x => x.FinalPrice <= maxPrice.Value).ToList();
