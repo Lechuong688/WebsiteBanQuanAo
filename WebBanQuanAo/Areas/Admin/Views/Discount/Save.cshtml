@@ -2,7 +2,7 @@
 
 <section class="content-header">
     <h1>
-        @(Model.Id > 0 ? "Sửa Discount" : "Thêm Discount")
+        @(Model.Id > 0 ? "Sửa giảm giá" : "Thêm giảm giá")
     </h1>
 </section>
 
@@ -22,12 +22,12 @@
                 <div class="box-body">
 
                     <div class="form-group">
-                        <label>Tên Discount</label>
+                        <label>Tên giảm giá</label>
                         <input type="text"
                                name="Name"
                                value="@Model.Name"
                                class="form-control"
-                               placeholder="Nhập tên Discount"
+                               placeholder="Nhập tên giảm giá"
                                required />
                     </div>
 

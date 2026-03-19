@@ -115,6 +115,21 @@
                         <span class="fs-5 text-muted">Phí vận chuyển</span>
                         <span class="fs-5 fw-bold">@Model.ShippingFee.ToString("N0") đ</span>
                     </div>
+                    @if (Model.DiscountAmount != null)
+                    {
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fs-5 text-danger">Giảm giá</span>
+                            <span class="fs-5 fw-bold text-danger">@Model.DiscountAmount?.ToString("N0") đ</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fs-5 text-danger">Giảm giá</span>
+                            <span class="fs-5 fw-bold text-danger">0 đ</span>
+                        </div>
+                    }
+
                     <hr class="my-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="h5 mb-0 fw-bold text-dark">Tổng cộng</span>

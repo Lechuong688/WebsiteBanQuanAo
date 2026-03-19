@@ -17,7 +17,8 @@ namespace Data.DTO.CheckOut
         public List<CartItemDTO> Items { get; set; } = new();
         public decimal SubTotal { get; set; }
         public decimal ShippingFee { get; set; }
-        public decimal Total => SubTotal + ShippingFee;
+        public decimal DiscountAmount { get; set; }
+        public decimal Total => SubTotal + ShippingFee - DiscountAmount;
     }
 
 }

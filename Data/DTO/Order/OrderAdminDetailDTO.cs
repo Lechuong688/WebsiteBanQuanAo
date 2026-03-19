@@ -23,6 +23,7 @@ namespace Data.DTO.Order
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? CreatedBy { get; set; }
+        public decimal? DiscountAmount { get; set; }
 
         public List<OrderItemAdminDTO> Items { get; set; } = new();
     }

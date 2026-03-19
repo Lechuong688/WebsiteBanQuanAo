@@ -55,6 +55,11 @@
                     <i class="fa fa-th"></i> <span>Quản lý danh mục</span>
                 </a>
             </li>
+            <li class="@Html.IsSelected(controller: "Order")">
+                <a href="@Url.Action("Index", "Order")">
+                    <i class="fa fa-th"></i> <span>Quản lý đơn hàng</span>
+                </a>
+            </li>
             <li class="@Html.IsSelected(controller: "Attribute")">
                 <a href="@Url.Action("Index", "Attribute")">
                     <i class="fa fa-th"></i> <span>Quản lý thuộc tính</span>
@@ -64,17 +69,12 @@
                 <a href="@Url.Action("Index", "Collection")">
                     <i class="fa fa-th"></i> <span>Quản lý bộ sưu tập</span>
                 </a>
-            </li>
-            <li class="@Html.IsSelected(controller: "Order")">
-                <a href="@Url.Action("Index", "Order")">
-                    <i class="fa fa-th"></i> <span>Quản lý đơn hàng</span>
-                </a>
-            </li>
+            </li>@* 
             <li class="@Html.IsSelected(controller: "Banner")">
                 <a href="@Url.Action("Index", "Banner")">
                     <i class="fa fa-th"></i> <span>Quản lý banner</span>
                 </a>
-            </li>
+            </li> *@
             <li class="@Html.IsSelected(controller: "Discount")">
                 <a href="@Url.Action("Index", "Discount")">
                     <i class="fa fa-th"></i> <span>Quản lý giảm giá</span>

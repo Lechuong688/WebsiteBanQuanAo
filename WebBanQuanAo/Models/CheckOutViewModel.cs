@@ -19,6 +19,8 @@ namespace WebBanQuanAo.Models
         public string? CreatedBy { get; set; }
 
         public CartDTO Cart { get; set; } = new();
+        public string DiscountCode { get; set; }
+        public decimal? DiscountAmount { get; set; }
     }
 
 }

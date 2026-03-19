@@ -128,5 +128,76 @@ namespace Data.Repository.Discount
 
             return result?.ToList() ?? new List<ProductListDTO>();
         }
+
+
+        //DiscountRepository
+        public async Task<PagedResult<DiscountCodeListDTO>> GetListDiscountCode(int page, int pageSize)
+        {
+            var par = new List<SqlParameter>()
+            {
+                     new SqlParameter("@Page", page),
+                     new SqlParameter("@PageSize", pageSize),
+            };
+            var result = await _databaseSql.ExecuteProcToList<DiscountCodeListDTO>("DiscountCode_Admin_GetList", par) ?? new List<DiscountCodeListDTO>();
+
+            return new PagedResult<DiscountCodeListDTO>
+            {
+                Items = result?.ToList() ?? new List<DiscountCodeListDTO>(),
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public DiscountCodeEntity GetByIdDiscountCode(int id)
+        {
+            return _context.DiscountCode.FirstOrDefault(x => x.Id == id);
+        }
+
+        public void SaveDiscountCode(DiscountCodeEntity discountCode)
+        {
+            if (discountCode.Id == 0)
+            {
+                discountCode.CreatedDate = DateTime.Now;
+                discountCode.IsActive = true;
+
+                _context.DiscountCode.Add(discountCode);
+            }
+            else
+            {
+                var dbEntity = _context.DiscountCode
+                    .FirstOrDefault(x => x.Id == discountCode.Id);
+
+                if (dbEntity == null) return;
+
+                dbEntity.Code = discountCode.Code;
+                dbEntity.Name = discountCode.Name;
+                dbEntity.DiscountType = discountCode.DiscountType;
+                dbEntity.DiscountValue = discountCode.DiscountValue;
+                dbEntity.MinOrderValue = discountCode.MinOrderValue;
+                dbEntity.MaxDiscount = discountCode.MaxDiscount;
+                dbEntity.Quantity = discountCode.Quantity;
+                dbEntity.UsedCount = discountCode.UsedCount;
+                dbEntity.StartDate = discountCode.StartDate;
+                dbEntity.EndDate = discountCode.EndDate;
+                dbEntity.UpdatedBy = discountCode.UpdatedBy;
+                dbEntity.UpdatedDate = DateTime.Now;
+                dbEntity.IsActive = discountCode.IsActive;
+            }
+            _context.SaveChanges();
+        }
+
+        public void DeleteDiscountCode(int id)
+        {
+            var discountCode = _context.DiscountCode
+                                     .FirstOrDefault(x => x.Id == id);
+
+            if (discountCode == null) return;
+
+            discountCode.IsActive = false;
+            discountCode.UpdatedDate = DateTime.Now;
+
+            _context.DiscountCode.Update(discountCode);
+            _context.SaveChanges();
+        }
     }
 }

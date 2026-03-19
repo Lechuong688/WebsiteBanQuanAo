@@ -1,18 +1,14 @@
-﻿@using Data.DTO.Product
-@using Data.DTO.Common
-@model PagedResult<Data.DTO.Discount.DiscountListDTO>
+﻿@using Data.DTO.Common
+@using Data.DTO.Discount
+@model PagedResult<DiscountCodeListDTO>
 
 <section class="content-header">
-    <h1>Quản lý giảm giá</h1>
+    <h1>Quản lý mã giảm giá</h1>
 </section>
 
 <section class="content">
-    <a href="/Admin/Discount/Save" class="btn btn-primary mb-3">
-        <i class="fa fa-plus"></i> Thêm giảm giá
-    </a>
-
-    <a href="/Admin/DiscountCode/Index" class="btn btn-warning mb-3">
-        <i class="fa fa-list"></i> Quản lý mã giảm giá
+    <a href="/Admin/DiscountCode/Save" class="btn btn-primary mb-3">
+        <i class="fa fa-plus"></i> Thêm mã giảm giá
     </a>
 
     <div class="box box-primary">
@@ -20,35 +16,52 @@
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th width="80">ID</th>
-                        <th>Tên khuyến mãi</th>
-                        <th>Giảm</th>
-                        <th>Thời gian</th>
+                        <th width="120">Mã</th>
+                        <th>Tên</th>
+                        <th width="120">Giảm</th>
+                        <th width="200">Điều kiện</th>
+                        <th width="180">Thời gian</th>
                         <th width="120">Trạng thái</th>
-                        <th width="180">Thao tác</th>
+                        <th width="150">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model?.Items != null && Model.Items.Any())
                     {
-                        @foreach (var item in Model.Items)
+                        foreach (var item in Model.Items)
                         {
                             <tr>
-                                <td>@item.Id</td>
-
                                 <td>
-                                    <strong>@item.Name</strong>
-                                    @* @if (!string.IsNullOrEmpty(item.Note))
+                                    <strong>@item.Code</strong>
+                                </td>
+                                <td>
+                                    @item.Name
+                                </td>
+                                <td>
+                                    @if (item.DiscountType == 1)
                                     {
-                                        <br />
-                                        <small class="text-muted">@item.Note</small>
-                                    } *@
+                                        <span class="label label-success">
+                                            @item.DiscountValue %
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-info">
+                                            @item.DiscountValue.ToString("N0") đ
+                                        </span>
+                                    }
                                 </td>
-
                                 <td>
-                                    <span class="label label-default">@item.Percent %</span>
+                                    @if (item.MinOrderValue.HasValue)
+                                    {
+                                        <div>Tối thiểu: @item.MinOrderValue.Value.ToString("N0") đ</div>
+                                    }
+                                    @if (item.MaxDiscount.HasValue && item.DiscountType == 1)
+                                    {
+                                        <div>Tối đa: @item.MaxDiscount.Value.ToString("N0") đ</div>
+                                    }
+                                    <div>Lượt: @item.UsedCount / @item.Quantity</div>
                                 </td>
-
                                 <td>
                                     @if (item.StartDate != null || item.EndDate != null)
                                     {
@@ -63,7 +76,6 @@
                                         <span>Không giới hạn</span>
                                     }
                                 </td>
-
                                 <td>
                                     @if (item.IsActive)
                                     {
@@ -74,38 +86,36 @@
                                         <span class="label label-danger">Đã tắt</span>
                                     }
                                 </td>
-
                                 <td>
-                                    <a href="/Admin/Discount/Save?id=@item.Id"
+                                    <a href="/Admin/DiscountCode/Save?id=@item.Id"
                                        class="btn btn-warning btn-sm">
                                         <i class="fa fa-edit"></i>
                                     </a>
 
-                                    <a href="/Admin/Discount/Product?id=@item.Id"
-                                       class="btn btn-info btn-sm"
-                                       title="Gán sản phẩm">
-                                        <i class="fa fa-link"></i>
-                                    </a>
-
-
                                     <form method="post"
-                                          action="/Admin/Discount/Delete"
+                                          action="/Admin/DiscountCode/Delete"
                                           style="display:inline;">
                                         <input type="hidden" name="id" value="@item.Id" />
                                         <button type="submit"
                                                 class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Tắt giảm giá này?')">
+                                                onclick="return confirm('Tắt mã này?')">
                                             <i class="fa fa-power-off"></i>
                                         </button>
                                     </form>
                                 </td>
                             </tr>
                         }
-
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                Không có mã giảm giá nào
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
-
 </section>

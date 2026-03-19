@@ -27,6 +27,7 @@ namespace Data.Repository
         public DbSet<BannerEntity> Banner { get; set; }
         public DbSet<DiscountEntity> Discount { get; set; }
         public DbSet<ProductDiscountEntity> ProductDiscount { get; set; }
+        public DbSet<DiscountCodeEntity> DiscountCode { get; set; }
 
     }
 }

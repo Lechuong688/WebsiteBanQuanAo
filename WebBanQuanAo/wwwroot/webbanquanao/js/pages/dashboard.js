@@ -148,7 +148,7 @@ $(document).ready(function () {
                 data: chartData,
                 xkey: 'y',
                 ykeys: ['item1'],
-                labels: ['Revenue'],
+                labels: ['Doanh thu'],
                 lineColors: ['#3c8dbc'],
                 hideHover: 'auto',
                 parseTime: false
@@ -194,7 +194,7 @@ $(document).ready(function () {
             donut = new Morris.Donut({
                 element: 'sales-chart',
                 resize: true,
-                colors: ['#559CC6', '#f39c12', '#00a65a', '#f56954'],
+                colors: ['#FFCCCC','#559CC6', '#f39c12', '#00a65a', '#f56954'],
                 data: data,
                 hideHover: 'auto'
             });
