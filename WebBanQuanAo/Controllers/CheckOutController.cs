@@ -4,6 +4,7 @@ using Data.Entity;
 using Data.Repository;
 using Data.Repository.Order;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using WebBanQuanAo.helpers;
 using WebBanQuanAo.Models;
@@ -22,7 +23,16 @@ namespace WebBanQuanAo.Controllers
         }
         public IActionResult Index()
         {
+            var selectedItems = Request.Query["SelectedItems"];
             var cart = CartCookieHelper.GetCart(Request);
+            var selectedList = selectedItems.Select(x => x.ToString()).ToList();
+
+            if (selectedItems.Any())
+            {
+                cart = cart.Where(x =>
+                    selectedList.Contains($"{x.ProductId}-{x.ColorId}-{x.SizeId}")
+                ).ToList();
+            }
             if (!cart.Any())
                 return RedirectToAction("Index", "Cart");
 
@@ -60,6 +70,7 @@ namespace WebBanQuanAo.Controllers
 
             var cartDto = new CartDTO
             {
+
                 Items = (
                     from c in cart
                     join p in products on c.ProductId equals p.Id
@@ -88,7 +99,8 @@ namespace WebBanQuanAo.Controllers
             var model = new CheckOutViewModel
             {
                 Cart = cartDto,
-                IsAuthenticated = User.Identity != null && User.Identity.IsAuthenticated
+                IsAuthenticated = User.Identity != null && User.Identity.IsAuthenticated,
+                SelectedItems = selectedList
             };
 
             if (model.IsAuthenticated)
@@ -116,6 +128,16 @@ namespace WebBanQuanAo.Controllers
         {
             var action = Request.Form["action"];
             var cart = CartCookieHelper.GetCart(Request);
+            var selectedItems = Request.Form["SelectedItems"];
+            var selectedList = selectedItems.Select(x => x.ToString()).ToList();
+
+            if (selectedList.Any())
+            {
+                cart = cart.Where(x =>
+                    selectedList.Contains($"{x.ProductId}-{x.ColorId}-{x.SizeId}")
+                ).ToList();
+            }
+            Console.WriteLine("Selected count: " + selectedList.Count);
             if (!cart.Any())
                 return RedirectToAction("Index", "Cart");
 
@@ -242,17 +264,26 @@ namespace WebBanQuanAo.Controllers
                     }
                 ).ToList();
 
+                var masterData = _context.MasterData
+                .Where(x => !x.IsDeleted)
+                .ToList();
                 var cartDto = new CartDTO
                 {
                     Items = (
                         from c in cart
                         join p in products on c.ProductId equals p.Id
+                        join color in masterData on c.ColorId equals color.Id
+                        join size in masterData on c.SizeId equals size.Id
                         select new CartItemDTO
                         {
                             ProductId = p.Id,
                             ProductName = p.Name,
                             Price = p.Price,
-                            Quantity = c.Quantity
+                            Quantity = c.Quantity,
+                            ColorId = c.ColorId,
+                            ColorName = color.Name,
+                            SizeId = c.SizeId,
+                            SizeName = size.Name
                         }
                     ).ToList()
                 };
@@ -274,14 +305,21 @@ namespace WebBanQuanAo.Controllers
                     PhoneNumber = model.PhoneNumber,
                     Address = model.Address,
                     Note = model.Note,
-                    IsAuthenticated = true
+                    IsAuthenticated = true,
+                    SelectedItems = selectedList
                 };
 
                 return View("Index", modelView);
             }
             var orderId = await _orderRepository.CreateOrder(dto);
 
-            CartCookieHelper.ClearCart(Response);
+            var fullCart = CartCookieHelper.GetCart(Request);
+
+            var remainingCart = fullCart
+                .Where(x => !selectedList.Contains($"{x.ProductId}-{x.ColorId}-{x.SizeId}"))
+                .ToList();
+
+            CartCookieHelper.SaveCart(Response, remainingCart);
 
             return RedirectToAction("Success", new { id = orderId });
         }

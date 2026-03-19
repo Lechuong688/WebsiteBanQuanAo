@@ -22,10 +22,13 @@
         }
         else
         {
+
+            <form method="get" action="/CheckOut/Index">
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Tên sản phẩm</th>
                             <th>Màu sắc / Size</th>
                             <th>Giá</th>
@@ -37,7 +40,13 @@
                     <tbody>
                         @foreach (var item in Model.Items)
                         {
-                            <tr>
+                            <tr data-key="@($"{item.ProductId}-{item.ColorId}-{item.SizeId}")">
+                                <td class="align-middle text-center">
+                                    <input type="checkbox"
+                                           name="SelectedItems"
+                                           class="item-checkbox"
+                                           value="@($"{item.ProductId}-{item.ColorId}-{item.SizeId}")" />
+                                </td>
                                 <td>
                                     <p class="mb-0 py-4">@item.ProductName</p>
                                 </td>
@@ -115,14 +124,14 @@
                         </div>
 
                         <div class="p-4">
-                            <a href="/Checkout"
-                               class="btn btn-primary rounded-pill w-100 py-3">
+                            <button type="submit" class="btn btn-primary rounded-pill w-100 py-3">
                                 Tiến hành thanh toán
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+            </form>
         }
     </div>
 </div>
@@ -164,7 +173,11 @@
             input.dataset.loading = "0";
         });
     }
-
+        document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('item-checkbox')) {
+            calculateSelectedTotal();
+        }
+    });
     document.addEventListener('click', function (e) {
 
         const btn = e.target.closest('.btn-remove');
@@ -203,8 +216,34 @@
                 if (newCart && currentCart) {
                     currentCart.innerHTML = newCart.innerHTML;
                 }
+                setTimeout(() => {
+                calculateSelectedTotal();
+                }, 100);
             });
     }
+        function calculateSelectedTotal() {
+        let total = 0;
+
+        document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
+
+            const row = cb.closest('tr');
+            const key = row.getAttribute('data-key');
+
+            const lineTotalEl = document.querySelector(`.line-total[data-key="${key}"]`);
+
+            if (lineTotalEl) {
+                const text = lineTotalEl.innerText.replace(/[^\d]/g, '');
+                total += parseInt(text) || 0;
+            }
+        });
+
+        document.getElementById("cartTotal").innerText =
+            total.toLocaleString('vi-VN') + " ₫";
+
+        document.getElementById("subTotal").innerText =
+            total.toLocaleString('vi-VN') + " ₫";
+    }
+
 </script>
 
 
