@@ -43,9 +43,9 @@ namespace WebBanQuanAo.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetRevenueChart(int year)
+        public async Task<IActionResult> GetRevenueChart(DateTime startDate, DateTime endDate)
         {
-            var data = await _dashboardRepository.GetRevenueByMonth(year);
+            var data = await _dashboardRepository.GetRevenueByMonth(startDate, endDate);
             return Json(data);
         }
 

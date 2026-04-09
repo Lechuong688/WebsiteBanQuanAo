@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 using WebBanQuanAo.Models;
 
 namespace WebBanQuanAo.Controllers
@@ -32,18 +33,21 @@ namespace WebBanQuanAo.Controllers
         {
             //var products = _productRepository.GetAll();
             //return View(products);
-            var products = await _productRepository.GetList(1, 8);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var products = await _productRepository.GetList(userId, 1, 8);
             var bannerResult = await _bannerRepository.GetList(1, 10, null, true);
             var pinned = await _productRepository.GetPinned();
             var bestSeller = await _productRepository.GetBestseller();
             var topSelling = await _productRepository.GetTopSelling();
             var newArrival = await _productRepository.GetNewArrival();
+            //var productWishlist = await _productRepository.GetProductWishlist(1, 8);
 
             ViewBag.Banners = bannerResult.Items;
             ViewBag.PinnedProduct = pinned;
             ViewBag.BestSeller = bestSeller;
             ViewBag.TopSelling = topSelling;
             ViewBag.NewArrival = newArrival;
+            //ViewBag.ProductWishlist = productWishlist;
             //Console.WriteLine(bestSeller.Count);
             return View(products?.Items ?? new List<ProductListDTO>());
         }

@@ -24,15 +24,16 @@ public class DashboardRepository : IDashboardRepository
         return result.FirstOrDefault() ?? new DashboardSummaryDTO();
     }
 
-    public async Task<List<RevenueByMonthDTO>> GetRevenueByMonth(int year)
+    public async Task<List<RevenueByMonthDTO>> GetRevenueByMonth(DateTime startDate, DateTime endDate)
     {
         var par = new List<SqlParameter>()
     {
-        new SqlParameter("@Year", year)
+        new SqlParameter("@StartDate", startDate),
+        new SqlParameter("@EndDate", endDate)
     };
 
         var result = await _databaseSql.ExecuteProcToList<RevenueByMonthDTO>(
-            "Dashboard_RevenueByMonth",
+            "Dashboard_RevenueSummary",
             par
         ) ?? new List<RevenueByMonthDTO>();
 

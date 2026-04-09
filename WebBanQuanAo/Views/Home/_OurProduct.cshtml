@@ -111,7 +111,12 @@
                                             </div>
                                             <div class="d-flex">
                                                 <a href="#" class="text-primary d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-sm-square border"><i class="fas fa-random"></i></span></a>
-                                                <a href="#" class="text-primary d-flex align-items-center justify-content-center me-0"><span class="rounded-circle btn-sm-square border"><i class="fas fa-heart"></i></span></a>
+                                                @* <a href="#" class="text-primary d-flex align-items-center justify-content-center me-0"><span class="rounded-circle btn-sm-square border"><i class="fas fa-heart"></i></span></a> *@
+                                                <a href="#" class="wishlist-btn" data-product-id="@item.Id">
+                                                    <span class="rounded-circle btn-sm-square border">
+                                                        <i class="fas fa-heart @(item.IsInWishlist ? "text-danger" : "text-dark")"></i>
+                                                    </span>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

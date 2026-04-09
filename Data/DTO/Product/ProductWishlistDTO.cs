@@ -2,37 +2,27 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.DTO.Product
 {
-    public class ProductListDTO
+    public class ProductWishlistDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public int Quantity { get; set; }
+        public int ProductId { get; set; }
+        public string UserId { get; set; }
+        public string? Name { get; set; }
+        public string? TypeName { get; set; }
         public decimal Price { get; set; }
-        public string? Note { get; set; }
+        public DateTime CreatedDate { get; set; }
         [JsonProperty("Files"), JsonConverter(typeof(SafeCollectionConverter))]
         public List<string> Files { get; set; } = new();
-        public List<string> Colors { get; set; } = new();
-        public List<string> Sizes { get; set; } = new();
-
         public string? FilesRaw { get; set; }
-        public string? ColorsRaw { get; set; }
-        public string? SizesRaw { get; set; }
-
-        public int TypeId { get; set; }
-        public string? TypeName { get; set; }
-        public string? ParentTypeName { get; set; }
         public int TotalRecord { get; set; }
         public int? DiscountPercent { get; set; }
         public decimal FinalPrice { get; set; }
-        public DateTime CreatedDate {  get; set; }
         public bool IsInWishlist { get; set; }
     }
-
 }

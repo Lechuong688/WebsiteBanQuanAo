@@ -1,7 +1,10 @@
-﻿using Data.Entity;
+﻿using Data.DTO.Product;
+using Data.Entity;
 using Data.Repository.Product;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebBanQuanAo.Controllers
 {
@@ -21,7 +24,9 @@ namespace WebBanQuanAo.Controllers
         {
             ViewBag.Categories = _productRepository.GetCategories();
             ViewBag.Colors = _productRepository.GetColors();
-            var products = _productRepository.GetAll();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var products = _productRepository.GetAll(userId);
             return View(products);
         }
 
@@ -44,6 +49,8 @@ namespace WebBanQuanAo.Controllers
         string keyword = "",
         string sort = "")
         {
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var result = _productRepository.GetForShopPaged(
                 page,
                 pageSize,
@@ -51,7 +58,8 @@ namespace WebBanQuanAo.Controllers
                 colorIds,
                 maxPrice,
                 keyword,
-                sort
+                sort,
+                userId
             );
 
             System.Diagnostics.Debug.WriteLine(
@@ -61,6 +69,26 @@ namespace WebBanQuanAo.Controllers
         );
 
             return PartialView("_ProductItems", result);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ProductWishlist(int page = 1, int pageSize = 8)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var productWishlist = await _productRepository.GetProductWishlist(userId, page, pageSize);
+            ViewBag.ProductWishlist = productWishlist;
+            return View(productWishlist?.Items ?? new List<ProductWishlistDTO>());
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ToggleWishlist([FromBody] int productId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var isAdded = await _productRepository.ToggleWishlist(productId, userId);
+
+            return Json(new { isAdded });
         }
 
     }

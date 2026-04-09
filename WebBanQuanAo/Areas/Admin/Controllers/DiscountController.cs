@@ -86,7 +86,9 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             if (discount == null)
                 return NotFound();
 
-            var products = _productRepository.GetAll().ToList();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var products = _productRepository.GetAll(userId).ToList();
 
             ViewBag.Products = products;
             ViewBag.SelectedProductIds = _discountRepository.GetProductIds(id);

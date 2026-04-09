@@ -11,10 +11,10 @@ namespace Data.Repository.Product
 {
     public interface IProductRepository
     {
-        IEnumerable<ProductListDTO> GetAll();
+        IEnumerable<ProductListDTO> GetAll(string userId);
         PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
-            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null);
-        Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize);
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null, string? userId = null);
+        Task<PagedResult<ProductListDTO>> GetList(string userId, int page, int pageSize);
         Task<ProductListDTO?> GetPinned();
         Task SetPinned(int id);
 
@@ -32,6 +32,10 @@ namespace Data.Repository.Product
         Task<List<ProductBestsellerDTO>> GetBestseller();
         Task<List<ProductTopSellingDTO>> GetTopSelling();
         Task<List<ProductNewArrivalDTO>> GetNewArrival();
+
+        Task<PagedResult<ProductWishlistDTO>> GetProductWishlist(string userId, int page, int pageSize);
+
+        Task<bool> ToggleWishlist(int productId, string userId);
 
     }
 }

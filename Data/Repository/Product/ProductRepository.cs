@@ -3,6 +3,7 @@ using Data.DTO.Common;
 using Data.DTO.Product;
 using Data.Entity;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Data.Repository.Product
         }
 
         //GetAllProductAdmin
-        public IEnumerable<ProductListDTO> GetAll()
+        public IEnumerable<ProductListDTO> GetAll(string userId)
         {
             return (
             from p in _context.Product
@@ -90,13 +91,16 @@ namespace Data.Repository.Product
                                 && a.FilePath != null
                                 && a.IsDeleted != true)
                                 .Select(a => a.FilePath!)
-                                .ToList()
+                                .ToList(),
+
+                IsInWishlist = _context.ProductWishlist
+                                .Any(w => w.ProductId == p.Id && w.UserId == userId)
             }).ToList();
         }
 
         //GetAllProduct và phân trang
         public PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
-            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null)
+            List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null, string? userId = null)
         {
             var query =
                 from p in _context.Product
@@ -176,7 +180,11 @@ namespace Data.Repository.Product
                     && a.EntityType == "Product"
                     && a.IsDeleted != true)
                 .Select(a => a.FilePath!)
-                .ToList()
+                .ToList(),
+
+            IsInWishlist = userId != null &&
+            _context.ProductWishlist
+                .Any(w => w.ProductId == x.p.Id && w.UserId == userId)
         };
     })
     .ToList();
@@ -190,12 +198,13 @@ namespace Data.Repository.Product
             };
         }
 
-        public async Task<PagedResult<ProductListDTO>> GetList(int page, int pageSize)
+        public async Task<PagedResult<ProductListDTO>> GetList(string userId, int page, int pageSize)
         {
             var par = new List<SqlParameter>()
             {
-                     new SqlParameter("@Page", page),
-                     new SqlParameter("@PageSize", pageSize),
+                    new SqlParameter("@UserId", userId ?? (object)DBNull.Value),
+                    new SqlParameter("@Page", page),
+                    new SqlParameter("@PageSize", pageSize),
             };
             var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList", par) ?? new List<ProductListDTO>();
 
@@ -647,6 +656,57 @@ namespace Data.Repository.Product
             );
 
             return result?.ToList() ?? new List<ProductNewArrivalDTO>();
+        }
+
+        public async Task<PagedResult<ProductWishlistDTO>> GetProductWishlist(string userId, int page, int pageSize)
+        {
+            var par = new List<SqlParameter>()
+            {
+                     new SqlParameter("@UserId", userId),
+                     new SqlParameter("@Page", page),
+                     new SqlParameter("@PageSize", pageSize),
+            };
+            var result = await _databaseSql.ExecuteProcToList<ProductWishlistDTO>("Product_GetWishlist", par) ?? new List<ProductWishlistDTO>();
+
+            foreach (var item in result)
+            {
+                if (!string.IsNullOrWhiteSpace(item.FilesRaw))
+                    item.Files = item.FilesRaw.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            return new PagedResult<ProductWishlistDTO>
+            {
+                Items = result?.ToList() ?? new List<ProductWishlistDTO>(),
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = result?.FirstOrDefault()?.TotalRecord ?? 0,
+            };
+        }
+
+        public async Task<bool> ToggleWishlist(int productId, string userId)
+        {
+            var exist = await _context.ProductWishlist
+                .FirstOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId);
+
+            if (exist != null)
+            {
+                _context.ProductWishlist.Remove(exist);
+                await _context.SaveChangesAsync();
+                return false;
+            }
+            else
+            {
+                var wishlist = new ProductWishlistEntity
+                {
+                    ProductId = productId,
+                    UserId = userId,
+                    CreatedDate = DateTime.Now
+                };
+
+                await _context.ProductWishlist.AddAsync(wishlist);
+                await _context.SaveChangesAsync();
+                return true;
+            }
         }
     }
 }

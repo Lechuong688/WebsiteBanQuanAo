@@ -28,6 +28,7 @@ namespace Data.Repository
         public DbSet<DiscountEntity> Discount { get; set; }
         public DbSet<ProductDiscountEntity> ProductDiscount { get; set; }
         public DbSet<DiscountCodeEntity> DiscountCode { get; set; }
+        public DbSet<ProductWishlistEntity> ProductWishlist { get; set; }
 
     }
 }

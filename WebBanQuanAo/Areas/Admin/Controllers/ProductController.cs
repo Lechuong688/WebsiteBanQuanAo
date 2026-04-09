@@ -25,7 +25,8 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
         
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var result = await _productRepository.GetList(page, pageSize);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _productRepository.GetList(userId, page, pageSize);
 
             ViewBag.Page = page;
             ViewBag.PageSize = pageSize;

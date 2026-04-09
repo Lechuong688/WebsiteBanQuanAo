@@ -10,7 +10,7 @@ namespace Data.Repository.Dashboard
     public interface IDashboardRepository
     {
         Task<DashboardSummaryDTO> GetSummary();
-        Task<List<RevenueByMonthDTO>> GetRevenueByMonth(int year);
+        Task<List<RevenueByMonthDTO>> GetRevenueByMonth(DateTime startDate, DateTime endDate);
         Task<List<OrderStatusDTO>> GetOrderStatus();
     }
 }

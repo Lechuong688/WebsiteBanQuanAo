@@ -94,8 +94,9 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             var collection = _collectionRepository.GetById(id);
             if (collection == null)
                 return NotFound();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var products = _productRepository.GetAll().ToList();
+            var products = _productRepository.GetAll(userId).ToList();
 
             ViewBag.Products = products;
             ViewBag.SelectedProductIds = _collectionRepository.GetProductIds(id);

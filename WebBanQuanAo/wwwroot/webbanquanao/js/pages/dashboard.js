@@ -1,9 +1,44 @@
-/*
+﻿/*
  * Author: Abdullah A Almsaeed
  * Date: 4 Jan 2014
  * Description:
  *      This is a demo file used only for the main dashboard (index.html)
  **/
+
+var dashboardStartDate;
+var dashboardEndDate;
+
+function drawDoanhThuTheoThang() {
+    // Sales chart
+    fetch('/Admin/Dashboard/GetRevenueChart?startDate=' + dashboardStartDate + '&endDate=' + dashboardEndDate)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('revenue-chart').innerHTML = '';
+            console.log(data);
+
+            var chartData = [];
+
+            data.forEach(x => {
+                chartData.push({
+                    y: 'T' + x.month,
+                    item1: parseFloat(x.revenue)
+                });
+            });
+
+            Morris.Area({
+                element: 'revenue-chart',
+                resize: true,
+                data: chartData,
+                xkey: 'y',
+                ykeys: ['item1'],
+                labels: ['Doanh thu'],
+                lineColors: ['#3c8dbc'],
+                hideHover: 'auto',
+                parseTime: false
+            });
+
+        });
+}
 
 $(document).ready(function () {
 
@@ -29,22 +64,62 @@ $(document).ready(function () {
 
   // bootstrap WYSIHTML5 - text editor
   $('.textarea').wysihtml5();
+  drawDoanhThuTheoThang();
+  //$('.daterange').daterangepicker({
+  //  ranges   : {
+  //    'Today'       : [moment(), moment()],
+  //    'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+  //    'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+  //    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+  //    'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+  //    'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+  //  },
+  //  startDate: moment().subtract(29, 'days'),
+  //  endDate  : moment()
+  //}, function (start, end) {
+  //  window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    //});
 
-  $('.daterange').daterangepicker({
-    ranges   : {
-      'Today'       : [moment(), moment()],
-      'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-      'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-      'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-      'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-      'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-    },
-    startDate: moment().subtract(29, 'days'),
-    endDate  : moment()
-  }, function (start, end) {
-    window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-  });
 
+    //Lọc tổng
+    $('#dashboard-date-range').daterangepicker({
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'This Year': [moment().startOf('year'), moment().endOf('year')],
+            'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment()
+    }, function (start, end) {
+        dashboardStartDate = start.format('YYYY-MM-DD');
+        dashboardEndDate = end.format('YYYY-MM-DD');
+        //drawDoanhThuTheoThang()
+        //window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    });
+    //$('#dashboard-date-range').click
+
+
+    //Lọc riêng
+    $('#dashboard-date-range1').daterangepicker({
+        ranges: {
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+       },
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment()
+    }, function (start, end) {
+        dashboardStartDate = start.format('YYYY-MM-DD');
+        dashboardEndDate = end.format('YYYY-MM-DD');
+        //drawDoanhThuTheoThang()
+        //window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    });
   /* jQueryKnob */
   $('.knob').knob();
 
@@ -125,36 +200,6 @@ $(document).ready(function () {
   });
 
     /* Morris.js Charts */
-    var area;
-  // Sales chart
-    fetch('/Admin/Dashboard/GetRevenueChart?year=2025')
-        .then(res => res.json())
-        .then(data => {
-
-            console.log(data);
-
-            var chartData = [];
-
-            data.forEach(x => {
-                chartData.push({
-                    y: 'T' + x.month,
-                    item1: parseFloat(x.revenue)
-                });
-            });
-
-            area = new Morris.Area({
-                element: 'revenue-chart',
-                resize: true,
-                data: chartData,
-                xkey: 'y',
-                ykeys: ['item1'],
-                labels: ['Doanh thu'],
-                lineColors: ['#3c8dbc'],
-                hideHover: 'auto',
-                parseTime: false
-            });
-
-        });
   var line = new Morris.Line({
     element          : 'line-chart',
     resize           : true,
@@ -203,7 +248,7 @@ $(document).ready(function () {
 
   // Fix for charts under tabs
     $('.box ul.nav a').on('shown.bs.tab', function () {
-        if (area) area.redraw();
+        //if (area) area.redraw();
         if (donut) donut.redraw();
         if (line) line.redraw();
     });
