@@ -130,6 +130,7 @@ namespace WebBanQuanAo.Controllers
             var cart = CartCookieHelper.GetCart(Request);
             var selectedItems = Request.Form["SelectedItems"];
             var selectedList = selectedItems.Select(x => x.ToString()).ToList();
+            var paymentMethod = Request.Form["PaymentMethod"];
 
             if (selectedList.Any())
             {
@@ -235,6 +236,7 @@ namespace WebBanQuanAo.Controllers
 
                 }
             }
+            dto.TransactionCode = "ORDER" + Guid.NewGuid().ToString("N").Substring(0, 6);
             dto.DiscountAmount = discountAmount;
             if (action == "apply")
             {
@@ -311,17 +313,33 @@ namespace WebBanQuanAo.Controllers
 
                 return View("Index", modelView);
             }
-            var orderId = await _orderRepository.CreateOrder(dto);
+            await _orderRepository.CreateOrder(dto);
 
-            var fullCart = CartCookieHelper.GetCart(Request);
+            var order = _context.Order
+                .FirstOrDefault(x => x.TransactionCode == dto.TransactionCode);
 
-            var remainingCart = fullCart
-                .Where(x => !selectedList.Contains($"{x.ProductId}-{x.ColorId}-{x.SizeId}"))
-                .ToList();
+            if (order == null)
+            {
+                return Content("Không tìm thấy đơn sau khi tạo ❌");
+            }
 
-            CartCookieHelper.SaveCart(Response, remainingCart);
 
-            return RedirectToAction("Success", new { id = orderId });
+            if (paymentMethod == "BANK")
+            {
+                return RedirectToAction("Payment", "Order", new { id = order.Id });
+            }
+            else
+            {
+                var fullCart = CartCookieHelper.GetCart(Request);
+
+                var remainingCart = fullCart
+                    .Where(x => !selectedList.Contains($"{x.ProductId}-{x.ColorId}-{x.SizeId}"))
+                    .ToList();
+
+                CartCookieHelper.SaveCart(Response, remainingCart);
+
+                return RedirectToAction("Success", new { id = order.Id });
+            }
         }
 
         public IActionResult Success(int id)

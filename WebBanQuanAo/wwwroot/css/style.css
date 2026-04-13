@@ -1011,3 +1011,82 @@
 
 
 
+/*Màn hình chờ thanh toán online*/
+/* Reset cơ bản và thiết lập màu nền cho toàn trang (bạn có thể bỏ nếu web đã có) */
+.payment-wrapper {
+    min-height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f3f4f6; /* Màu nền xám nhạt */
+    font-family: Arial, sans-serif;
+}
+
+/* Khung thẻ chứa thông tin thanh toán */
+.payment-card {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+    .payment-card h2 {
+        color: #1f2937;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 24px;
+    }
+
+    .payment-card img {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+.payment-info {
+    font-size: 16px;
+    color: #4b5563;
+    margin-bottom: 15px;
+}
+
+.payment-total {
+    font-size: 20px;
+    color: #111827;
+}
+
+.transaction-code {
+    background-color: #fef2f2;
+    color: #ef4444; /* Màu đỏ nổi bật */
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px dashed #f87171;
+    display: inline-block;
+    margin: 5px 0 20px 0;
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+
+.waiting-status {
+    color: #d97706;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Hiệu ứng xoay tròn cho icon chờ */
+.spinner {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,31 @@
+﻿<div class="payment-wrapper">
+    <div class="payment-card">
+        <h2>Thanh toán đơn hàng</h2>
+
+        <img src="@ViewBag.QR" width="250" alt="Mã QR Thanh Toán" />
+
+        <p class="payment-info payment-total">Số tiền: <b>@Model.Total VNĐ</b></p>
+
+        <p class="payment-info">Nội dung chuyển khoản:</p>
+        <h3 class="transaction-code">@Model.TransactionCode</h3>
+
+        <p class="waiting-status">
+            <span class="spinner">⏳</span> Đang chờ thanh toán...
+        </p>
+    </div>
+</div>
+
+<script>
+    setInterval(async () => {
+        try {
+            let res = await fetch('/Order/CheckStatus?id=@Model.Id');
+            let data = await res.json();
+
+            if (data.status == 1 || data.status === "Paid") {
+                window.location.href = "/CheckOut/Success?id=@Model.Id";
+            }
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra trạng thái:", error);
+        }
+    }, 3000);
+</script>

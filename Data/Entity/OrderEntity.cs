@@ -31,5 +31,6 @@ namespace Data.Entity
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public decimal DiscountAmount { get; set; }
+        public string TransactionCode { get; set; }
     }
 }
