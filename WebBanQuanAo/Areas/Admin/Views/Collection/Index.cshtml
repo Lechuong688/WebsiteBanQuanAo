@@ -1,100 +1,143 @@
 ﻿@using Data.Entity
 @model List<CollectionEntity>
-
+@section Styles {
+    <link rel="stylesheet" href="~/css/collectionadmin.css" />
+}
 <section class="content-header">
-    <h1>Quản lý bộ sưu tập</h1>
+    <h1 class="modern-page-title">Quản lý Bộ sưu tập</h1>
+    <p class="page-subtitle">Nhóm các sản phẩm theo chủ đề, sự kiện hoặc chiến dịch khuyến mãi</p>
 </section>
 
 <section class="content">
 
-    <a href="/Admin/Collection/Save" class="btn btn-primary mb-3">
-        <i class="fa fa-plus"></i> Thêm bộ sưu tập
-    </a>
-    <a href="/Admin/Banner/Index" class="btn btn-warning mb-3">
-        <i class="fa fa-list"></i> Quản lý banner
-    </a>
+    <div class="modern-card">
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-images text-primary"></i> Danh sách bộ sưu tập
+            </h4>
+            <div style="display: flex; gap: 10px;">
+                <a href="/Admin/Banner/Index" class="btn-modern-secondary">
+                    <i class="fas fa-list"></i> &nbsp;Banner
+                </a>
+                <a href="/Admin/Collection/Save" class="btn-modern-primary">
+                    <i class="fas fa-plus-circle"></i> &nbsp;Thêm bộ sưu tập
+                </a>
+            </div>
+        </div>
 
-    <div class="box box-primary">
-        <div class="box-body">
-            <table class="table table-bordered table-hover">
+        <div class="modern-toolbar">
+            <div class="search-wrapper">
+                <i class="fa fa-search"></i>
+                <input type="text"
+                       id="searchCollection"
+                       class="modern-control"
+                       placeholder="Tìm theo tên bộ sưu tập, mã code..."
+                       autocomplete="off" />
+            </div>
+
+            <select id="filterStatus" class="modern-control">
+                <option value="all">-- Tất cả trạng thái --</option>
+                <option value="active">Đang bật (Hoạt động)</option>
+                <option value="inactive">Đã tắt</option>
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table modern-table" id="collectionTable">
                 <thead>
                     <tr>
-                        <th width="80">ID</th>
+                        <th width="80" class="text-center">ID</th>
                         <th>Tên bộ sưu tập</th>
-                        <th>Code</th>
-                        <th>Thời gian</th>
-                        <th width="120">Trạng thái</th>
-                        <th width="180">Thao tác</th>
+                        <th>Mã Code</th>
+                        <th>Thời gian áp dụng</th>
+                        <th width="120" class="text-center">Trạng thái</th>
+                        <th width="160" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var isActiveStr = item.IsActive ? "active" : "inactive";
+
+                            <tr class="collection-row @(item.IsActive ? "" : "row-inactive")"
+                                data-name="@item.Name"
+                                data-code="@item.Code"
+                                data-status="@isActiveStr">
+
+                                <td class="text-center text-muted">#@item.Id</td>
+
+                                <td>
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">@item.Name</div>
+                                    @if (!string.IsNullOrEmpty(item.Note))
+                                    {
+                                        <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px;">@item.Note</div>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="modern-badge badge-soft-secondary" style="font-family: monospace;">@item.Code</span>
+                                </td>
+
+                                <td>
+                                    @if (item.StartDate != null || item.EndDate != null)
+                                    {
+                                        <div style="color: #334155; font-size: 0.9rem;">
+                                            <i class="far fa-calendar-alt text-muted" style="margin-right: 4px;"></i>
+                                            @(item.StartDate?.ToString("dd/MM/yyyy") ?? "--")
+                                            <span style="margin: 0 4px; color: #94a3b8;">&rarr;</span>
+                                            @(item.EndDate?.ToString("dd/MM/yyyy") ?? "--")
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #64748b; font-style: italic;">
+                                            <i class="fas fa-infinity text-muted" style="font-size: 0.8em; margin-right: 4px;"></i> Không giới hạn
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="modern-badge badge-soft-success">Đang bật</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="modern-badge badge-soft-danger">Đã tắt</span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+
+                                        <a href="/Admin/Collection/Save?id=@item.Id" class="btn-modern btn-outline-warning-modern" title="Sửa bộ sưu tập">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <a href="/Admin/Collection/Product?id=@item.Id" class="btn-modern btn-outline-info-modern" title="Gán sản phẩm vào BST">
+                                            <i class="fas fa-link"></i>
+                                        </a>
+
+                                        <form method="post" action="/Admin/Collection/Delete" style="margin: 0; display: flex;">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-modern btn-outline-danger-modern" title="Tắt / Xóa Collection này" onclick="return confirm('Bạn có chắc chắn muốn Tắt Collection này không?')">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@item.Id</td>
-
-                            <td>
-                                <strong>@item.Name</strong>
-                                @if (!string.IsNullOrEmpty(item.Note))
-                                {
-                                    <br />
-                                    <small class="text-muted">@item.Note</small>
-                                }
-                            </td>
-
-                            <td>
-                                <span class="label label-default">@item.Code</span>
-                            </td>
-
-                            <td>
-                                @if (item.StartDate != null || item.EndDate != null)
-                                {
-                                    <span>
-                                        @(item.StartDate?.ToString("dd/MM/yyyy") ?? "--")
-                                        -
-                                        @(item.EndDate?.ToString("dd/MM/yyyy") ?? "--")
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span>Không giới hạn</span>
-                                }
-                            </td>
-
-                            <td>
-                                @if (item.IsActive)
-                                {
-                                    <span class="label label-success">Đang bật</span>
-                                }
-                                else
-                                {
-                                    <span class="label label-danger">Đã tắt</span>
-                                }
-                            </td>
-
-                            <td>
-                                <a href="/Admin/Collection/Save?id=@item.Id"
-                                   class="btn btn-warning btn-sm">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-
-                                <a href="/Admin/Collection/Product?id=@item.Id"
-                                   class="btn btn-info btn-sm"
-                                   title="Gán sản phẩm">
-                                    <i class="fa fa-link"></i>
-                                </a>
-
-
-                                <form method="post"
-                                      action="/Admin/Collection/Delete"
-                                      style="display:inline;">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit"
-                                            class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Tắt Collection này?')">
-                                        <i class="fa fa-power-off"></i>
-                                    </button>
-                                </form>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-images fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                <p class="mb-0">Chưa có bộ sưu tập nào.</p>
                             </td>
                         </tr>
                     }
@@ -104,3 +147,42 @@
     </div>
 
 </section>
+
+<script>
+    // JS Xử lý lọc và tìm kiếm Client-side
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchCollection");
+        const filterStatus = document.getElementById("filterStatus");
+        const rows = document.querySelectorAll(".collection-row");
+
+        function filterTable() {
+            const keyword = normalizeText(searchInput.value);
+            const statusValue = filterStatus.value;
+
+            rows.forEach(row => {
+                const name = normalizeText(row.getAttribute("data-name"));
+                const code = normalizeText(row.getAttribute("data-code") || "");
+                const status = row.getAttribute("data-status");
+
+                // Check điều kiện tìm kiếm
+                const matchesKeyword = keyword === "" || name.includes(keyword) || code.includes(keyword);
+
+                // Check điều kiện lọc trạng thái
+                const matchesStatus = statusValue === "all" || statusValue === status;
+
+                if (matchesKeyword && matchesStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        function normalizeText(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        filterStatus.addEventListener("change", filterTable);
+    });
+</script>

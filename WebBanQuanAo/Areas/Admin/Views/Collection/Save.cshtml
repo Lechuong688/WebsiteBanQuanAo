@@ -1,105 +1,116 @@
 ﻿@model Data.Entity.CollectionEntity
-
+@section Styles {
+    <link rel="stylesheet" href="~/css/collectionadmin.css" />
+}
 <section class="content-header">
-    <h1>
-        @(Model.Id > 0 ? "Sửa Collection" : "Thêm Collection")
+    <h1 class="modern-page-title">
+        @(Model.Id > 0 ? "Sửa thông tin Bộ sưu tập" : "Thêm Bộ sưu tập mới")
     </h1>
+    <p class="page-subtitle">
+        Thiết lập tên, mã và thời gian áp dụng cho bộ sưu tập sản phẩm
+    </p>
 </section>
 
 <section class="content">
-    <div class="col-md-6">
-        <div class="box box-primary">
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="modern-card">
 
-            <form asp-area="Admin"
-                  asp-controller="Collection"
-                  asp-action="Save"
-                  method="post">
+                <form asp-area="Admin"
+                      asp-controller="Collection"
+                      asp-action="Save"
+                      method="post">
 
-                @Html.AntiForgeryToken()
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
 
-                <input type="hidden" name="Id" value="@Model.Id" />
+                    <div class="modern-card-body">
 
-                <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tên Bộ sưu tập <span style="color: #e11d48;">*</span></label>
+                                    <input type="text"
+                                           name="Name"
+                                           value="@Model.Name"
+                                           class="modern-control"
+                                           placeholder="Ví dụ: BST Mùa Hè 2026..."
+                                           required />
+                                </div>
+                            </div>
 
-                    <div class="form-group">
-                        <label>Tên Collection</label>
-                        <input type="text"
-                               name="Name"
-                               value="@Model.Name"
-                               class="form-control"
-                               placeholder="Nhập tên collection"
-                               required />
-                    </div>
-
-                    <div class="form-group">
-                        <label>Code</label>
-                        <input type="text"
-                               name="Code"
-                               value="@Model.Code"
-                               class="form-control"
-                               placeholder="Để trống sẽ tự sinh" />
-                        @Html.ValidationMessage("Code", "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ghi chú</label>
-                        <textarea name="Note"
-                                  class="form-control"
-                                  rows="3"
-                                  placeholder="Nhập ghi chú">@Model.Note</textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Ngày bắt đầu</label>
-                                <input type="date"
-                                       name="StartDate"
-                                       value="@(Model.StartDate.HasValue
-                                                                                                                            ? Model.StartDate.Value.ToString("yyyy-MM-dd")
-                                                                                                                            : "")"
-                                       class="form-control" />
+                            <div class="col-md-5">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Mã Code (Tùy chọn)</label>
+                                    <input type="text"
+                                           name="Code"
+                                           value="@Model.Code"
+                                           class="modern-control"
+                                           style="font-family: monospace; color: #0ea5e9;"
+                                           placeholder="Để trống sẽ tự sinh" />
+                                    @Html.ValidationMessage("Code", "", new { @class = "text-danger mt-1 d-block", style = "font-size: 0.85rem;" })
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Ngày kết thúc</label>
-                                <input type="date"
-                                       name="EndDate"
-                                       value="@(Model.EndDate.HasValue
-                                                                                                                            ? Model.EndDate.Value.ToString("yyyy-MM-dd")
-                                                                                                                            : "")"
-                                       class="form-control" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label"><i class="far fa-calendar-alt text-muted me-1"></i> Ngày bắt đầu</label>
+                                    <input type="date"
+                                           name="StartDate"
+                                           value="@(Model.StartDate.HasValue? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")"
+                                           class="modern-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label"><i class="far fa-calendar-check text-muted me-1"></i> Ngày kết thúc</label>
+                                    <input type="date"
+                                           name="EndDate"
+                                           value="@(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")"
+                                           class="modern-control" />
+                                </div>
                             </div>
                         </div>
+
+                        <div class="modern-form-group">
+                            <label class="modern-label">Ghi chú nội bộ</label>
+                            <textarea name="Note"
+                                      class="modern-control"
+                                      rows="3"
+                                      placeholder="Nhập thông tin mô tả chi tiết hoặc ghi chú nội bộ...">@Model.Note</textarea>
+                        </div>
+
+                        @if (Model.Id > 0)
+                        {
+                            <div class="modern-form-group" style="margin-bottom: 0;">
+                                <label class="toggle-wrapper">
+                                    <input type="checkbox"
+                                           name="IsActive"
+                                           value="true"
+                                           class="modern-toggle"
+                                           @(Model.IsActive ? "checked" : "") />
+                                    <span class="toggle-label-text">Đang hoạt động (Hiển thị trên website)</span>
+                                </label>
+                            </div>
+                        }
+
                     </div>
 
-                    @if (Model.Id > 0)
-                    {
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox"
-                                       name="IsActive"
-                                       value="true"
-                                       @(Model.IsActive ? "checked" : "") />
-                                Đang hoạt động
-                            </label>
-                        </div>
-                    }
-                </div>
+                    <div class="modern-btn-group">
+                        <button type="submit" class="btn-modern-primary">
+                            <i class="fas fa-save" style="margin-right: 5px;"></i> @(Model.Id > 0 ? "Lưu thay đổi" : "Tạo bộ sưu tập")
+                        </button>
+                        <a href="/Admin/Collection/Index" class="btn-modern-default">
+                            Hủy bỏ
+                        </a>
+                    </div>
 
-                <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">
-                        Lưu
-                    </button>
-                    <a href="/Admin/Collection/Index" class="btn btn-default">
-                        Quay lại
-                    </a>
-                </div>
                 </form>
-        </div>
 
-        
+            </div>
+        </div>
     </div>
 </section>

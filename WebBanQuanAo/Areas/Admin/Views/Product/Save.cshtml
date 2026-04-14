@@ -1,5 +1,7 @@
 ﻿@model WebBanQuanAo.Areas.Admin.Models.UpdateProductViewModel
-
+@section Styles {
+    <link rel="stylesheet" href="~/css/productadmin.css" />
+}
 <section class="content-header">
     <h1 class="modern-page-title">
         @(Model.Id > 0 ? "Sửa sản phẩm" : "Thêm sản phẩm mới")
