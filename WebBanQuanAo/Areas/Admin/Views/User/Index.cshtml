@@ -1,38 +1,42 @@
 ﻿@* <div class="content-wrapper"> *@
 <section class="content-header">
-    <h1>Danh sách người dùng</h1>
+    <h1 class="modern-page-title">Quản lý Người Dùng</h1>
 </section>
 
 <section class="content">
-    <div class="row" style="margin-bottom: 15px">
-        <div class="col-sm-12">
-            <div class="col-sm-6">
-                <a href="/Admin/User/CreateUser" class="btn btn-primary">
-                    <i class="fa fa-plus"></i> Thêm người dùng
-                </a>
-            </div>
-            <div class="col-sm-6 text-right">
+    <div class="modern-toolbar">
+        <div class="toolbar-group">
+            <a href="/Admin/User/CreateUser" class="btn-modern-primary">
+                <i class="fa fa-plus"></i> Thêm người dùng
+            </a>
+        </div>
+
+        <div class="toolbar-group">
+            <div style="position: relative;">
                 <input type="text"
                        id="keyword"
-                       class="form-control"
-                       placeholder="Tìm kiếm..."
-                       style="width:300px; display:inline-block;" />
+                       class="modern-control"
+                       placeholder="Nhập từ khóa tìm kiếm..."
+                       style="width:250px;" />
+            </div>
 
-                <button class="btn btn-primary" onclick="loadUsers(1)">Tìm</button>
-                <b>
-                    Hiển thị
-                    <select id="pageSize"
-                            class="form-control"
-                            style="width:90px; display:inline-block; margin-left:15px;"
-                            onchange="changePageSize()">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    &nbsp;tài khoản
-                </b>
+            <button class="btn-modern-primary" onclick="loadUsers(1)">
+                <i class="fa fa-search"></i> Tìm
+            </button>
+
+            <div class="page-size-wrapper">
+                <span>Hiển thị</span>
+                <select id="pageSize"
+                        class="modern-control"
+                        style="padding: 6px 10px; cursor: pointer;"
+                        onchange="changePageSize()">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span>dòng</span>
             </div>
         </div>
     </div>
@@ -47,6 +51,13 @@
     <script>
         $(document).ready(function () {
             loadUsers(1);
+
+            // Bổ sung UX: Nhấn Enter ở ô tìm kiếm sẽ tự động gọi nút Tìm
+            $('#keyword').on('keypress', function (e) {
+                if (e.which === 13) {
+                    loadUsers(1);
+                }
+            });
         });
 
         function loadUsers(page) {
@@ -68,7 +79,7 @@
             loadUsers(1);
         }
 
-            function goUpdateUser(id) {
+        function goUpdateUser(id) {
             window.location.href = '/Admin/User/UpdateUser/' + id;
         }
 
@@ -76,14 +87,14 @@
             if (!confirm('Bạn có chắc muốn xóa người dùng này?'))
                 return;
 
-                $.ajax({
-            url: '/Admin/User/DeleteUser',
-            type: 'POST',
-            data: { id: id },
-            success: function () {
-                alert('Xóa người dùng thành công');
-                loadUsers(1);
-            },
+            $.ajax({
+                url: '/Admin/User/DeleteUser',
+                type: 'POST',
+                data: { id: id },
+                success: function () {
+                    alert('Xóa người dùng thành công');
+                    loadUsers(1);
+                },
                 error: function (xhr) {
                     if (xhr.responseText) {
                         alert(xhr.responseText);
@@ -94,7 +105,7 @@
             });
         }
 
-                function toggleLockUser(id) {
+        function toggleLockUser(id) {
             if (!confirm('Bạn có chắc muốn thay đổi trạng thái khóa?')) return;
 
             $.ajax({
@@ -109,6 +120,5 @@
                 }
             });
         }
-
     </script>
 }
