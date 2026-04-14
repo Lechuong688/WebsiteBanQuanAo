@@ -1,7 +1,9 @@
 ﻿using Data.Repository;
+using Data.Repository.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Security.Claims;
 using WebBanQuanAo.Models;
 
 namespace WebBanQuanAo.Controllers
@@ -9,10 +11,12 @@ namespace WebBanQuanAo.Controllers
     public class OrderController : Controller
     {
         private readonly DataContext _context;
+        private readonly IOrderRepository _orderRepository;
 
-        public OrderController(DataContext context)
+        public OrderController(DataContext context, IOrderRepository orderRepository)
         {
             _context = context;
+            _orderRepository = orderRepository;
         }
 
         public IActionResult Payment(int id)
@@ -113,6 +117,35 @@ namespace WebBanQuanAo.Controllers
                 Console.WriteLine("ERROR: " + ex.ToString());
                 return Ok();
             }
+        }
+
+        public IActionResult History()
+        {
+            string userId = null;
+            var guestOrderIds = new List<int>();
+
+            // Lấy ID người dùng nếu đã đăng nhập
+            if (User.Identity.IsAuthenticated)
+            {
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+            else
+            {
+                // Đọc Cookie nếu là khách vãng lai
+                var guestCookie = Request.Cookies["GuestOrders"];
+                if (!string.IsNullOrEmpty(guestCookie))
+                {
+                    guestOrderIds = guestCookie.Split(',')
+                        .Select(id => int.TryParse(id, out var parsed) ? parsed : 0)
+                        .Where(id => id > 0)
+                        .ToList();
+                }
+            }
+
+            // Giao cho Repository xử lý và trả về DTO
+            var orders = _orderRepository.GetOrderHistory(userId, guestOrderIds);
+
+            return View(orders);
         }
     }
 }

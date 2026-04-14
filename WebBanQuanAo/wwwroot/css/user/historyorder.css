@@ -1,0 +1,184 @@
+﻿/* Bọc toàn bộ CSS bên trong class .history-page-wrapper
+           để đảm bảo không bao giờ conflict với Navbar */
+.history-page-wrapper {
+    --vybe-orange: #EE7C6B;
+    --bg-gray: #f5f5f5;
+    --border-color: #eaeaea;
+    background-color: var(--bg-gray);
+    min-height: 100vh;
+}
+
+/* --- TABS TRẠNG THÁI (Đã thêm prefix .history-page-wrapper) --- */
+.history-page-wrapper .order-tabs {
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+    .history-page-wrapper .order-tabs .nav-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .history-page-wrapper .order-tabs .nav-link {
+        color: #333;
+        padding: 15px 0;
+        font-weight: 500;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        border-radius: 0;
+        background: transparent;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+        .history-page-wrapper .order-tabs .nav-link:hover {
+            color: var(--vybe-orange);
+        }
+
+        .history-page-wrapper .order-tabs .nav-link.active {
+            color: var(--vybe-orange);
+            border-bottom: 3px solid var(--vybe-orange);
+        }
+
+/* --- THẺ ĐƠN HÀNG --- */
+.history-page-wrapper .order-card {
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.history-page-wrapper .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-page-wrapper .shop-badge {
+    background: #EE7C6B;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.history-page-wrapper .order-status-text {
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* --- SẢN PHẨM --- */
+.history-page-wrapper .order-body {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+}
+
+.history-page-wrapper .order-item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+}
+
+.history-page-wrapper .order-item-info {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.history-page-wrapper .order-item-name {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.history-page-wrapper .order-item-variant {
+    color: #757575;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* --- FOOTER --- */
+.history-page-wrapper .order-footer {
+    padding: 20px;
+    background: #fffafa;
+}
+
+.history-page-wrapper .total-price-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.history-page-wrapper .total-price-number {
+    color: var(--vybe-orange);
+    font-size: 24px;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.history-page-wrapper .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-page-wrapper .action-note {
+    color: #757575;
+    font-size: 12px;
+}
+
+.history-page-wrapper .btn-action-main {
+    background: var(--vybe-orange);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 3px;
+    min-width: 130px;
+    transition: 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+    .history-page-wrapper .btn-action-main:hover {
+        background: #d96959;
+        color: #fff;
+    }
+
+.history-page-wrapper .btn-action-sub {
+    background: #fff;
+    color: #555;
+    border: 1px solid #ccc;
+    padding: 8px 20px;
+    border-radius: 3px;
+    min-width: 130px;
+    transition: 0.2s;
+}
+
+    .history-page-wrapper .btn-action-sub:hover {
+        background: #f8f8f8;
+    }
+
+.history-page-wrapper .d-none {
+    display: none !important;
+}

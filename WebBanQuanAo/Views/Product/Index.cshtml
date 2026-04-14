@@ -140,9 +140,25 @@
         let searchTimer;
 
         $(document).ready(function () {
+            // 1. Đọc các tham số từ thanh địa chỉ (URL)
+            const urlParams = new URLSearchParams(window.location.search);
 
+            // 2. Kiểm tra xem URL có truyền typeId không (từ Menu dropdown)
+            if (urlParams.has('typeId')) {
+                typeId = parseInt(urlParams.get('typeId'));
+            }
+
+            // 3. Kiểm tra xem URL có truyền keyword không (từ thanh tìm kiếm Topbar)
+            if (urlParams.has('keyword')) {
+                keyword = urlParams.get('keyword');
+                $('#searchKeyword').val(keyword); // Gán từ khóa vào ô input cho khách thấy
+            }
+
+            // 4. Cập nhật giao diện bộ lọc (hiện các tag Đang chọn)
+            renderActiveFilters();
+
+            // 5. Gọi AJAX load sản phẩm với các tham số vừa lấy được
             loadProducts();
-
         });
 
 

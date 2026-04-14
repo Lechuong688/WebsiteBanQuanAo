@@ -128,6 +128,7 @@
                             <li><a class="dropdown-item" href="#"><i class="fa fa-user me-2"></i> Tài khoản</a></li>
                             <li><a class="dropdown-item" href="~/Product/ProductWishlist"><i class="fa fa-heart me-2"></i> Yêu thích</a></li>
                             <li><a class="dropdown-item" href="~/Cart/Index"><i class="fa fa-shopping-cart me-2"></i> Giỏ hàng</a></li>
+                            <li><a class="dropdown-item" href="~/Order/History"><i class="fa fa-shopping-cart me-2"></i> Đơn hàng đã mua</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout"><i class="fa fa-sign-out me-2"></i> Đăng xuất</a></li>
                         }
@@ -171,7 +172,7 @@
         <div class="col-md-4 col-lg-3 text-center text-lg-end">
             <div class="d-inline-flex align-items-center">
                 <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
-                <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
+                <a href="~/Product/ProductWishlist" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
                 <a href="~/Cart/Index" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span></a>
             </div>
         </div>

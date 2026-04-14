@@ -17,5 +17,10 @@ namespace Data.Repository.Order
             DateTime? fromDate, DateTime? toDate, int page, int pageSize);
         Task<OrderAdminDetailDTO?> GetOrderDetail(int orderId);
         Task UpdateStatus(int orderId, int status, string updatedBy);
+        List<OrderHistoryDTO> GetOrderHistory(string userId, List<int> guestOrderIds);
+        Data.Entity.OrderEntity GetOrderById(int id);
+        Data.Entity.OrderEntity GetOrderByWebhookContent(string content);
+        void UpdateOrderStatus(int orderId, int status);
+        Task CancelExpiredOrders();
     }
 }

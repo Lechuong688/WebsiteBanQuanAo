@@ -9,6 +9,7 @@ using Data.Repository.Order;
 using Data.Repository.Product;
 using Data.Repository.User;
 using Data.Service.Auth;
+using Data.Service.Order;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +49,8 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
+// Đăng ký Background Service
+builder.Services.AddHostedService<OrderCleanupService>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddSession();
 

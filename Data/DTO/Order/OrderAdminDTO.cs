@@ -19,5 +19,6 @@ namespace Data.DTO.Order
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int TotalRecord { get; set; }
+        public string TransactionCode { get; set; }
     }
 }

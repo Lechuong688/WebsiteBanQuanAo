@@ -13,14 +13,14 @@ namespace Data.Entity
         public int Id { get; set; }
         public string? UserId { get; set; }
         [Required]
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         [Required]
-        public string Address { get; set; }
+        public string? Address { get; set; }
         [Required]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
         public int Status { get; set; }
         public string? Note { get; set; }
         public decimal Total { get; set; }
@@ -31,6 +31,6 @@ namespace Data.Entity
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public decimal DiscountAmount { get; set; }
-        public string TransactionCode { get; set; }
+        public string? TransactionCode { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Data.DTO.Cart;
 using Data.DTO.CheckOut;
 using Data.Entity;
+using Data.Helper;
 using Data.Repository;
 using Data.Repository.Order;
 using Microsoft.AspNetCore.Mvc;
@@ -236,7 +237,7 @@ namespace WebBanQuanAo.Controllers
 
                 }
             }
-            dto.TransactionCode = "ORDER" + Guid.NewGuid().ToString("N").Substring(0, 6);
+            dto.TransactionCode = OrderHelper.GenerateTransactionCode();
             dto.DiscountAmount = discountAmount;
             if (action == "apply")
             {
@@ -323,6 +324,19 @@ namespace WebBanQuanAo.Controllers
                 return Content("Không tìm thấy đơn sau khi tạo ❌");
             }
 
+            if (string.IsNullOrEmpty(userId))
+            {
+                var existingCookie = Request.Cookies["GuestOrders"];
+                var newCookieValue = string.IsNullOrEmpty(existingCookie)
+                    ? order.Id.ToString()
+                    : $"{existingCookie},{order.Id}";
+
+                Response.Cookies.Append("GuestOrders", newCookieValue, new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(30),
+                    HttpOnly = true
+                });
+            }
 
             if (paymentMethod == "BANK")
             {
@@ -344,7 +358,17 @@ namespace WebBanQuanAo.Controllers
 
         public IActionResult Success(int id)
         {
-            ViewBag.OrderId = id;
+            // Tìm lại đơn hàng bằng Repo để lấy TransactionCode
+            var order = _orderRepository.GetOrderById(id);
+
+            if (order == null)
+            {
+                return RedirectToAction("Index", "Home"); // Tránh lỗi nếu ko tìm thấy
+            }
+
+            // Truyền mã xịn ra View
+            ViewBag.TransactionCode = order.TransactionCode;
+
             return View();
         }
     }

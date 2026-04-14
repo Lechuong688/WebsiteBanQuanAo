@@ -103,7 +103,7 @@
                         foreach (var o in Model.Items)
                         {
                             <tr>
-                                <td class="text-center order-id-text">#@o.Id</td>
+                                <td class="text-center order-id-text">#@o.TransactionCode</td>
 
                                 <td class="fw-bold text-dark">
                                     @(string.IsNullOrEmpty(o.FullName) ? "Khách vãng lai" : o.FullName)
