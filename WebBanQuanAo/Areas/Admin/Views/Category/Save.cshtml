@@ -1,86 +1,102 @@
 ﻿@model WebBanQuanAo.Areas.Admin.Models.MasterDataViewModel
 
 <section class="content-header">
-    <h1>
-        @(Model.Id > 0 ? "Sửa danh mục" : "Thêm danh mục")
+    <h1 class="modern-page-title">
+        @(Model.Id > 0 ? "Sửa thông tin danh mục" : "Thêm danh mục mới")
     </h1>
+    <p class="page-subtitle">
+        Quản lý cấu trúc phân cấp và mã phân loại cho sản phẩm
+    </p>
 </section>
 
 <section class="content">
-    <div class="col-md-6">
-        <div class="box box-primary">
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="modern-card">
 
-            <form asp-area="Admin"
-                  asp-controller="Category"
-                  asp-action="Save"
-                  method="post">
+                <form asp-area="Admin"
+                      asp-controller="Category"
+                      asp-action="Save"
+                      method="post">
 
-                @Html.AntiForgeryToken()
-                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    @Html.AntiForgeryToken()
 
-                <input type="hidden" name="Id" value="@Model.Id" />
+                    <div class="modern-card-body">
 
-                <div class="box-body">
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="validation-summary-errors">
+                                @Html.ValidationSummary(false, "")
+                            </div>
+                        }
 
-                    <div class="form-group">
-                        <label>Danh mục cha</label>
-                        <select class="form-control" name="ParentId">
-                            <option value="0">-- Danh mục chính --</option>
+                        <input type="hidden" name="Id" value="@Model.Id" />
 
-                            @foreach (var item in Model.ParentItems)
-                            {
-                                if (item.Id != Model.Id)
+                        <div class="modern-form-group">
+                            <label class="modern-label"><i class="fas fa-sitemap text-muted" style="margin-right: 5px;"></i> Cấp danh mục (Danh mục cha)</label>
+                            <select class="modern-control" name="ParentId">
+                                <option value="0" style="font-weight: bold; color: #3b82f6;">-- Đặt làm Danh mục chính --</option>
+
+                                @foreach (var item in Model.ParentItems)
                                 {
-                                    <option value="@item.Id"
-                                            selected="@(item.Id == Model.ParentId)">
-                                        @item.Name
-                                    </option>
+                                    if (item.Id != Model.Id)
+                                    {
+                                        <option value="@item.Id" selected="@(item.Id == Model.ParentId)">
+                                            @item.Name
+                                        </option>
+                                    }
                                 }
-                            }
-                        </select>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tên danh mục <span style="color: #e11d48;">*</span></label>
+                                    <input type="text"
+                                           name="Name"
+                                           value="@Model.Name"
+                                           class="modern-control"
+                                           placeholder="Ví dụ: Áo sơ mi nam..."
+                                           required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Mã Code (Tùy chọn)</label>
+                                    <input type="text"
+                                           name="Code"
+                                           value="@Model.Code"
+                                           class="modern-control"
+                                           style="font-family: monospace; color: #0ea5e9;"
+                                           placeholder="Để trống sẽ tự sinh" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modern-form-group" style="margin-bottom: 0;">
+                            <label class="modern-label">Ghi chú nội bộ</label>
+                            <textarea name="Note"
+                                      class="modern-control"
+                                      rows="3"
+                                      placeholder="Nhập ghi chú hoặc mô tả ngắn cho danh mục này...">@Model.Note</textarea>
+                        </div>
+
                     </div>
 
-                    <div class="form-group">
-                        <label>Tên danh mục</label>
-                        <input type="text"
-                               name="Name"
-                               value="@Model.Name"
-                               class="form-control"
-                               placeholder="Nhập tên danh mục"
-                               required />
+                    <div class="modern-btn-group">
+                        <button type="submit" class="btn-modern-primary">
+                            <i class="fas fa-save" style="margin-right: 5px;"></i> @(Model.Id > 0 ? "Lưu thay đổi" : "Lưu danh mục")
+                        </button>
+                        <a href="/Admin/Category/Index" class="btn-modern-default">
+                            Hủy bỏ
+                        </a>
                     </div>
 
-                    <div class="form-group">
-                        <label>Code</label>
-                        <input type="text"
-                               name="Code"
-                               value="@Model.Code"
-                               class="form-control"
-                               placeholder="Để trống sẽ tự sinh" />
-                    </div>
+                </form>
 
-                    <div class="form-group">
-                        <label>Ghi chú</label>
-                        <input type="text"
-                               name="Note"
-                               value="@Model.Note"
-                               class="form-control"
-                               placeholder="Nhập ghi chú" />
-                    </div>
-
-                </div>
-
-                <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">
-                        Lưu
-                    </button>
-                    <a href="/Admin/Category/Index" class="btn btn-default">
-                        Quay lại
-                    </a>
-                </div>
-
-            </form>
-
+            </div>
         </div>
     </div>
 </section>

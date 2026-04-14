@@ -7,97 +7,91 @@
 
     var currentStatus = Context.Request.Query["status"].ToString();
 
+    // Map thẳng trạng thái sang class màu Soft UI
     string GetStatusStyle(int statusId)
     {
         return statusId switch
         {
-            0 => "status-new",
-            1 => "status-info",
-            2 => "status-shipping",
-            3 => "status-success",
-            4 => "status-danger",
-            _ => "status-default"
+            0 => "badge-soft-primary",   // Mới
+            1 => "badge-soft-info",      // Đã xác nhận / Đang chuẩn bị
+            2 => "badge-soft-warning",   // Đang giao
+            3 => "badge-soft-success",   // Hoàn thành
+            4 => "badge-soft-danger",    // Đã hủy
+            _ => "badge-soft-secondary"  // Mặc định
         };
     }
 }
 
-<div class="container-fluid py-5">
+<div class="container-fluid py-4">
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-end mb-4 gap-3">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Quản lý đơn hàng</h2>
-            <p class="text-muted mb-0">Theo dõi và xử lý các đơn đặt hàng mới nhất.</p>
+    <div class="modern-card">
+        <div class="modern-card-header" style="flex-direction: column; align-items: flex-start; gap: 5px;">
+            <h4 class="modern-card-title">
+                <i class="fas fa-shopping-cart text-primary"></i> Quản lý đơn hàng
+            </h4>
+            <p class="modern-card-subtitle">Theo dõi và xử lý các đơn đặt hàng từ khách hàng.</p>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body py-3">
+        <div class="modern-toolbar">
+            <form method="get" class="toolbar-row" style="margin-bottom: 0;">
+                <div class="filter-group">
 
-                <form method="get" class="row g-2 align-items-center">
+                    <select name="status" class="modern-control" style="min-width: 160px;">
+                        <option value="">-- Tất cả trạng thái --</option>
+                        @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
+                        {
+                            <option value="@((int)s)" selected="@(currentStatus == ((int)s).ToString())">
+                                @s
+                            </option>
+                        }
+                    </select>
 
-                    <div class="col-auto">
-                        <span class="fw-semibold text-muted">
-                            <i class="bi bi-funnel me-1"></i> Bộ lọc
-                        </span>
-                    </div>
-
-                    <div class="col-md-2">
-                        <select name="status" class="form-select">
-                            <option value="">Tất cả trạng thái</option>
-                            @foreach (OrderStatus s in Enum.GetValues(typeof(OrderStatus)))
-                            {
-                                <option value="@((int)s)" selected="@(currentStatus == ((int)s).ToString())">
-                                    @s
-                                </option>
-                            }
-                        </select>
-                    </div>
-
-                    <div class="col-md-3">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
                         <input type="text"
                                name="keyword"
                                value="@Context.Request.Query["keyword"]"
-                               class="form-control"
-                               placeholder="Tên khách hàng..." />
+                               class="modern-control"
+                               placeholder="Tìm theo tên khách, SĐT..." />
                     </div>
 
-                    <div class="col-md-2">
+                    <div style="display: flex; align-items: center; gap: 8px;">
                         <input type="date"
                                name="fromDate"
                                value="@Context.Request.Query["fromDate"]"
-                               class="form-control" />
-                    </div>
-
-                    <div class="col-md-2">
+                               class="modern-control"
+                               title="Từ ngày" />
+                        <span style="color: #94a3b8;"><i class="fas fa-minus"></i></span>
                         <input type="date"
                                name="toDate"
                                value="@Context.Request.Query["toDate"]"
-                               class="form-control" />
+                               class="modern-control"
+                               title="Đến ngày" />
                     </div>
 
-                    <div class="col-auto">
-                        <button class="btn btn-primary px-4">
-                            <i class="bi bi-search me-1"></i> Lọc
-                        </button>
-                    </div>
+                    <button type="submit" class="btn-modern-primary">
+                        <i class="fas fa-filter" style="margin-right: 5px;"></i> Lọc kết quả
+                    </button>
 
-                </form>
+                    <a href="?" class="btn-modern btn-outline-secondary-modern">
+                        Xóa bộ lọc
+                    </a>
 
-            </div>
+                </div>
+            </form>
         </div>
-    </div>
 
-    <div class="dashboard-card overflow-hidden">
         <div class="table-responsive">
-            <table class="table table-modern align-middle">
+            <table class="table modern-table">
                 <thead>
                     <tr>
-                        <th class="ps-4">Mã đơn</th>
+                        <th class="text-center" width="100">Mã đơn</th>
                         <th>Khách hàng</th>
                         <th>Liên lạc</th>
                         <th class="text-end">Tổng tiền</th>
                         <th class="text-center">Trạng thái</th>
                         <th>Ngày tạo</th>
-                        <th class="text-end pe-4">Hành động</th>
+                        <th class="text-center" width="120">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,22 +100,34 @@
                         foreach (var o in Model.Items)
                         {
                             <tr>
-                                <td class="ps-4 fw-bold" style="color: var(--primary-color)">#@o.Id</td>
-                                <td>@(string.IsNullOrEmpty(o.FullName) ? "Khách vãng lai" : o.FullName)</td>
-                                <td>@o.PhoneNumber</td>
-                                <td class="text-end fw-bold">@o.Total.ToString("N0") đ</td>
+                                <td class="text-center order-id-text">#@o.Id</td>
+
+                                <td class="fw-bold text-dark">
+                                    @(string.IsNullOrEmpty(o.FullName) ? "Khách vãng lai" : o.FullName)
+                                </td>
+
+                                <td>
+                                    <span style="color: #475569;"><i class="fas fa-phone-alt" style="font-size: 0.8em; margin-right: 4px; color: #94a3b8;"></i> @o.PhoneNumber</span>
+                                </td>
+
+                                <td class="text-end price-text">
+                                    @o.Total.ToString("N0") đ
+                                </td>
+
                                 <td class="text-center">
-                                    <span class="status-badge @GetStatusStyle(o.Status)">
+                                    <span class="modern-badge @GetStatusStyle(o.Status)">
                                         @((OrderStatus)o.Status)
                                     </span>
                                 </td>
-                                <td class="text-muted small">
-                                    @o.CreatedDate?.ToString("dd/MM/yyyy")<br />
-                                    <span style="font-size: 0.75em">@o.CreatedDate?.ToString("HH:mm")</span>
+
+                                <td>
+                                    <div style="color: #334155; font-weight: 500;">@o.CreatedDate?.ToString("dd/MM/yyyy")</div>
+                                    <div style="color: #94a3b8; font-size: 0.85em;"><i class="far fa-clock"></i> @o.CreatedDate?.ToString("HH:mm")</div>
                                 </td>
-                                <td class="text-end pe-4">
-                                    <a href="/Admin/Order/Detail/@o.Id" class="btn-action text-decoration-none">
-                                        Chi tiết <i class="bi bi-arrow-right ms-1"></i>
+
+                                <td class="text-center">
+                                    <a href="/Admin/Order/Detail/@o.Id" class="btn-modern btn-outline-info-modern">
+                                        Chi tiết <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -131,84 +137,61 @@
                     {
                         <tr>
                             <td colspan="7" class="text-center py-5 text-muted">
-                                Không có đơn hàng nào
+                                <i class="fas fa-clipboard-list fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                <p class="mb-0">Không tìm thấy đơn hàng nào khớp với điều kiện lọc.</p>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-    </div>
 
-    @{
-        var totalPages = Model.TotalPages;
-
-        int windowSize = 5;
-        int half = windowSize / 2;
-
-        int startPage = Model.Page - half;
-        int endPage = Model.Page + half;
-
-        if (startPage < 1)
+        @if (Model.TotalPages > 1)
         {
-            startPage = 1;
-            endPage = Math.Min(windowSize, totalPages);
-        }
+            var totalPages = Model.TotalPages;
+            int windowSize = 5;
+            int half = windowSize / 2;
+            int startPage = Model.Page - half;
+            int endPage = Model.Page + half;
 
-        if (endPage > totalPages)
-        {
-            endPage = totalPages;
-            startPage = Math.Max(1, totalPages - windowSize + 1);
-        }
-    }
-    @if (Model.TotalPages > 1)
-    {
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
+            if (startPage < 1)
+            {
+                startPage = 1;
+                endPage = Math.Min(windowSize, totalPages);
+            }
+            if (endPage > totalPages)
+            {
+                endPage = totalPages;
+                startPage = Math.Max(1, totalPages - windowSize + 1);
+            }
 
-                <!-- First -->
-                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=1">
-                        «
-                    </a>
-                </li>
+            // Gộp chuỗi Query String
+            var queryString = $"?status={ViewBag.Status}&keyword={Context.Request.Query["keyword"]}&fromDate={Context.Request.Query["fromDate"]}&toDate={Context.Request.Query["toDate"]}";
 
-                <!-- Previous -->
-                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@(Model.Page - 1)">
-                        ‹
-                    </a>
-                </li>
-
-                @for (int i = startPage; i <= endPage; i++)
-                {
-                    <li class="page-item @(i == Model.Page ? "active" : "")">
-                        <a class="page-link"
-                           href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@i">
-                            @i
-                        </a>
+            <nav aria-label="Page navigation">
+                <ul class="modern-pagination">
+                    <li class="@(Model.Page == 1 ? "disabled" : "")">
+                        <a href="@queryString&page=1" title="Trang đầu">«</a>
                     </li>
-                }
+                    <li class="@(Model.Page == 1 ? "disabled" : "")">
+                        <a href="@queryString&page=@(Model.Page - 1)" title="Trang trước">‹</a>
+                    </li>
 
-                <!-- Next -->
-                <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@(Model.Page + 1)">
-                        ›
-                    </a>
-                </li>
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="@(i == Model.Page ? "active" : "")">
+                            <a href="@queryString&page=@i">@i</a>
+                        </li>
+                    }
 
-                <!-- Last -->
-                <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       href="?status=@ViewBag.Status&keyword=@Context.Request.Query["keyword"]&fromDate=@Context.Request.Query["fromDate"]&toDate=@Context.Request.Query["toDate"]&page=@totalPages">
-                        »
-                    </a>
-                </li>
-
-            </ul>
-        </nav>
-    }
+                    <li class="@(Model.Page == totalPages ? "disabled" : "")">
+                        <a href="@queryString&page=@(Model.Page + 1)" title="Trang sau">›</a>
+                    </li>
+                    <li class="@(Model.Page == totalPages ? "disabled" : "")">
+                        <a href="@queryString&page=@totalPages" title="Trang cuối">»</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
 </div>

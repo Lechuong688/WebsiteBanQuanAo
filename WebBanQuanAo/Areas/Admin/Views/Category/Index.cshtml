@@ -1,83 +1,110 @@
 ﻿@model List<Data.Entity.MasterDataEntity>
 
-<section class="content-header">
-    <h1>Quản lý danh mục</h1>
-</section>
+<div class="container-fluid py-4">
 
-<section class="content">
-    <a href="/Admin/Category/Save" class="btn btn-primary mb-3">
-        <i class="fa fa-plus"></i> Thêm danh mục
-    </a>
+    <div class="modern-card">
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-tags text-primary"></i> Quản lý danh mục
+            </h4>
+            <a href="/Admin/Category/Save" class="btn-modern-primary">
+                <i class="fas fa-plus-circle"></i> &nbsp;Thêm danh mục
+            </a>
+        </div>
 
-    <div class="box box-primary">
-        <div class="box-body">
-            <table class="table table-bordered table-hover">
+        <div class="modern-toolbar">
+            <div class="search-wrapper">
+                <i class="fa fa-search"></i>
+                <input type="text"
+                       id="searchCategory"
+                       class="modern-control"
+                       placeholder="Tìm theo tên hoặc mã code..."
+                       autocomplete="off" />
+            </div>
+
+            <select id="filterType" class="modern-control">
+                <option value="all">-- Tất cả cấp bậc --</option>
+                <option value="main">Chỉ hiện Danh mục chính</option>
+                <option value="sub">Chỉ hiện Danh mục con</option>
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table modern-table" id="categoryTable">
                 <thead>
                     <tr>
-                        <th width="80">ID</th>
+                        <th width="80" class="text-center">ID</th>
                         <th>Tên danh mục</th>
-                        <th>Code</th>
-                        <th>Danh mục</th>
-                        <th width="150">Thao tác</th>
+                        <th>Mã Code</th>
+                        <th>Phân cấp</th>
+                        <th width="120" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @if (Model != null && Model.Any())
                     {
-                        var mainCategory = item.GroupId == 0
-                        ? item
-                        : Model.FirstOrDefault(x => x.Id == item.GroupId);
+                        foreach (var item in Model)
+                        {
+                            var isMain = item.GroupId == 0;
+                            var parent = isMain ? null : Model.FirstOrDefault(x => x.Id == item.GroupId);
 
+                            // Gán data-attributes để JS đọc và lọc
+                            <tr class="category-row @(isMain ? "row-main-category" : "")"
+                                data-name="@item.Name"
+                                data-code="@item.Code"
+                                data-type="@(isMain ? "main" : "sub")">
+
+                                <td class="text-center text-muted">#@item.Id</td>
+
+                                <td>
+                                    @if (isMain)
+                                    {
+                                        <span>@item.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="padding-left: 20px; color: #475569;">
+                                            <i class="fas fa-level-up-alt fa-rotate-90 text-muted" style="margin-right: 5px;"></i> @item.Name
+                                        </span>
+                                    }
+                                </td>
+
+                                <td style="font-family: monospace; font-size: 0.95rem; color: #0ea5e9;">
+                                    @item.Code
+                                </td>
+
+                                <td>
+                                    @if (isMain)
+                                    {
+                                        <span class="modern-badge badge-soft-primary">Danh mục chính</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="modern-badge badge-soft-secondary" title="Thuộc danh mục: @(parent?.Name)">
+                                            Thuộc: @(parent != null ? parent.Name : "Không xác định")
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    <div style="display: flex; gap: 6px; justify-content: center;">
+                                        <a href="/Admin/Category/Save/@item.Id" class="btn-modern btn-outline-warning-modern" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/Admin/Category/Delete/@item.Id" class="btn-modern btn-outline-danger-modern" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <td>@item.Id</td>
-                            <td>
-                                @if (item.GroupId == 0)
-                                {
-                                    <strong>@item.Name</strong>
-                                }
-                                else
-                                {
-                                    <span>@item.Name</span>
-                                }
-                            </td>
-                            <td>
-                                @if (item.GroupId == 0)
-                                {
-                                    <strong>@item.Code</strong>
-                                }
-                                else
-                                {
-                                    <span>@item.Code</span>
-                                }
-                            </td>
-                            <td>
-                                @if (item.GroupId == 0)
-                                {
-                                    <span class="label label-primary">Danh mục chính</span>
-                                }
-                                else
-                                {
-                                    var parent = Model.FirstOrDefault(x => x.Id == item.GroupId);
-                                    <span class="label label-info">
-                                        @(parent != null ? parent.Name : "Không xác định")
-                                    </span>
-                                }
-                            </td>
-
-                            <td>
-                                <a href="/Admin/Category/Save/@item.Id"
-                                   class="btn btn-warning btn-sm">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-
-                                @* @if (item.GroupId != 0)
-                                { *@
-                                    <a href="/Admin/Category/Delete/@item.Id"
-                                       class="btn btn-danger btn-sm"
-                                       onclick="return confirm('Xóa danh mục này?')">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                @* } *@
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-tags fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                <p class="mb-0">Chưa có dữ liệu danh mục nào.</p>
                             </td>
                         </tr>
                     }
@@ -85,4 +112,44 @@
             </table>
         </div>
     </div>
-</section>
+</div>
+
+<script>
+    // JS Xử lý lọc và tìm kiếm Client-side
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchCategory");
+        const filterType = document.getElementById("filterType");
+        const rows = document.querySelectorAll(".category-row");
+
+        function filterTable() {
+            const keyword = normalizeText(searchInput.value);
+            const typeValue = filterType.value;
+
+            rows.forEach(row => {
+                const name = normalizeText(row.getAttribute("data-name"));
+                const code = normalizeText(row.getAttribute("data-code") || "");
+                const type = row.getAttribute("data-type");
+
+                // Check điều kiện tìm kiếm (khớp tên hoặc mã)
+                const matchesKeyword = keyword === "" || name.includes(keyword) || code.includes(keyword);
+
+                // Check điều kiện lọc loại (all, main, sub)
+                const matchesType = typeValue === "all" || typeValue === type;
+
+                if (matchesKeyword && matchesType) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        function normalizeText(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
+        }
+
+        // Lắng nghe sự kiện gõ phím và chọn dropdown
+        searchInput.addEventListener("input", filterTable);
+        filterType.addEventListener("change", filterTable);
+    });
+</script>

@@ -4,201 +4,205 @@
 @{
     ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
 
+    // Cập nhật lại hàm lấy màu map thẳng với Soft Badge và Enum cho an toàn tuyệt đối
     string GetStatusColor(int statusId)
     {
         return statusId switch
         {
-            1 => "bg-warning text-dark",
-            2 => "bg-primary",
-            3 => "bg-info text-dark",
-            4 => "bg-success",
-            5 => "bg-danger",
-            _ => "bg-secondary"
+            (int)OrderStatus.New => "badge-soft-primary",
+            (int)OrderStatus.Confirmed => "badge-soft-info",
+            (int)OrderStatus.Shipping => "badge-soft-warning",
+            (int)OrderStatus.Completed => "badge-soft-success",
+            (int)OrderStatus.Cancelled => "badge-soft-danger",
+            _ => "badge-soft-secondary"
         };
     }
 }
 
 <div class="container-fluid py-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h2 fw-bold text-dark mb-1">Đơn hàng #@Model.Id</h1>
-            <p class="text-muted mb-0 fs-5">Ngày tạo: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+            <h1 class="modern-page-title" style="color: #3b82f6; font-family: monospace;">#@Model.Id</h1>
+            <p class="page-subtitle"><i class="far fa-clock"></i> Ngày tạo: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
         </div>
-        <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
-            <i class="bi bi-arrow-left me-2"></i>Quay lại
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn-modern-default">
+            <i class="fas fa-arrow-left me-2"></i> Trở về danh sách
         </a>
     </div>
 
-    <div class="row g-4">
+    <div class="row">
         <div class="col-lg-8">
 
-            <div class="card card-custom mb-4">
-                <div class="card-header-custom">
-                    <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-person-lines-fill me-2"></i>Thông tin giao hàng</h4>
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h4 class="modern-card-title"><i class="fas fa-map-marker-alt text-primary"></i> Thông tin giao hàng</h4>
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-4">
+                <div class="modern-card-body">
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <span class="label-title">Khách hàng</span>
-                            <div class="info-content">@Model.FullName</div>
-                        </div>
-                        <div class="col-md-6">
-                            <span class="label-title">Email</span>
-                            <div class="info-content">
-                                <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                            <div class="info-box">
+                                <span class="info-label">Khách hàng</span>
+                                <div class="info-value fw-bold text-primary">@Model.FullName</div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <span class="label-title">Số điện thoại</span>
-                            <div class="info-content">@Model.PhoneNumber</div>
+                            <div class="info-box">
+                                <span class="info-label">Số điện thoại</span>
+                                <div class="info-value">
+                                    <i class="fas fa-phone-alt text-muted" style="font-size: 0.8em; margin-right: 5px;"></i> @Model.PhoneNumber
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <span class="label-title">Địa chỉ nhận hàng</span>
-                            <div class="info-content">@Model.Address</div>
+                            <div class="info-box">
+                                <span class="info-label">Email</span>
+                                <div class="info-value">
+                                    <a href="mailto:@Model.Email" class="text-decoration-none text-dark">@Model.Email</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-label">Địa chỉ nhận hàng</span>
+                                <div class="info-value">@Model.Address</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card card-custom">
-                <div class="card-header-custom">
-                    <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-box-seam me-2"></i>Sản phẩm đã đặt</h4>
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h4 class="modern-card-title"><i class="fas fa-box-open text-primary"></i> Sản phẩm đã đặt</h4>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-custom mb-0">
-                            <thead>
+                <div class="table-responsive">
+                    <table class="table modern-table">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Phân loại</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var i in Model.Items)
+                            {
                                 <tr>
-                                    <th style="width: 40%">Sản phẩm</th>
-                                    <th class="text-center">Thuộc tính</th>
-                                    <th class="text-center">Số lượng</th>
-                                    <th class="text-end">Đơn giá</th>
-                                    <th class="text-end">Thành tiền</th>
+                                    <td class="fw-bold" style="color: #0f172a;">@i.ProductName</td>
+                                    <td class="text-center">
+                                        <span class="modern-badge badge-soft-secondary" style="padding: 4px 10px; font-weight: 500;">
+                                            @i.ColorName / @i.SizeName
+                                        </span>
+                                    </td>
+                                    <td class="text-center fw-bold">x @i.Quantity</td>
+                                    <td class="text-end text-muted">@i.Price.ToString("N0") đ</td>
+                                    <td class="text-end fw-bold" style="color: #3b82f6;">@((i.Price * i.Quantity).ToString("N0")) đ</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var i in Model.Items)
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="fw-bold text-dark">@i.ProductName</div>
-                                        </td>
-                                        <td class="text-center">
-                                            <span class="badge bg-light text-dark border px-3 py-2">
-                                                @i.ColorName / @i.SizeName
-                                            </span>
-                                        </td>
-                                        <td class="text-center fw-bold">x @i.Quantity</td>
-                                        <td class="text-end text-muted">@i.Price.ToString("N0") đ</td>
-                                        <td class="text-end fw-bold text-dark">@((i.Price * i.Quantity).ToString("N0")) đ</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4">
 
-            <div class="card card-custom mb-4">
-                <div class="card-header-custom bg-light">
-                    <h4 class="mb-0 fw-bold"><i class="bi bi-receipt me-2"></i>Thanh toán</h4>
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h4 class="modern-card-title"><i class="fas fa-receipt text-primary"></i> Hóa đơn tạm tính</h4>
                 </div>
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="fs-5 text-muted">Tạm tính</span>
-                        <span class="fs-5 fw-bold">@Model.SubTotal.ToString("N0") đ</span>
+                <div class="modern-card-body">
+                    <div class="summary-row">
+                        <span>Tổng tiền hàng</span>
+                        <span class="fw-bold text-dark">@Model.SubTotal.ToString("N0") đ</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="fs-5 text-muted">Phí vận chuyển</span>
-                        <span class="fs-5 fw-bold">@Model.ShippingFee.ToString("N0") đ</span>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển</span>
+                        <span class="fw-bold text-dark">@Model.ShippingFee.ToString("N0") đ</span>
                     </div>
-                    @if (Model.DiscountAmount != null)
+
+                    @if (Model.DiscountAmount != null && Model.DiscountAmount > 0)
                     {
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="fs-5 text-danger">Giảm giá</span>
-                            <span class="fs-5 fw-bold text-danger">@Model.DiscountAmount?.ToString("N0") đ</span>
+                        <div class="summary-row text-success">
+                            <span>Giảm giá</span>
+                            <span class="fw-bold">- @Model.DiscountAmount?.ToString("N0") đ</span>
                         </div>
                     }
                     else
                     {
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="fs-5 text-danger">Giảm giá</span>
-                            <span class="fs-5 fw-bold text-danger">0 đ</span>
+                        <div class="summary-row">
+                            <span>Giảm giá</span>
+                            <span class="fw-bold">0 đ</span>
                         </div>
                     }
 
-                    <hr class="my-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="h5 mb-0 fw-bold text-dark">Tổng cộng</span>
-                        <span class="h3 mb-0 fw-bold text-danger">@Model.Total.ToString("N0") đ</span>
+                    <div class="summary-total">
+                        <span>TỔNG CỘNG</span>
+                        <span>@Model.Total.ToString("N0") đ</span>
                     </div>
                 </div>
             </div>
 
-            <div class="card card-custom">
-                <div class="card-body p-4">
-                    <label class="label-title mb-3">Trạng thái đơn hàng</label>
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h4 class="modern-card-title"><i class="fas fa-tasks text-primary"></i> Tiến trình đơn hàng</h4>
+                </div>
+                <div class="modern-card-body">
 
-                    <div class="d-grid mb-4">
-                        <span class="badge fs-5 py-3 rounded-pill">
+                    <div class="mb-4" style="text-align: center;">
+                        <span class="modern-badge @GetStatusColor(Model.Status)" style="font-size: 1rem; width: 100%; padding: 12px;">
                             @((OrderStatus)Model.Status)
                         </span>
                     </div>
 
-                    <hr />
-
-                    @if (Model.Status < (int)OrderStatus.Completed &&
-                                        Model.Status != (int)OrderStatus.Cancelled)
+                    @if (Model.Status < (int)OrderStatus.Completed && Model.Status != (int)OrderStatus.Cancelled)
                     {
-                        <form method="post"
-                              id="updateStatusForm"
-                              action="/Admin/Order/UpdateStatus">
-
+                        <form method="post" id="updateStatusForm" action="/Admin/Order/UpdateStatus">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="orderId" value="@Model.Id" />
 
-                            <label class="label-title">Cập nhật trạng thái</label>
+                            <div class="modern-form-group">
+                                <label class="modern-label">Cập nhật trạng thái mới</label>
+                                <select name="status" id="orderStatusSelect" class="modern-control mb-3">
+                                    @if (Model.Status == (int)OrderStatus.New)
+                                    {
+                                        <option value="@((int)OrderStatus.Confirmed)">Xác nhận đơn (Confirmed)</option>
+                                        <option value="@((int)OrderStatus.Cancelled)">Hủy đơn (Cancelled)</option>
+                                    }
+                                    else if (Model.Status == (int)OrderStatus.Confirmed)
+                                    {
+                                        <option value="@((int)OrderStatus.Shipping)">Đang giao (Shipping)</option>
+                                        <option value="@((int)OrderStatus.Cancelled)">Hủy đơn (Cancelled)</option>
+                                    }
+                                    else if (Model.Status == (int)OrderStatus.Shipping)
+                                    {
+                                        <option value="@((int)OrderStatus.Completed)">Đã nhận hàng (Completed)</option>
+                                    }
+                                </select>
+                            </div>
 
-                            <select name="status"
-                                    id="orderStatusSelect"
-                                    class="form-select form-select-lg mb-3 shadow-none border-secondary">
-
-                                @if (Model.Status == (int)OrderStatus.New)
-                                {
-                                    <option value="@((int)OrderStatus.Confirmed)">Confirmed</option>
-                                    <option value="@((int)OrderStatus.Cancelled)">Cancelled</option>
-                                }
-                                else if (Model.Status == (int)OrderStatus.Confirmed)
-                                {
-                                    <option value="@((int)OrderStatus.Shipping)">Shipping</option>
-                                    <option value="@((int)OrderStatus.Cancelled)">Cancelled</option>
-                                }
-                                else if (Model.Status == (int)OrderStatus.Shipping)
-                                {
-                                    <option value="@((int)OrderStatus.Completed)">Completed</option>
-                                }
-                            </select>
-
-                            <button class="btn btn-success btn-lg w-100 fw-bold" type="submit">
-                                Lưu trạng thái
+                            <button class="btn-modern-primary" type="submit">
+                                <i class="fas fa-check-circle" style="margin-right: 6px;"></i> Lưu trạng thái
                             </button>
                         </form>
                     }
 
                     @if (Model.Status == (int)OrderStatus.Completed)
                     {
-                        <div class="alert alert-success mt-3">
-                            Đơn hàng đã hoàn thành
+                        <div class="soft-alert soft-alert-success">
+                            <i class="fas fa-check-circle mb-2" style="font-size: 1.5rem;"></i><br />
+                            Đơn hàng đã giao thành công
                         </div>
                     }
 
                     @if (Model.Status == (int)OrderStatus.Cancelled)
                     {
-                        <div class="alert alert-danger mt-3">
-                            Đơn hàng đã bị huỷ
+                        <div class="soft-alert soft-alert-danger">
+                            <i class="fas fa-times-circle mb-2" style="font-size: 1.5rem;"></i><br />
+                            Đơn hàng đã bị hủy
                         </div>
                     }
 
@@ -211,7 +215,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-
         const form = document.getElementById('updateStatusForm');
         const select = document.getElementById('orderStatusSelect');
         const cancelledValue = '@((int)OrderStatus.Cancelled)';
@@ -220,7 +223,7 @@
 
         form.addEventListener('submit', function (e) {
             if (select.value === cancelledValue) {
-                const ok = confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');
+                const ok = confirm('Hành động này không thể hoàn tác.\nBạn có chắc chắn muốn hủy đơn hàng này không?');
                 if (!ok) {
                     e.preventDefault();
                 }
