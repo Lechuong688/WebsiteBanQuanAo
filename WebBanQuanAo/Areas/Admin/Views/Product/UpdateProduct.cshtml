@@ -1,95 +1,125 @@
 ﻿@model WebBanQuanAo.Areas.Admin.Models.UpdateProductViewModel
 
 <section class="content-header">
-    <h1>
-        @(Model.Id > 0 ? "Sửa sản phẩm" : "Thêm sản phẩm")
-        <small>
-            @(Model.Id > 0 ? "Cập nhật thông tin" : "Nhập thông tin sản phẩm mới")
-        </small>
+    <h1 class="modern-page-title">
+        @(Model.Id > 0 ? "Sửa thông tin sản phẩm" : "Thêm sản phẩm mới")
     </h1>
-
+    <p class="page-subtitle">
+        @(Model.Id > 0 ? "Cập nhật chi tiết, hình ảnh và phân loại của sản phẩm" : "Nhập đầy đủ thông tin để đăng bán sản phẩm mới")
+    </p>
 </section>
 
-<section class="content" style="font-family:'Times New Roman'">
+<section class="content">
     <div class="row">
-        <div class="col-md-8">
-            <div class="box box-primary">
+        <div class="col-md-9 col-lg-8">
+            <div class="modern-card">
 
                 <form asp-action="UpdateProduct" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Id" value="@Model.Id" />
 
-                    <div class="box-body">
+                    <div class="modern-card-body">
 
-                        <div class="form-group">
-                            <label>Tên sản phẩm</label>
-                            <input name="Name" value="@Model.Name" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Giá</label>
-                            <input name="Price" value="@Model.Price" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Số lượng</label>
-                            <input name="Quantity" value="@Model.Quantity" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Màu sắc</label><br />
-                            @foreach (var c in Model.Colors)
-                            {
-                                <label class="me-2">
-                                    <input type="checkbox"
-                                           name="ColorIds"
-                                           value="@c.Id"
-                                           @(Model.ColorIds.Contains(c.Id) ? "checked" : "") />
-                                    @c.Name
-                                </label>
-                            }
-                        </div>
-
-                        <div class="form-group">
-                            <label>Size</label><br />
-                            @foreach (var s in Model.Sizes)
-                            {
-                                <label class="me-2">
-                                    <input type="checkbox"
-                                           name="SizeIds"
-                                           value="@s.Id"
-                                           @(Model.SizeIds.Contains(s.Id) ? "checked" : "") />
-                                    @s.Name
-                                </label>
-                            }
-                        </div>
-
-                        <label>Ảnh hiện tại</label>
-                        <div class="d-flex flex-wrap">
-                            @foreach (var img in Model.oldImages)
-                            {
-                                <div style="position:relative;margin:5px">
-                                    <img src="@img.Path" width="100" class="img-thumbnail" />
-
-                                    <input type="checkbox"
-                                           name="DeletedImageIds[]"
-                                           value="@img.Id" style="position:absolute;top:5px;right:5px;" />
-
-                                    <span style="position:absolute;top:5px;right:20px;color:red">✖</span>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tên sản phẩm</label>
+                                    <input name="Name" value="@Model.Name" class="modern-control" placeholder="Nhập tên sản phẩm..." required />
                                 </div>
-                            }
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Giá bán (VNĐ)</label>
+                                    <input type="number" name="Price" value="@Model.Price" class="modern-control" placeholder="0" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Số lượng kho</label>
+                                    <input type="number" name="Quantity" value="@Model.Quantity" class="modern-control" placeholder="0" required />
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Thêm ảnh mới</label>
-                            <input type="file" name="newImages" multiple class="form-control" />
+                        <div class="modern-form-group">
+                            <label class="modern-label"><i class="fas fa-palette text-muted" style="margin-right: 5px;"></i> Màu sắc có sẵn</label>
+                            <div class="pill-group">
+                                @if (Model.Colors != null)
+                                {
+                                    @foreach (var c in Model.Colors)
+                                    {
+                                        <div class="pill-checkbox">
+                                            <input type="checkbox"
+                                                   id="color_@c.Id"
+                                                   name="ColorIds"
+                                                   value="@c.Id"
+                                                   @(Model.ColorIds != null && Model.ColorIds.Contains(c.Id) ? "checked" : "") />
+                                            <label for="color_@c.Id">@c.Name</label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="modern-form-group">
+                            <label class="modern-label"><i class="fas fa-ruler text-muted" style="margin-right: 5px;"></i> Kích cỡ (Size)</label>
+                            <div class="pill-group">
+                                @if (Model.Sizes != null)
+                                {
+                                    @foreach (var s in Model.Sizes)
+                                    {
+                                        <div class="pill-checkbox">
+                                            <input type="checkbox"
+                                                   id="size_@s.Id"
+                                                   name="SizeIds"
+                                                   value="@s.Id"
+                                                   @(Model.SizeIds != null && Model.SizeIds.Contains(s.Id) ? "checked" : "") />
+                                            <label for="size_@s.Id">@s.Name</label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        @if (Model.oldImages != null && Model.oldImages.Any())
+                        {
+                            <div class="modern-form-group">
+                                <label class="modern-label">Ảnh hiện tại (Chọn để xóa)</label>
+                                <div class="image-gallery">
+                                    @foreach (var img in Model.oldImages)
+                                    {
+                                        <div class="img-preview-item">
+                                            <img src="@img.Path" alt="Product Image" />
+
+                                            <label class="delete-img-btn" title="Đánh dấu để xóa ảnh này">
+                                                <input type="checkbox" name="DeletedImageIds[]" value="@img.Id" />
+                                                <i class="fas fa-trash-alt"></i>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="modern-form-group" style="margin-bottom: 0;">
+                            <label class="modern-label">Tải lên ảnh mới</label>
+                            <input type="file" name="newImages" multiple class="modern-control" accept="image/*" />
+                            <small class="text-muted" style="display: block; margin-top: 6px;">
+                                Có thể chọn nhiều ảnh cùng lúc. Hỗ trợ định dạng JPG, PNG, WEBP.
+                            </small>
                         </div>
 
                     </div>
 
-                    <div class="box-footer">
-                        <button type="submit" class="btn btn-primary">Lưu</button>
-                        <a asp-action="Index" class="btn btn-default">Quay lại</a>
+                    <div class="modern-btn-group">
+                        <button type="submit" class="btn-modern-primary">
+                            <i class="fas fa-save" style="margin-right: 5px;"></i> Lưu thay đổi
+                        </button>
+                        <a asp-action="Index" class="btn-modern-default">
+                            Hủy bỏ
+                        </a>
                     </div>
 
                 </form>

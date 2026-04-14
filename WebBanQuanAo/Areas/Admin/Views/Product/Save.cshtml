@@ -1,138 +1,158 @@
 ﻿@model WebBanQuanAo.Areas.Admin.Models.UpdateProductViewModel
 
 <section class="content-header">
-    <h1>
-        @(Model.Id > 0 ? "Sửa sản phẩm" : "Thêm sản phẩm")
-        <br />
-        <small>
-            @(Model.Id > 0 ? "Cập nhật thông tin" : "Nhập thông tin sản phẩm mới")
-        </small>
+    <h1 class="modern-page-title">
+        @(Model.Id > 0 ? "Sửa sản phẩm" : "Thêm sản phẩm mới")
     </h1>
+    <p class="page-subtitle">
+        @(Model.Id > 0 ? "Cập nhật chi tiết, hình ảnh và phân loại của sản phẩm" : "Nhập đầy đủ thông tin để đăng bán sản phẩm mới")
+    </p>
 </section>
 
-<section class="content" style="font-family:'Times New Roman'">
+<section class="content">
     <div class="row">
-        <div class="col-md-8">
-            <div class="box box-primary">
-
+        <div class="col-md-10 col-lg-9">
+            <div class="modern-card">
                 <form asp-action="Save" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Id" value="@Model.Id" />
 
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label>-- Loại sản phẩm --</label>
-                            <select class="form-control" name="TypeId">
-                                @foreach (var item in Model.Types)
+                    <div class="modern-card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Loại sản phẩm</label>
+                                    <select class="modern-control" name="TypeId">
+                                        <option value="">-- Chọn danh mục --</option>
+                                        @foreach (var item in Model.Types)
+                                        {
+                                            <option value="@item.Id" selected="@(Model.TypeId == item.Id)">
+                                                @item.Name
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tên sản phẩm</label>
+                                    <input name="Name" value="@Model.Name" class="modern-control" placeholder="Nhập tên sản phẩm..." required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Giá bán (VNĐ)</label>
+                                    <input type="number" name="Price" value="@Model.Price" class="modern-control" placeholder="0" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Số lượng kho</label>
+                                    <input type="number" name="Quantity" value="@Model.Quantity" class="modern-control" placeholder="0" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modern-form-group">
+                            <label class="modern-label">Chi tiết sản phẩm</label>
+                            <div style="border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden;">
+                                <textarea id="editor1" name="Note" rows="10" cols="80">
+                                    @Model.Note
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <div class="modern-form-group">
+                            <label class="modern-label"><i class="fas fa-palette text-muted" style="margin-right: 5px;"></i> Màu sắc có sẵn</label>
+                            <select name="ColorIds" class="modern-control select2-multi" multiple="multiple" data-placeholder="Nhấp để tìm và chọn màu sắc...">
+                                @foreach (var c in Model.Colors)
                                 {
-                                    <option value="@item.Id"
-                                            selected="@(Model.TypeId == item.Id)">
-                                        @item.Name
+                                    <option value="@c.Id" selected="@(Model.ColorIds != null && Model.ColorIds.Contains(c.Id))">
+                                        @c.Name
                                     </option>
                                 }
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Tên sản phẩm</label>
-                            <input name="Name" value="@Model.Name" class="form-control" />
-                        </div>
 
-                        <div class="form-group">
-                            <label>Giá</label>
-                            <input name="Price" value="@Model.Price" class="form-control" />
-                        </div>
+                        <div class="modern-form-group">
+                            <label class="modern-label"><i class="fas fa-ruler text-muted" style="margin-right: 5px;"></i> Kích cỡ (Size)</label>
+                            <div class="pill-group">
+                                @{
+                                    // 1. Tạo một danh sách quy định thứ tự chuẩn từ nhỏ đến lớn
+                                    var sizeOrder = new List<string> { "XS", "S", "M", "L", "XL", "XXL", "2XL", "3XL", "4XL", "FREESIZE" };
 
-                        <div class="form-group">
-                            <label>Số lượng</label>
-                            <input name="Quantity" value="@Model.Quantity" class="form-control" />
-                        </div>
+                                    // 2. Sắp xếp lại danh sách Size của Model dựa trên danh sách chuẩn ở trên
+                                    var sortedSizes = Model.Sizes.OrderBy(s =>
+                                    {
+                                        var index = sizeOrder.IndexOf(s.Name.Trim().ToUpper());
+                                        return index == -1 ? 999 : index; // Nếu size nào lạ không có trong list thì đẩy xuống cuối cùng
+                                    }).ToList();
+                                }
 
-                        <div class="form-group">
-                            <label>Chi tiết</label>
-                            <div class="box-body pad">
-                                <textarea id="editor1" name="Note" rows="10" cols="80">
-                                    @Model.Note
-                            </textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Màu sắc</label><br />
-                            @foreach (var c in Model.Colors)
-                            {
-                                <label class="me-2">
-                                    <input type="checkbox"
-                                           name="ColorIds"
-                                           value="@c.Id"
-                                           @(Model.ColorIds.Contains(c.Id) ? "checked" : "") />
-                                    @c.Name
-                                </label>
-                            }
-                        </div>
-
-                        <div class="form-group">
-                            <label>Size</label><br />
-                            @foreach (var s in Model.Sizes)
-                            {
-                                <label class="me-2">
-                                    <input type="checkbox"
-                                           name="SizeIds"
-                                           value="@s.Id"
-                                           @(Model.SizeIds.Contains(s.Id) ? "checked" : "") />
-                                    @s.Name
-                                </label>
-                            }
-                        </div>
-
-                        @if (Model.Id > 0 && Model.oldImages.Any())
-                        {
-                            <label>Ảnh hiện tại</label>
-                            <div class="d-flex flex-wrap">
-                                @foreach (var img in Model.oldImages)
+                                @foreach (var s in sortedSizes)
                                 {
-                                    <div style="position:relative;margin:5px">
-                                        <img src="@img.Path" width="100" class="img-thumbnail"
-                                             onerror="this.style.display='none'" />
-
+                                    <div class="pill-checkbox">
                                         <input type="checkbox"
-                                               name="DeletedImageIds[]"
-                                               value="@img.Id"
-                                               style="position:absolute;top:5px;right:5px;" />
-
-                                        <span style="position:absolute;top:5px;right:20px;color:red">✖</span>
+                                               id="size_@s.Id"
+                                               name="SizeIds"
+                                               value="@s.Id"
+                                               @(Model.SizeIds != null && Model.SizeIds.Contains(s.Id) ? "checked" : "") />
+                                        <label for="size_@s.Id">@s.Name</label>
                                     </div>
                                 }
                             </div>
+                        </div>
+
+                        @if (Model.Id > 0 && Model.oldImages != null && Model.oldImages.Any())
+                        {
+                            <div class="modern-form-group">
+                                <label class="modern-label">Ảnh hiện tại (Chọn để xóa)</label>
+                                <div class="image-gallery">
+                                    @foreach (var img in Model.oldImages)
+                                    {
+                                        <div class="img-preview-item">
+                                            <img src="@img.Path" onerror="this.style.display='none'" alt="Product Image" />
+                                            <label class="delete-img-btn" title="Đánh dấu để xóa ảnh này">
+                                                <input type="checkbox" name="DeletedImageIds[]" value="@img.Id" />
+                                                <i class="fas fa-trash-alt"></i>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         }
 
-
-                        <div class="form-group">
-                            <label>Thêm ảnh mới</label>
-                            <input type="file" name="newImages" multiple class="form-control" />
+                        <div class="modern-form-group">
+                            <label class="modern-label">Tải lên ảnh mới</label>
+                            <input type="file" name="newImages" multiple class="modern-control" accept="image/*" />
                         </div>
 
-                        <div class="form-check">
-                            <input type="checkbox"
-                                   name="IsPinned"
-                                   value="true"
-                                   class="form-check-input"
-                                   @(Model.IsPinned ? "checked" : "") />
-
-                            <label class="form-check-label">
-                                Ghim sản phẩm lên banner
+                        <div class="modern-form-group">
+                            <label class="toggle-wrapper">
+                                <input type="checkbox"
+                                       name="IsPinned"
+                                       value="true"
+                                       class="modern-toggle"
+                                       @(Model.IsPinned ? "checked" : "") />
+                                <span class="toggle-label-text">Ghim sản phẩm lên banner trang chủ</span>
                             </label>
-
                         </div>
+
                     </div>
 
-                    <div class="box-footer">
-                        <button type="submit" class="btn btn-primary">
-                            @(Model.Id > 0 ? "Lưu thay đổi" : "Thêm sản phẩm")
+                    <div class="modern-btn-group">
+                        <button type="submit" class="btn-modern-primary">
+                            <i class="fas fa-save" style="margin-right: 5px;"></i> @(Model.Id > 0 ? "Lưu thay đổi" : "Thêm sản phẩm")
                         </button>
-                        <a asp-action="Index" class="btn btn-default">Quay lại</a>
+                        <a asp-action="Index" class="btn-modern-default">
+                            Hủy bỏ
+                        </a>
                     </div>
 
                 </form>
-
             </div>
         </div>
     </div>
@@ -140,9 +160,11 @@
 
 @section Scripts {
     <script src="~/webbanquanao/components/ckeditor/ckeditor.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         CKEDITOR.replace('editor1', {
-            height: 300,
+            height: 350, // Tăng nhẹ chiều cao Editor cho cân đối
             toolbar: [
                 { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline'] },
                 { name: 'paragraph', items: ['NumberedList', 'BulletedList'] },
@@ -151,26 +173,13 @@
                 { name: 'tools', items: ['Maximize'] }
             ]
         });
-    </script>
-}
 
-@* @section Scripts {
-    <script src="~/ckeditor/ckeditor.js"></script>
-    <script>
-        CKEDITOR.replace('editor1', {
-            height: 300 
+        $(document).ready(function() {
+            // Kích hoạt thanh chọn màu
+            $('.select2-multi').select2({
+                width: '100%',
+                closeOnSelect: false // Giữ menu mở để chọn liên tiếp nhiều màu
+            });
         });
     </script>
 }
-<script>
-    CKEDITOR.replace('editor1', {
-        height: 300,
-        toolbar: [
-            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline'] },
-            { name: 'paragraph', items: ['NumberedList', 'BulletedList'] },
-            { name: 'links', items: ['Link', 'Unlink'] },
-            { name: 'insert', items: ['Image', 'Table'] },
-            { name: 'tools', items: ['Maximize'] }
-        ]
-    });
-</script> *@

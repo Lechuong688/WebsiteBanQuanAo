@@ -198,14 +198,20 @@ namespace Data.Repository.Product
             };
         }
 
-        public async Task<PagedResult<ProductListDTO>> GetList(string userId, int page, int pageSize)
+        public async Task<PagedResult<ProductListDTO>> GetList(string userId, string keyword, string size, string color, decimal? minPrice, decimal? maxPrice, int page, int pageSize)
         {
             var par = new List<SqlParameter>()
             {
-                    new SqlParameter("@UserId", userId ?? (object)DBNull.Value),
-                    new SqlParameter("@Page", page),
-                    new SqlParameter("@PageSize", pageSize),
+                new SqlParameter("@UserId", userId ?? (object)DBNull.Value),
+                new SqlParameter("@Keyword", string.IsNullOrWhiteSpace(keyword) ? (object)DBNull.Value : keyword),
+                new SqlParameter("@Size", string.IsNullOrWhiteSpace(size) ? (object)DBNull.Value : size),
+                new SqlParameter("@Color", string.IsNullOrWhiteSpace(color) ? (object)DBNull.Value : color),
+                new SqlParameter("@MinPrice", minPrice ?? (object)DBNull.Value),
+                new SqlParameter("@MaxPrice", maxPrice ?? (object)DBNull.Value),
+                new SqlParameter("@Page", page),
+                new SqlParameter("@PageSize", pageSize),
             };
+
             var result = await _databaseSql.ExecuteProcToList<ProductListDTO>("Product_GetList", par) ?? new List<ProductListDTO>();
 
             foreach (var item in result)

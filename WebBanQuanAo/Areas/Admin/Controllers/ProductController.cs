@@ -22,11 +22,12 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             _productRepository = productRepository;
             _masterDataRepository = masterDataRepository;
         }
-        
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
+
+        public async Task<IActionResult> Index(string keyword, string size, string color, decimal? minPrice, decimal? maxPrice, int page = 1, int pageSize = 10)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var result = await _productRepository.GetList(userId, page, pageSize);
+
+            var result = await _productRepository.GetList(userId, keyword, size, color, minPrice, maxPrice, page, pageSize);
 
             ViewBag.Page = page;
             ViewBag.PageSize = pageSize;

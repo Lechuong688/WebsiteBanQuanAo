@@ -14,7 +14,7 @@ namespace Data.Repository.Product
         IEnumerable<ProductListDTO> GetAll(string userId);
         PagedResult<ProductListDTO> GetForShopPaged(int page, int pageSize, int? typeId = null,
             List<int>? colorIds = null, decimal? maxPrice = null, string? keyword = null, string? sort = null, string? userId = null);
-        Task<PagedResult<ProductListDTO>> GetList(string userId, int page, int pageSize);
+        Task<PagedResult<ProductListDTO>> GetList(string userId, string keyword, string size, string color, decimal? minPrice, decimal? maxPrice, int page, int pageSize);
         Task<ProductListDTO?> GetPinned();
         Task SetPinned(int id);
 

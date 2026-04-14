@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Drawing;
 using System.Security.Claims;
 using WebBanQuanAo.Models;
 
@@ -29,12 +30,11 @@ namespace WebBanQuanAo.Controllers
             _productRepository = productRepository;
             _bannerRepository = bannerRepository;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string keyword = null, string size = null, string color = null, decimal? minPrice = null, decimal? maxPrice = null, int page = 1, int pageSize = 8)
         {
-            //var products = _productRepository.GetAll();
-            //return View(products);
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var products = await _productRepository.GetList(userId, 1, 8);
+
+            var products = await _productRepository.GetList(userId, keyword, size, color, minPrice, maxPrice, page, pageSize);
             var bannerResult = await _bannerRepository.GetList(1, 10, null, true);
             var pinned = await _productRepository.GetPinned();
             var bestSeller = await _productRepository.GetBestseller();
@@ -48,7 +48,15 @@ namespace WebBanQuanAo.Controllers
             ViewBag.TopSelling = topSelling;
             ViewBag.NewArrival = newArrival;
             //ViewBag.ProductWishlist = productWishlist;
-            //Console.WriteLine(bestSeller.Count);
+
+            ViewBag.Keyword = keyword;
+            ViewBag.Size = size;
+            ViewBag.Color = color;
+            ViewBag.MinPrice = minPrice;
+            ViewBag.MaxPrice = maxPrice;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+
             return View(products?.Items ?? new List<ProductListDTO>());
         }
 

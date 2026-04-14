@@ -4,186 +4,231 @@
 
 @{
     ViewBag.Title = "Quản lý sản phẩm";
+
+    // Lấy trạng thái hiện tại trên URL để binding lại vào các ô input (giữ trạng thái khi load lại trang)
     var currentStatus = Context.Request.Query["status"].ToString();
+    var keyword = Context.Request.Query["keyword"].ToString();
+    var pageSize = Context.Request.Query["pageSize"].ToString();
+    if (string.IsNullOrEmpty(pageSize)) pageSize = "10"; // Mặc định là 10
+
+    var color = Context.Request.Query["color"].ToString();
+    var size = Context.Request.Query["size"].ToString();
+    var minPrice = Context.Request.Query["minPrice"].ToString();
+    var maxPrice = Context.Request.Query["maxPrice"].ToString();
+
+    // 1. Định nghĩa mảng thứ tự size chuẩn để dùng chung cho cả bảng
+    var sizeOrder = new List<string> { "XS", "S", "M", "L", "XL", "XXL", "2XL", "3XL", "4XL", "FREESIZE" };
 }
 
 <div class="container-fluid py-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <h4 class="mb-0 text-primary fw-bold">
-                <i class="fas fa-boxes me-2"></i> Quản lý sản phẩm
+    <div class="modern-card">
+
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-boxes text-primary"></i> Quản lý sản phẩm
             </h4>
-            <a href="@Url.Action("Save")" class="btn btn-success btn-sm">
-                <i class="fas fa-plus-circle me-1"></i> Thêm sản phẩm mới
+            <a href="@Url.Action("Save")" class="btn-modern-primary">
+                <i class="fas fa-plus-circle"></i> &nbsp;Thêm sản phẩm mới
             </a>
         </div>
-        <br/>
-        <div class="p-3 border-bottom bg-light">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="search-box">
-                        <i class="fa fa-search search-icon"></i>
+
+        <form method="GET" action="" id="filterForm">
+            <input type="hidden" name="status" value="@currentStatus" />
+
+            <div class="modern-toolbar">
+                <div class="toolbar-row">
+                    <div class="search-wrapper">
+                        <i class="fa fa-search"></i>
                         <input type="search"
+                               name="keyword"
                                id="searchProduct"
-                               class="search-input"
-                               placeholder="Tìm sản phẩm theo tên hoặc danh mục..."
+                               class="modern-control"
+                               value="@keyword"
+                               placeholder="Tìm sản phẩm theo tên..."
                                autocomplete="off" />
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; color: #475569; font-weight: 500; font-size: 0.9rem;">
+                        <span>Hiển thị</span>
+                        <select name="pageSize" class="modern-control" style="width: auto; cursor: pointer;" onchange="this.form.submit()">
+                            <option value="5" selected="@(pageSize == "5")">5</option>
+                            <option value="10" selected="@(pageSize == "10")">10</option>
+                            <option value="20" selected="@(pageSize == "20")">20</option>
+                            <option value="50" selected="@(pageSize == "50")">50</option>
+                            <option value="100" selected="@(pageSize == "100")">100</option>
+                        </select>
+                        <span>dòng</span>
+                    </div>
+                </div>
+
+                <div class="toolbar-row" style="margin-bottom: 0;">
+                    <div class="filter-group">
+                        <select name="size" class="modern-control" style="min-width: 130px; cursor: pointer;">
+                            <option value="">-- Tất cả Size --</option>
+                            <option value="S" selected="@(size == "S")">Size S</option>
+                            <option value="M" selected="@(size == "M")">Size M</option>
+                            <option value="L" selected="@(size == "L")">Size L</option>
+                            <option value="XL" selected="@(size == "XL")">Size XL</option>
+                            <option value="XXL" selected="@(size == "XXL")">Size XXL</option>
+                        </select>
+
+                        <select name="color" class="modern-control" style="min-width: 140px; cursor: pointer;">
+                            <option value="">-- Tất cả Màu --</option>
+                            <option value="Đen" selected="@(color == "Đen")">Đen</option>
+                            <option value="Trắng" selected="@(color == "Trắng")">Trắng</option>
+                            <option value="Đỏ" selected="@(color == "Đỏ")">Đỏ</option>
+                            <option value="Xanh" selected="@(color == "Xanh")">Xanh</option>
+                        </select>
+
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <input type="number" name="minPrice" value="@minPrice" class="modern-control" placeholder="Giá từ..." style="width: 120px;" />
+                            <span style="color: #94a3b8;">-</span>
+                            <input type="number" name="maxPrice" value="@maxPrice" class="modern-control" placeholder="Đến..." style="width: 120px;" />
+                        </div>
+
+                        <button type="submit" class="btn-modern-primary">
+                            <i class="fas fa-filter"></i> &nbsp;Lọc
+                        </button>
+
+                        <a href="?" class="btn-modern btn-outline-secondary-modern">
+                            Xóa bộ lọc
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
 
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0">
-                    <thead class="table-light text-secondary">
-                        <tr>
-                            <th>Tên sản phẩm</th>
-                            <th>Ảnh</th>
-                            <th>Giá</th>
-                            <th class="text-center">Số lượng</th>
-                            <th>Màu sắc</th>
-                            <th>Kích cỡ</th>
-                            <th scope="col" class="text-center" style="width: 150px;">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model?.Items != null && Model.Items.Any())
+        <div class="table-responsive">
+            <table class="table modern-table">
+                <thead>
+                    <tr>
+                        <th>Tên sản phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Giá</th>
+                        <th class="text-center">Số lượng</th>
+                        <th>Màu sắc</th>
+                        <th>Kích cỡ</th>
+                        <th class="text-center" style="width: 120px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
                         {
-                            foreach (var item in Model.Items)
-                            {
-                                <tr class="product-row" data-name="@item.Name">
-                                    <td class="fw-bold text-dark">
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </td>
-                                    <td>
-                                        @if (item.Files?.Count > 0)
-                                        {
-                                            <img src="@item.Files.FirstOrDefault()" class="product-img" alt="@item.Name" />
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted small"><i class="fas fa-image"></i> No Image</span>
-                                        }
-                                    </td>
-
-                                    <td class="price-text">
-                                        @string.Format("{0:N0} đ", item.Price)
-                                    </td>
-
-                                    <td class="text-center">
-                                        @{
-                                            string qClass = "bg-success";
-                                            if (item.Quantity == 0) { qClass = "bg-danger"; }
-                                            else if (item.Quantity < 10) { qClass = "bg-warning text-dark"; }
-                                        }
-                                        <span class="badge @qClass rounded-pill">
-                                            @item.Quantity
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        @if (item.Colors != null && item.Colors.Any())
-                                        {
-                                            var maxShow = 3;
-                                            var colors = item.Colors.ToList();
-                                            var hiddenCount = colors.Count - maxShow;
-
-                                            foreach (var color in colors.Take(maxShow))
-                                            {
-                                                <span class="badge-color">@color</span>
-                                            }
-
-                                            if (hiddenCount > 0)
-                                            {
-                                                <span class="badge-more">+@hiddenCount</span>
-                                            }
-                                        }
-                                    </td>
-
-                                    <td>
-                                        @if (item.Sizes != null)
-                                        {
-                                            foreach (var size in item.Sizes)
-                                            {
-                                                <span class="badge-size">@size</span>
-                                            }
-                                        }
-                                    </td>
-
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            <a href="@Url.Action("Save", "Product", new { area = "Admin", id = item.Id })"
-                                               class="btn btn-outline-primary btn-sm action-btn"
-                                               title="Sửa">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-
-                                            <a href="@Url.Action("Delete", "Product", new { area = "Admin", id = item.Id })"
-                                               class="btn btn-outline-danger btn-sm action-btn"
-                                               title="Xóa"
-                                               onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
+                            <tr class="product-row" data-name="@item.Name">
+                                <td class="product-name">@Html.DisplayFor(modelItem => item.Name)</td>
+                                <td>
+                                    @if (item.Files?.Count > 0)
+                                    {
+                                        <img src="@item.Files.FirstOrDefault()" class="product-img" alt="@item.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-img" style="display: flex; align-items: center; justify-content: center; background: #f8fafc;">
+                                            <i class="fas fa-image text-muted"></i>
                                         </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
-                                    Chưa có dữ liệu sản phẩm nào.
+                                    }
+                                </td>
+                                <td class="price-text">@string.Format("{0:N0} đ", item.Price)</td>
+                                <td class="text-center">
+                                    @{
+                                        string qClass = "badge-soft-success";
+                                        if (item.Quantity == 0) { qClass = "badge-soft-danger"; }
+                                        else if (item.Quantity < 10) { qClass = "badge-soft-warning"; }
+                                    }
+                                    <span class="modern-badge @qClass">@item.Quantity</span>
+                                </td>
+                                <td>
+                                    @if (item.Colors != null && item.Colors.Any())
+                                    {
+                                        var maxShow = 3;
+                                        var colors = item.Colors.ToList();
+                                        var hiddenCount = colors.Count - maxShow;
+                                        foreach (var c in colors.Take(maxShow))
+                                        {
+                                            <span class="modern-badge badge-soft-secondary" style="margin: 2px;">@c</span>
+                                        }
+                                        if (hiddenCount > 0)
+                                        {
+                                            <span class="modern-badge badge-soft-primary" style="margin: 2px;">+@hiddenCount</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Sizes != null && item.Sizes.Any())
+                                    {
+                                        // 2. Sắp xếp lại mảng Sizes của mỗi sản phẩm dựa theo sizeOrder
+                                        var sortedSizes = item.Sizes.OrderBy(s =>
+                                        {
+                                            var index = sizeOrder.IndexOf(s.Trim().ToUpper());
+                                            return index == -1 ? 999 : index;
+                                        }).ToList();
+
+                                        foreach (var s in sortedSizes)
+                                        {
+                                            <span class="modern-badge badge-soft-secondary" style="margin: 2px;">@s</span>
+                                        }
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div style="display: flex; gap: 6px; justify-content: center;">
+                                        <a href="@Url.Action("Save", "Product", new { area = "Admin", id = item.Id })" class="btn-modern btn-outline-info-modern" title="Sửa"><i class="fas fa-edit"></i></a>
+                                        <a href="@Url.Action("Delete", "Product", new { area = "Admin", id = item.Id })" class="btn-modern btn-outline-danger-modern" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');"><i class="fas fa-trash-alt"></i></a>
+                                    </div>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-box-open fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                <p class="mb-0">Chưa có dữ liệu sản phẩm nào.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
+
         @if (Model.TotalItems > Model.PageSize)
         {
             var totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+            var currentPage = Model.Page;
 
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
+            int startPage = currentPage - 2;
+            int endPage = currentPage + 2;
 
-                    <!-- First -->
-                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                        <a class="page-link" href="?status=@currentStatus&page=1">
-                            «
-                        </a>
+            if (startPage < 1) { startPage = 1; endPage = Math.Min(5, totalPages); }
+            if (endPage > totalPages) { endPage = totalPages; startPage = Math.Max(1, totalPages - 4); }
+
+            // Giữ lại tất cả các tham số query khi bấm chuyển trang
+            var queryString = $"?status={currentStatus}&keyword={keyword}&pageSize={pageSize}&size={size}&color={color}&minPrice={minPrice}&maxPrice={maxPrice}";
+
+            <nav aria-label="Page navigation">
+                <ul class="modern-pagination">
+                    <li class="@(currentPage == 1 ? "disabled" : "")">
+                        <a href="@queryString&page=1" title="Trang đầu">«</a>
+                    </li>
+                    <li class="@(currentPage == 1 ? "disabled" : "")">
+                        <a href="@queryString&page=@(currentPage - 1)" title="Trang trước">‹</a>
                     </li>
 
-                    <!-- Previous -->
-                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                        <a class="page-link" href="?status=@currentStatus&page=@(Model.Page - 1)">
-                            ‹
-                        </a>
-                    </li>
-
-                    @for (int i = 1; i <= totalPages; i++)
+                    @for (int i = startPage; i <= endPage; i++)
                     {
-                        <li class="page-item @(i == Model.Page ? "active" : "")">
-                            <a class="page-link" href="?status=@currentStatus&page=@i">@i</a>
+                        <li class="@(i == currentPage ? "active" : "")">
+                            <a href="@queryString&page=@i">@i</a>
                         </li>
                     }
 
-                    <!-- Next -->
-                    <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
-                        <a class="page-link" href="?status=@currentStatus&page=@(Model.Page + 1)">
-                            ›
-                        </a>
+                    <li class="@(currentPage == totalPages ? "disabled" : "")">
+                        <a href="@queryString&page=@(currentPage + 1)" title="Trang sau">›</a>
                     </li>
-
-                    <!-- Last -->
-                    <li class="page-item @(Model.Page == totalPages ? "disabled" : "")">
-                        <a class="page-link" href="?status=@currentStatus&page=@totalPages">
-                            »
-                        </a>
+                    <li class="@(currentPage == totalPages ? "disabled" : "")">
+                        <a href="@queryString&page=@totalPages" title="Trang cuối">»</a>
                     </li>
-
                 </ul>
             </nav>
         }
@@ -191,14 +236,12 @@
 </div>
 
 <script>
+    // JS Filter tức thì
     const searchInput = document.getElementById("searchProduct");
-
     searchInput.addEventListener("input", function () {
         const keyword = normalizeText(this.value);
-
         document.querySelectorAll(".product-row").forEach(row => {
             const name = normalizeText(row.dataset.name);
-
             if (keyword === "" || name.includes(keyword)) {
                 row.style.display = "";
             } else {
@@ -208,11 +251,6 @@
     });
 
     function normalizeText(text) {
-        return text
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/Đ/g, "d");
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
     }
 </script>
