@@ -2,110 +2,183 @@
 @using Data.DTO.Common
 @model PagedResult<Data.DTO.Discount.DiscountListDTO>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/discountadmin.css" />
+}
 <section class="content-header">
-    <h1>Quản lý giảm giá</h1>
+    <h1 class="modern-page-title">Quản lý Chương trình Giảm giá</h1>
+    <p class="page-subtitle">Tạo và quản lý các chiến dịch giảm giá cho một nhóm sản phẩm cụ thể</p>
 </section>
 
 <section class="content">
-    <a href="/Admin/Discount/Save" class="btn btn-primary mb-3">
-        <i class="fa fa-plus"></i> Thêm giảm giá
-    </a>
 
-    <a href="/Admin/DiscountCode/Index" class="btn btn-warning mb-3">
-        <i class="fa fa-list"></i> Quản lý mã giảm giá
-    </a>
+    <div class="modern-card">
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-tags text-primary"></i> Danh sách Khuyến mãi
+            </h4>
+            <div style="display: flex; gap: 10px;">
+                <a href="/Admin/DiscountCode/Index" class="btn-modern-secondary">
+                    <i class="fas fa-ticket-alt"></i> &nbsp;Quản lý Mã giảm giá (Coupon)
+                </a>
+                <a href="/Admin/Discount/Save" class="btn-modern-primary">
+                    <i class="fas fa-plus-circle"></i> &nbsp;Thêm giảm giá mới
+                </a>
+            </div>
+        </div>
 
-    <div class="box box-primary">
-        <div class="box-body">
-            <table class="table table-bordered table-hover">
+        <div class="modern-toolbar">
+            <div class="search-wrapper">
+                <i class="fa fa-search"></i>
+                <input type="text"
+                       id="searchDiscount"
+                       class="modern-control"
+                       placeholder="Tìm theo tên chương trình khuyến mãi..."
+                       autocomplete="off" />
+            </div>
+
+            <select id="filterStatus" class="modern-control">
+                <option value="all">-- Tất cả trạng thái --</option>
+                <option value="active">Đang bật (Hoạt động)</option>
+                <option value="inactive">Đã tắt</option>
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table class="modern-table" id="discountTable">
                 <thead>
                     <tr>
-                        <th width="80">ID</th>
+                        <th width="80" class="text-center">ID</th>
                         <th>Tên khuyến mãi</th>
-                        <th>Giảm</th>
-                        <th>Thời gian</th>
-                        <th width="120">Trạng thái</th>
-                        <th width="180">Thao tác</th>
+                        <th class="text-center">Mức giảm</th>
+                        <th>Thời gian áp dụng</th>
+                        <th width="120" class="text-center">Trạng thái</th>
+                        <th width="160" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model?.Items != null && Model.Items.Any())
                     {
-                        @foreach (var item in Model.Items)
+                        foreach (var item in Model.Items)
                         {
-                            <tr>
-                                <td>@item.Id</td>
+                            var isActiveStr = item.IsActive ? "active" : "inactive";
+
+                            <tr class="discount-row @(item.IsActive ? "" : "row-inactive")"
+                                data-name="@item.Name"
+                                data-status="@isActiveStr">
+
+                                <td class="text-center text-muted">#@item.Id</td>
 
                                 <td>
-                                    <strong>@item.Name</strong>
-                                    @* @if (!string.IsNullOrEmpty(item.Note))
-                                    {
-                                        <br />
-                                        <small class="text-muted">@item.Note</small>
-                                    } *@
+                                    <strong class="text-dark" style="font-size: 0.95rem;">@item.Name</strong>
                                 </td>
 
-                                <td>
-                                    <span class="label label-default">@item.Percent %</span>
+                                <td class="text-center">
+                                    <span class="percent-text">-@item.Percent%</span>
                                 </td>
 
                                 <td>
                                     @if (item.StartDate != null || item.EndDate != null)
                                     {
-                                        <span>
+                                        <div style="color: #334155; font-size: 0.9rem;">
+                                            <i class="far fa-calendar-alt text-muted" style="margin-right: 4px;"></i>
                                             @(item.StartDate?.ToString("dd/MM/yyyy") ?? "--")
-                                            -
+                                            <span style="margin: 0 4px; color: #94a3b8;">&rarr;</span>
                                             @(item.EndDate?.ToString("dd/MM/yyyy") ?? "--")
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #64748b; font-style: italic;">
+                                            <i class="fas fa-infinity text-muted" style="font-size: 0.8em; margin-right: 4px;"></i> Không giới hạn
                                         </span>
                                     }
-                                    else
-                                    {
-                                        <span>Không giới hạn</span>
-                                    }
                                 </td>
 
-                                <td>
+                                <td class="text-center">
                                     @if (item.IsActive)
                                     {
-                                        <span class="label label-success">Đang bật</span>
+                                        <span class="modern-badge badge-soft-success">Đang bật</span>
                                     }
                                     else
                                     {
-                                        <span class="label label-danger">Đã tắt</span>
+                                        <span class="modern-badge badge-soft-danger">Đã tắt</span>
                                     }
                                 </td>
 
-                                <td>
-                                    <a href="/Admin/Discount/Save?id=@item.Id"
-                                       class="btn btn-warning btn-sm">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
+                                <td class="text-center">
+                                    <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
 
-                                    <a href="/Admin/Discount/Product?id=@item.Id"
-                                       class="btn btn-info btn-sm"
-                                       title="Gán sản phẩm">
-                                        <i class="fa fa-link"></i>
-                                    </a>
+                                        <a href="/Admin/Discount/Save?id=@item.Id" class="btn-modern btn-outline-warning-modern" title="Sửa khuyến mãi">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
+                                        <a href="/Admin/Discount/Product?id=@item.Id" class="btn-modern btn-outline-info-modern" title="Gán sản phẩm áp dụng">
+                                            <i class="fas fa-link"></i>
+                                        </a>
 
-                                    <form method="post"
-                                          action="/Admin/Discount/Delete"
-                                          style="display:inline;">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit"
-                                                class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Tắt giảm giá này?')">
-                                            <i class="fa fa-power-off"></i>
-                                        </button>
-                                    </form>
+                                        <form method="post" action="/Admin/Discount/Delete" style="margin: 0; display: flex;">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-modern btn-outline-danger-modern" title="Tắt / Xóa Khuyến mãi này" onclick="return confirm('Bạn có chắc chắn muốn tắt chương trình giảm giá này không?')">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
                                 </td>
                             </tr>
                         }
-
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-tags fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                <p class="mb-0">Chưa có chương trình giảm giá nào được tạo.</p>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
-
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchDiscount");
+        const filterStatus = document.getElementById("filterStatus");
+        const rows = document.querySelectorAll(".discount-row");
+
+        function filterTable() {
+            const keyword = normalizeText(searchInput.value);
+            const statusValue = filterStatus.value;
+
+            rows.forEach(row => {
+                const name = normalizeText(row.getAttribute("data-name"));
+                const status = row.getAttribute("data-status");
+
+                // Kiểm tra xem tên có chứa từ khóa không
+                const matchesKeyword = keyword === "" || name.includes(keyword);
+
+                // Kiểm tra trạng thái (all, active, inactive)
+                const matchesStatus = statusValue === "all" || statusValue === status;
+
+                if (matchesKeyword && matchesStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // Bỏ dấu tiếng Việt để tìm kiếm dễ hơn (Vd: gõ "ao" vẫn ra "áo")
+        function normalizeText(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
+        }
+
+        // Lắng nghe sự kiện người dùng gõ phím hoặc đổi Select
+        searchInput.addEventListener("input", filterTable);
+        filterStatus.addEventListener("change", filterTable);
+    });
+</script>

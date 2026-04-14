@@ -7,92 +7,93 @@
     var selectedIds = ViewBag.SelectedProductIds as List<int> ?? new List<int>();
     var selectedJson = JsonSerializer.Serialize(selectedIds);
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/discountadmin.css" />
+}
 
+<section class="content-header">
+    <h1 class="modern-page-title">Gán sản phẩm áp dụng giảm giá</h1>
+    <p class="page-subtitle">Chương trình: <strong class="text-primary">@Model.Name</strong> <span class="modern-badge badge-soft-primary ms-2">-@Model.Percent%</span></p>
+</section>
 
-<form method="post">
-    <input type="hidden" name="DiscountId" value="@Model.Id" />
+<section class="content">
+    <form method="post">
+        <input type="hidden" name="DiscountId" value="@Model.Id" />
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="box box-primary shadow-sm" style="border-top-width: 3px;">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-cubes"></i> Danh sách sản phẩm</h3>
-
-                    <div class="search-box">
-                        <i class="fa fa-search search-icon"></i>
-                        <input type="search"
-                               id="searchKeyword"
-                               class="search-input"
-                               placeholder="Tìm sản phẩm theo tên hoặc danh mục..."
-                               autocomplete="off" />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="modern-card">
+                    <div class="modern-card-header">
+                        <h4 class="modern-card-title"><i class="fas fa-cubes text-primary"></i> Kho sản phẩm</h4>
+                        <span class="modern-badge badge-soft-primary">Có sẵn</span>
                     </div>
 
-
-                    <div class="box-tools pull-right">
-                        <span class="label label-primary">Có sẵn</span>
+                    <div style="padding: 15px; border-bottom: 1px solid #edf2f9; background: #f8fafc;">
+                        <div class="search-wrapper">
+                            <i class="fa fa-search"></i>
+                            <input type="search"
+                                   id="searchKeyword"
+                                   class="modern-control"
+                                   placeholder="Tìm sản phẩm theo tên hoặc danh mục..."
+                                   autocomplete="off" />
+                        </div>
                     </div>
-                </div>
-                <div class="box-body scrollable-list">
 
-                    @foreach (var group in products.GroupBy(x => x.ParentTypeName))
-                    {
-                        <h4 class="text-primary" style="font-size: 14px; margin: 15px 0 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
-                            @group.Key
-                        </h4>
-
-                        @foreach (var p in group)
+                    <div class="scrollable-list">
+                        @foreach (var group in products.GroupBy(x => x.ParentTypeName))
                         {
-                            var image = (p.Files != null && p.Files.Any())
-                            ? p.Files.First()
-                            : "/admin/img/no-image.png";
-
-                            <div class="product-item product-source"
-                                 data-id="@p.Id"
-                                 data-name="@p.Name"
-                                 data-image="@image">
-
-                                <img src="@image" alt="@p.Name" />
-
-                                <div class="product-info">
-                                    <span class="product-name" title="@p.Name">@p.Name</span>
-                                    <span class="product-cate">
-                                        <i class="fa fa-tag"></i> @p.TypeName
-                                    </span>
-                                </div>
+                            <div class="category-group-title">
+                                <i class="fas fa-folder-open"></i> @group.Key
                             </div>
+
+                            @foreach (var p in group)
+                            {
+                                var image = (p.Files != null && p.Files.Any()) ? p.Files.First() : "/admin/img/no-image.png";
+
+                                <div class="product-item product-source"
+                                     data-id="@p.Id"
+                                     data-name="@p.Name"
+                                     data-image="@image">
+
+                                    <img src="@image" alt="@p.Name" />
+
+                                    <div class="product-info">
+                                        <span class="product-name" title="@p.Name">@p.Name</span>
+                                        <span class="product-cate">
+                                            <i class="fas fa-tag text-muted"></i> @p.TypeName
+                                        </span>
+                                    </div>
+                                </div>
+                            }
                         }
-                    }
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="box box-success shadow-sm" style="border-top-width: 3px;">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-check-circle"></i> Đã chọn</h3>
-                    <div class="box-tools pull-right">
-                        <span class="badge bg-green" style="font-size: 14px;">
-                            <span id="selectedCount">0</span>
+            <div class="col-md-6">
+                <div class="modern-card">
+                    <div class="modern-card-header" style="background-color: #f0fdf4;">
+                        <h4 class="modern-card-title" style="color: #166534;"><i class="fas fa-check-circle text-success"></i> Đã chọn áp dụng</h4>
+                        <span class="modern-badge badge-soft-success">
+                            <span id="selectedCount">0</span> sản phẩm
                         </span>
                     </div>
-                </div>
-                <div class="box-body scrollable-list" id="selectedList" style="background-color: #fcfcfc;">
+                    <div class="scrollable-list" id="selectedList" style="background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 15px 15px;">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-12 text-right" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-            <a href="/Admin/Discount" class="btn btn-default btn-lg" style="margin-right: 10px;">
-                <i class="fa fa-arrow-left"></i> Quay lại
+        <div class="action-bar">
+            <a href="/Admin/Discount" class="btn-modern-default">
+                <i class="fas fa-arrow-left" style="margin-right: 5px;"></i> Quay lại
             </a>
-            <button type="submit" class="btn btn-success btn-lg shadow">
-                <i class="fa fa-save"></i> Lưu thay đổi
+            <button type="submit" class="btn-modern-primary">
+                <i class="fas fa-save" style="margin-right: 5px;"></i> Lưu thay đổi
             </button>
         </div>
-    </div>
-</form>
+    </form>
+</section>
 
 <script>
     const selectedIds = @Html.Raw(selectedJson);
@@ -116,15 +117,12 @@
                 <span class="product-name" title="${name}">${name}</span>
                 <input type="hidden" name="productIds" value="${id}" />
             </div>
-            <button type="button"
-                    class="btn btn-xs btn-danger btn-remove"
-                    title="Xóa khỏi danh sách"
-                    onclick="removeSelected(${id})">
-                <i class="fa fa-times"></i>
+            <button type="button" class="btn-remove" title="Xóa khỏi danh sách" onclick="removeSelected(${id})">
+                <i class="fas fa-times"></i>
             </button>
         `;
 
-        div.style.animation = "fadeIn 0.3s";
+        div.style.animation = "fadeInItem 0.3s ease";
         selectedList.appendChild(div);
         selectedList.scrollTop = selectedList.scrollHeight;
         updateCount();
@@ -133,6 +131,7 @@
     function removeSelected(id) {
         const el = document.getElementById("selected-" + id);
         if (el) {
+            el.style.transform = "translateX(20px)";
             el.style.opacity = '0';
             setTimeout(() => {
                 el.remove();
@@ -141,12 +140,14 @@
         }
     }
 
+    // Gắn sự kiện click cho các item bên cột nguồn
     document.querySelectorAll(".product-source").forEach(item => {
         item.addEventListener("click", function () {
             addSelected(this.dataset.id, this.dataset.name, this.dataset.image);
         });
     });
 
+    // Khởi tạo hiển thị các sản phẩm đã có sẵn trong Discount
     selectedIds.forEach(id => {
         const item = document.querySelector(`.product-source[data-id="${id}"]`);
         if (item) {
@@ -154,53 +155,44 @@
         }
     });
 
+    // Tạo animation
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
-        @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        @@keyframes fadeInItem {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
     `;
     document.head.appendChild(styleSheet);
 
+    // Lọc tìm kiếm Client-side
     const searchInput = document.getElementById("searchKeyword");
-
     searchInput.addEventListener("input", function () {
         const keyword = normalizeText(this.value.trim());
 
-        document.querySelectorAll(".box-body.scrollable-list > h4").forEach(header => {
+        document.querySelectorAll(".category-group-title").forEach(header => {
             let hasVisibleItem = false;
             let next = header.nextElementSibling;
 
-            while (next && !next.matches("h4")) {
+            while (next && !next.classList.contains("category-group-title")) {
                 if (next.classList.contains("product-item")) {
                     const name = normalizeText(next.dataset.name || "");
-                    const cate = normalizeText(
-                        next.querySelector(".product-cate")?.innerText || ""
-                    );
+                    const cate = normalizeText(next.querySelector(".product-cate")?.innerText || "");
 
-                    const matched =
-                        keyword === "" ||
-                        name.includes(keyword) ||
-                        cate.includes(keyword);
-
-                    next.style.display = matched ? "" : "none";
+                    const matched = keyword === "" || name.includes(keyword) || cate.includes(keyword);
+                    next.style.display = matched ? "flex" : "none";
 
                     if (matched) hasVisibleItem = true;
                 }
                 next = next.nextElementSibling;
             }
 
-            header.style.display = hasVisibleItem ? "" : "none";
+            // Ẩn luôn cái tiêu đề danh mục nếu không có sản phẩm nào khớp
+            header.style.display = hasVisibleItem ? "flex" : "none";
         });
     });
 
     function normalizeText(text) {
-        return text
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/Đ/g, "d");
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
     }
 </script>

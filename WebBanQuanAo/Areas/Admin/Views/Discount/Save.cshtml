@@ -1,95 +1,110 @@
 ﻿@model Data.Entity.DiscountEntity
-
+@section Styles {
+    <link rel="stylesheet" href="~/css/discountadmin.css" />
+}
 <section class="content-header">
-    <h1>
-        @(Model.Id > 0 ? "Sửa giảm giá" : "Thêm giảm giá")
+    <h1 class="modern-page-title">
+        @(Model.Id > 0 ? "Sửa chương trình giảm giá" : "Thêm chương trình giảm giá")
     </h1>
+    <p class="page-subtitle">Thiết lập mức giảm giá và thời gian áp dụng cho sản phẩm</p>
 </section>
 
 <section class="content">
-    <div class="col-md-6">
-        <div class="box box-primary">
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="modern-card">
 
-            <form asp-area="Admin"
-                  asp-controller="Discount"
-                  asp-action="Save"
-                  method="post">
+                <form asp-area="Admin"
+                      asp-controller="Discount"
+                      asp-action="Save"
+                      method="post">
 
-                @Html.AntiForgeryToken()
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
 
-                <input type="hidden" name="Id" value="@Model.Id" />
+                    <div class="modern-card-body">
 
-                <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tên chương trình khuyến mãi <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           name="Name"
+                                           value="@Model.Name"
+                                           class="modern-control"
+                                           placeholder="Ví dụ: Siêu Sale Tháng 5..."
+                                           required />
+                                </div>
+                            </div>
 
-                    <div class="form-group">
-                        <label>Tên giảm giá</label>
-                        <input type="text"
-                               name="Name"
-                               value="@Model.Name"
-                               class="form-control"
-                               placeholder="Nhập tên giảm giá"
-                               required />
-                    </div>
-
-                    <div class="form-group">
-                        <label>Phần trăm giảm (%)</label>
-                        <input type="number"
-                               name="Percent"
-                               value="@Model.Percent"
-                               class="form-control"
-                               min="0"
-                               max="100"
-                               placeholder="Nhập % giảm giá"
-                               required />
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Ngày bắt đầu</label>
-                                <input type="date"
-                                       name="StartDate"
-                                       value="@(Model.StartDate.HasValue? Model.StartDate.Value.ToString("yyyy-MM-dd"): "")"
-                                       class="form-control" />
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Mức giảm <span class="text-danger">*</span></label>
+                                    <div class="input-group-modern">
+                                        <input type="number"
+                                               name="Percent"
+                                               value="@Model.Percent"
+                                               class="modern-control"
+                                               min="0"
+                                               max="100"
+                                               placeholder="0"
+                                               required />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Ngày kết thúc</label>
-                                <input type="date"
-                                       name="EndDate"
-                                       value="@(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd"): "")"
-                                       class="form-control" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label"><i class="far fa-calendar-alt text-muted me-1"></i> Ngày bắt đầu</label>
+                                    <input type="date"
+                                           name="StartDate"
+                                           value="@(Model.StartDate.HasValue? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")"
+                                           class="modern-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label"><i class="far fa-calendar-check text-muted me-1"></i> Ngày kết thúc</label>
+                                    <input type="date"
+                                           name="EndDate"
+                                           value="@(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")"
+                                           class="modern-control" />
+                                </div>
                             </div>
                         </div>
+
+                        @if (Model.Id > 0)
+                        {
+                            <div class="modern-form-group" style="margin-bottom: 0;">
+                                <label class="toggle-wrapper">
+                                    <input type="checkbox"
+                                           name="IsActive"
+                                           value="true"
+                                           class="modern-toggle"
+                                           @(Model.IsActive ? "checked" : "") />
+                                    <span class="toggle-label-text">Đang hoạt động (Áp dụng giảm giá)</span>
+                                </label>
+                            </div>
+                        }
+
                     </div>
 
-                    @if (Model.Id > 0)
-                    {
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox"
-                                       name="IsActive"
-                                       value="true"
-                                       @(Model.IsActive ? "checked" : "") />
-                                Đang hoạt động
-                            </label>
-                        </div>
-                    }
-                </div>
+                    <div class="modern-btn-group">
+                        <button type="submit" class="btn-modern-primary">
+                            <i class="fas fa-save"></i> @(Model.Id > 0 ? "Lưu thay đổi" : "Tạo chương trình")
+                        </button>
+                        <a href="/Admin/Discount/Index" class="btn-modern-default">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
 
-                <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">
-                        Lưu
-                    </button>
-                    <a href="/Admin/Discount/Index" class="btn btn-default">
-                        Quay lại
-                    </a>
-                </div>
-            </form>
+                </form>
+
+            </div>
         </div>
-
-
     </div>
 </section>

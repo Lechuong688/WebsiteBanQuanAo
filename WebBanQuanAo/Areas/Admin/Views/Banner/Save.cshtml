@@ -5,129 +5,133 @@
     ViewBag.Title = Model.Id == 0 ? "Thêm Banner" : "Cập nhật Banner";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
-
+@section Styles {
+    <link rel="stylesheet" href="~/css/banneradmin.css" />
+}
 <div class="container-fluid py-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <div>
-            <h2 class="mb-0 text-dark">Quản lý Banner</h2>
+            <h1 class="modern-page-title">Quản lý Banner</h1>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mt-2 mb-0 bg-transparent p-0">
-                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Danh sách Banner</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">@(Model.Id == 0 ? "Thêm mới" : "Chỉnh sửa")</li>
+                <ol class="breadcrumb mt-1 mb-0 bg-transparent p-0" style="font-size: 0.9rem;">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Danh sách Banner</a></li>
+                    <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">@(Model.Id == 0 ? "Thêm mới" : "Chỉnh sửa")</li>
                 </ol>
             </nav>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-header bg-white border-bottom py-3">
-            <h5 class="mb-0 text-primary fw-bold">
-                <i class="fa-regular fa-image me-2"></i>@(Model.Id == 0 ? "Thêm mới Banner" : "Chỉnh sửa thông tin Banner")
-            </h5>
+    <div class="modern-card">
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fa-regular fa-image text-primary"></i>
+                @(Model.Id == 0 ? "Thêm mới Banner" : "Chỉnh sửa thông tin Banner")
+            </h4>
         </div>
 
-        <div class="card-body p-4">
+        <div class="modern-card-body">
             <form asp-action="Save" method="post" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id" />
 
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Tiêu đề (Title) <span class="text-danger">*</span></label>
-                                <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề chính..." />
-                                <span asp-validation-for="Title" class="text-danger small"></span>
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tiêu đề chính (Title) <span class="text-danger">*</span></label>
+                                    <input asp-for="Title" class="modern-control" placeholder="Ví dụ: Khuyến mãi mùa hè..." />
+                                    <span asp-validation-for="Title" class="text-danger small mt-1 d-block"></span>
+                                </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Tiêu đề phụ (SubTitle)</label>
-                                <input asp-for="SubTitle" class="form-control" placeholder="Nhập tiêu đề phụ..." />
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Tiêu đề phụ (SubTitle)</label>
+                                    <input asp-for="SubTitle" class="modern-control" placeholder="Ví dụ: Giảm giá lên đến 50%..." />
+                                </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Mô tả</label>
-                                <input asp-for="Description" class="form-control" placeholder="Nhập mô tả..." />
+                            <div class="col-md-12">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Mô tả ngắn</label>
+                                    <input asp-for="Description" class="modern-control" placeholder="Nhập mô tả chi tiết cho banner..." />
+                                </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Nút bấm (ButtonText)</label>
-                                <input asp-for="ButtonText" class="form-control" placeholder="VD: Mua ngay, Khám phá..." />
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Nút bấm (Call to Action)</label>
+                                    <input asp-for="ButtonText" class="modern-control" placeholder="VD: Mua ngay, Khám phá..." />
+                                </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold d-block">Bộ sưu tập</label>
-
-                                <select asp-for="CollectionId"
-                                        class="form-select w-100 shadow-none"
-                                        style="height: 30px;margin-top: 10px;"
-                                        asp-items="ViewBag.Collections">
-                                    <option value="" class="text-muted">-- Chọn bộ sưu tập --</option>
-                                </select>
-
-                                <span asp-validation-for="CollectionId" class="text-danger small"></span>
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Gắn với Bộ sưu tập (Tùy chọn)</label>
+                                    <select asp-for="CollectionId" class="modern-control" asp-items="ViewBag.Collections">
+                                        <option value="">-- Không gắn bộ sưu tập --</option>
+                                    </select>
+                                    <span asp-validation-for="CollectionId" class="text-danger small mt-1 d-block"></span>
+                                </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Thứ tự hiển thị</label>
-                                <input asp-for="DisplayOrder" type="number" class="form-control" placeholder="1, 2, 3..." />
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label class="modern-label">Thứ tự hiển thị</label>
+                                    <input asp-for="DisplayOrder" type="number" class="modern-control" placeholder="1, 2, 3..." />
+                                </div>
                             </div>
 
-                            <div class="col-md-6 mb-3 d-flex align-items-end">
-                                <div class="form-check form-switch mb-2">
-                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="isActiveSwitch" style="transform: scale(1.2); margin-top: 0.25rem;" />
-                                    <label class="form-check-label fw-semibold ms-2" for="isActiveSwitch">Kích hoạt hiển thị</label>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="modern-form-group" style="margin-bottom: 0;">
+                                    <label class="toggle-wrapper" style="margin-top: 15px;">
+                                        <input asp-for="IsActive" type="checkbox" class="modern-toggle" />
+                                        <span class="toggle-label-text">Kích hoạt hiển thị Banner</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-4 mt-4 mt-lg-0">
-                        <div class="card border border-light-subtle shadow-none h-100 bg-light">
-                            <div class="card-body text-center d-flex flex-column justify-content-center">
-                                <label class="form-label fw-semibold mb-3">Ảnh Banner</label>
+                        <div class="modern-form-group h-100 d-flex flex-column">
+                            <label class="modern-label">Hình ảnh Banner <span class="text-danger">*</span></label>
 
-                                <div class="mb-3 border rounded d-flex justify-content-center align-items-center bg-white overflow-hidden mx-auto"
-                                     style="width: 100%; height: 200px; border-style: dashed !important;">
+                            <div class="flex-grow-1 border rounded d-flex justify-content-center align-items-center bg-light overflow-hidden mb-3"
+                                 style="border: 2px dashed #cbd5e1 !important; min-height: 220px; border-radius: 12px !important; position: relative;">
 
-                                    @if (!string.IsNullOrEmpty(Model.ExistingImagePath))
-                                    {
-                                        <img id="imagePreview"
-                                             src="@Model.ExistingImagePath"
-                                             alt="Preview"
-                                             style="max-width: 100%; max-height: 100%; object-fit: contain;" />
-                                    }
-                                    else
-                                    {
-                                        <img id="imagePreview"
-                                             src="#"
-                                             alt="Preview"
-                                             style="max-width: 100%; max-height: 100%; object-fit: contain; display:none;" />
-
-                                        <div id="uploadPlaceholder" class="text-muted">
-                                            <i class="fa-solid fa-cloud-arrow-up fs-1 mb-2"></i>
-                                            <p class="mb-0 small">Chưa có ảnh nào được chọn</p>
-                                        </div>
-                                    }
-
-                                </div>
-
-                                <input asp-for="ImageFile" type="file" class="form-control" id="imageInput" accept="image/*" />
-                                <small class="text-muted mt-2 d-block">Định dạng hỗ trợ: .jpg, .png, .jpeg</small>
+                                @if (!string.IsNullOrEmpty(Model.ExistingImagePath))
+                                {
+                                    <img id="imagePreview" src="@Model.ExistingImagePath" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                                    <div id="uploadPlaceholder" style="display:none; text-align:center;">
+                                        <i class="fa-solid fa-cloud-arrow-up fs-2 mb-2 text-primary"></i>
+                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">Click để chọn ảnh mới</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img id="imagePreview" src="#" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain; display:none;" />
+                                    <div id="uploadPlaceholder" style="text-align:center; padding: 20px;">
+                                        <i class="fa-solid fa-cloud-arrow-up fs-1 mb-2 text-primary"></i>
+                                        <p class="mb-0 text-muted" style="font-size: 0.95rem;">Chưa có ảnh nào được chọn</p>
+                                    </div>
+                                }
                             </div>
+
+                            <input asp-for="ImageFile" type="file" class="modern-control" id="imageInput" accept="image/png, image/jpeg, image/jpg, image/webp" />
+                            <small class="text-muted mt-2 d-block text-center">Định dạng hỗ trợ: .jpg, .png, .webp</small>
                         </div>
                     </div>
                 </div>
 
-                <hr class="my-4 text-muted">
-
-                <div class="d-flex justify-content-end">
-                    <a asp-action="Index" class="btn btn-light border px-4 me-2">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
-                    </a>
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                        <i class="fa-solid fa-floppy-disk me-1"></i> Lưu Banner
+                <div class="modern-btn-group">
+                    <button type="submit" class="btn-modern-primary">
+                        <i class="fa-solid fa-save me-2"></i> Lưu Banner
                     </button>
+                    <a asp-action="Index" class="btn-modern-default">
+                        <i class="fa-solid fa-arrow-left me-2"></i> Quay lại
+                    </a>
                 </div>
 
             </form>
@@ -139,7 +143,8 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-                document.getElementById('imageInput').addEventListener('change', function(event) {
+        // Xử lý Preview Ảnh
+        document.getElementById('imageInput').addEventListener('change', function(event) {
             var file = event.target.files[0];
             if (file) {
                 var reader = new FileReader();
