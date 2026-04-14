@@ -36,6 +36,6 @@ namespace Data.Repository.Product
         Task<PagedResult<ProductWishlistDTO>> GetProductWishlist(string userId, int page, int pageSize);
 
         Task<bool> ToggleWishlist(int productId, string userId);
-
+        Task<List<ProductListDTO>> InstantSearch(string keyword);
     }
 }

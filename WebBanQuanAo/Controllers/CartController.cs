@@ -90,21 +90,38 @@ namespace WebBanQuanAo.Controllers
 
 
         [HttpPost]
-        public IActionResult AddToCart(int productId, int colorId, int sizeId, int quantity = 1)
+        public IActionResult AddToCart(int productId, int colorId, int sizeId, int quantity = 1, bool isBuyNow = false)
         {
+            // 1. Kiểm tra dữ liệu đầu vào
             if (colorId <= 0 || sizeId <= 0)
                 return BadRequest("Chưa chọn màu hoặc size");
 
+            // 2. Lấy giỏ hàng từ Cookie
             var cart = CartCookieHelper.GetCart(Request);
 
+            // 3. Tìm sản phẩm trong giỏ
             var item = cart.FirstOrDefault(x =>
                 x.ProductId == productId &&
                 x.ColorId == colorId &&
                 x.SizeId == sizeId);
 
+            // 4. Xử lý logic số lượng
             if (item != null)
-                item.Quantity += quantity;
+            {
+                if (isBuyNow)
+                {
+                    // Bấm "Mua ngay": Gán đúng số lượng khách chọn trên màn hình
+                    item.Quantity = quantity;
+                }
+                else
+                {
+                    // Bấm "Thêm vào giỏ": Cộng dồn số lượng cũ
+                    item.Quantity += quantity;
+                }
+            }
             else
+            {
+                // Nếu chưa có trong giỏ thì thêm mới
                 cart.Add(new CartItemCookie
                 {
                     ProductId = productId,
@@ -112,8 +129,11 @@ namespace WebBanQuanAo.Controllers
                     SizeId = sizeId,
                     Quantity = quantity
                 });
+            }
 
+            // 5. Lưu lại Cookie
             CartCookieHelper.SaveCart(Response, cart);
+
             return Ok();
         }
 

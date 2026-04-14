@@ -4,6 +4,98 @@
 @{
     var categories = ProductRepository.GetCategories();
 }
+
+<style>
+    /* 1. Đảm bảo vùng chứa Search có thứ tự hiển thị cao */
+    .search-input-group {
+        position: relative;
+        z-index: 10001; /* Cao hơn topbar */
+    }
+
+    /* 2. Style cho khối Dropdown kết quả - Sửa lỗi bị đè */
+    #searchDropdownResult {
+        position: absolute;
+        top: 105%;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        /* QUAN TRỌNG: Hiển thị đè lên mọi thành phần khác */
+        z-index: 99999 !important;
+        display: none;
+        max-height: 480px;
+        overflow-y: auto;
+        padding: 8px 0;
+    }
+
+    /* Từng dòng kết quả */
+    .search-item-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+        .search-item-link:hover {
+            background-color: #fff5f2; /* Màu cam nhạt khi hover */
+            color: #EE7C6B;
+        }
+
+    /* Style cho ảnh sản phẩm trong search - Sửa lỗi ảnh mặc định to */
+    .search-item-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 15px;
+        border: 1px solid #eee;
+        flex-shrink: 0; /* Không cho ảnh bị bóp méo */
+    }
+
+    .search-item-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: left;
+    }
+
+    .search-item-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .search-item-price {
+        color: #EE7C6B;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .search-see-more-link {
+        display: block;
+        text-align: center;
+        padding: 12px;
+        font-weight: 600;
+        color: #EE7C6B;
+        text-decoration: none;
+        border-top: 1px solid #eee;
+        font-size: 0.9rem;
+    }
+
+    .search-loading, .search-no-result {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+    }
+</style>
+
 <div class="container-fluid px-5 d-none border-bottom d-lg-block">
     <div class="row gx-0 align-items-center">
         <div class="col-lg-4 text-center text-lg-start mb-lg-0">
@@ -11,133 +103,151 @@
                 <a href="#" class="text-muted me-2"> Help</a><small> / </small>
                 <a href="#" class="text-muted mx-2"> Support</a><small> / </small>
                 <a href="#" class="text-muted ms-2"> Contact</a>
-
             </div>
         </div>
         <div class="col-lg-4 text-center d-flex align-items-center justify-content-center">
             <small class="text-dark">Liên hệ:</small>
-            <a href="#" class="text-muted">(+84) 372783688</a>
+            <a href="#" class="text-muted ms-1">(+84) 372783688</a>
         </div>
-
         <div class="col-lg-4 text-center text-lg-end">
             <div class="d-inline-flex align-items-center" style="height: 45px;">
                 <div class="dropdown">
-                    <a href="#" class="dropdown-toggle text-muted me-2" data-bs-toggle="dropdown"><small> USD</small></a>
-                    <div class="dropdown-menu rounded">
-                        <a href="#" class="dropdown-item"> Euro</a>
-                        <a href="#" class="dropdown-item"> Dolar</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-toggle text-muted mx-2" data-bs-toggle="dropdown"><small> English</small></a>
-                    <div class="dropdown-menu rounded">
-                        <a href="#" class="dropdown-item"> English</a>
-                        <a href="#" class="dropdown-item"> Turkish</a>
-                        <a href="#" class="dropdown-item"> Spanol</a>
-                        <a href="#" class="dropdown-item"> Italiano</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <a href="#"
-                       class="dropdown-toggle text-muted ms-2 d-flex align-items-center"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
+                    <a href="#" class="dropdown-toggle text-muted ms-2 d-flex align-items-center" data-bs-toggle="dropdown">
                         <i class="fa fa-user-circle me-2"></i>
                         <small>Tài khoản</small>
                     </a>
-
                     <ul class="dropdown-menu dropdown-menu-end shadow rounded-3 p-2">
                         @if (!User.Identity.IsAuthenticated)
                         {
-                            <li>
-                                <a class="dropdown-item" asp-controller="Auth" asp-action="Login">
-                                    <i class="fa fa-sign-in me-2"></i> Đăng nhập
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-controller="Auth" asp-action="Register">
-                                    <i class="fa fa-user-plus me-2"></i> Đăng ký
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" asp-controller="Auth" asp-action="Login"><i class="fa fa-sign-in me-2"></i> Đăng nhập</a></li>
+                            <li><a class="dropdown-item" asp-controller="Auth" asp-action="Register"><i class="fa fa-user-plus me-2"></i> Đăng ký</a></li>
                         }
                         else
                         {
-                            <li class="dropdown-header text-warning fw-semibold">
-                                👋 Hi, @User.Identity.Name
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fa fa-user me-2"></i> Tài khoản của tôi
-                                </a>
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item" href="~/Product/ProductWishlist">
-                                    <i class="fa fa-heart me-2"></i> Sản phẩm yêu thích
-                                </a>
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item" href="~/Cart/Index">
-                                    <i class="fa fa-shopping-cart me-2"></i> Giỏ hàng
-                                </a>
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fa fa-bell me-2"></i> Thông báo
-                                </a>
-                            </li>
-
+                            <li class="dropdown-header text-warning fw-semibold">👋 Hi, @User.Identity.Name</li>
+                            <li><a class="dropdown-item" href="#"><i class="fa fa-user me-2"></i> Tài khoản</a></li>
+                            <li><a class="dropdown-item" href="~/Product/ProductWishlist"><i class="fa fa-heart me-2"></i> Yêu thích</a></li>
+                            <li><a class="dropdown-item" href="~/Cart/Index"><i class="fa fa-shopping-cart me-2"></i> Giỏ hàng</a></li>
                             <li><hr class="dropdown-divider"></li>
-
-                            <li>
-                                <a class="dropdown-item text-danger"
-                                   asp-controller="Auth"
-                                   asp-action="Logout">
-                                    <i class="fa fa-sign-out me-2"></i> Đăng xuất
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout"><i class="fa fa-sign-out me-2"></i> Đăng xuất</a></li>
                         }
                     </ul>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+
 <div class="container-fluid px-5 py-4 d-none d-lg-block">
     <div class="row gx-0 align-items-center text-center">
         <div class="col-md-4 col-lg-3 text-center text-lg-start">
-            <div class="d-inline-flex align-items-center">
-                <a href="~/Home/Index" class="navbar-brand p-0">
-                    <h1 class="display-5 text-primary m-0"><i class="fas fa-shopping-bag text-secondary me-2"></i>VYBE</h1>
-                    <!-- <img src="~/img/logo.png" alt="Logo"> -->
-                </a>
-            </div>
+            <a href="~/Home/Index" class="navbar-brand p-0">
+                <h1 class="display-5 text-primary m-0"><i class="fas fa-shopping-bag text-secondary me-2"></i>VYBE</h1>
+            </a>
         </div>
         <div class="col-md-4 col-lg-6 text-center">
-            <div class="position-relative ps-4">
-                <div class="d-flex border rounded-pill">
-                    <input class="form-control border-0 rounded-pill w-100 py-1" type="text" data-bs-target="#dropdownToggle123" placeholder="Bạn đang tìm kiếm gì?">
-                    @* <select class="form-select text-dark border-0 border-start rounded-0 p-3" style="width: 200px;">
-                        <option value="All Category">All Category</option>
-                        @foreach (var item in categories)
-                        {
-                            <option value="">@item.Name</option>
-                        }
-                    </select> *@
-                    <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i class="fas fa-search"></i></button>
+            <div class="position-relative ps-4 search-input-group">
+                <form asp-controller="Product" asp-action="Index" method="get" class="d-flex border rounded-pill w-100" id="globalSearchForm">
+                    <input name="keyword"
+                           id="globalSearchInput"
+                           class="form-control border-0 rounded-pill w-100 py-1 ps-4"
+                           type="search"
+                           placeholder="Bạn đang tìm kiếm gì?"
+                           autocomplete="off"
+                           required>
+                    <button type="submit" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <div id="searchDropdownResult">
+                    <div id="searchResultItems"></div>
+                    <a href="javascript:void(0)" class="search-see-more-link" id="btnSeeAllResults" style="display:none;">
+                        Xem thêm kết quả khác
+                    </a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 col-lg-3 text-center text-lg-end">
             <div class="d-inline-flex align-items-center">
-                <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></i></a>
-                <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></a>
-                <a href="~/Cart/Index" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span> <span class="text-dark ms-2">$0.00</span></a>
+                <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
+                <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
+                <a href="~/Cart/Index" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span></a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("globalSearchInput");
+        const dropdown = document.getElementById("searchDropdownResult");
+        const resultItems = document.getElementById("searchResultItems");
+        const seeMoreBtn = document.getElementById("btnSeeAllResults");
+
+        let debounceTimer;
+
+        input.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
+            const keyword = this.value.trim();
+
+            if (keyword.length < 2) {
+                dropdown.style.display = "none";
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                dropdown.style.display = "block";
+                resultItems.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin me-2"></i> Đang tìm...</div>';
+
+                fetch(`/Product/InstantSearch?keyword=${encodeURIComponent(keyword)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        renderResults(data, keyword);
+                    })
+                    .catch(err => {
+                        resultItems.innerHTML = '<div class="search-no-result text-danger">Lỗi kết nối máy chủ</div>';
+                    });
+            }, 300);
+        });
+
+        function renderResults(data, keyword) {
+            resultItems.innerHTML = "";
+
+            if (!data || data.length === 0) {
+                resultItems.innerHTML = '<div class="search-no-result">Không tìm thấy sản phẩm</div>';
+                seeMoreBtn.style.display = "none";
+                return;
+            }
+
+            data.forEach(item => {
+                const link = document.createElement("a");
+                link.href = `/Product/Detail/${item.id}`;
+                link.className = "search-item-link";
+                link.innerHTML = `
+                    <img src="${item.image}" class="search-item-image">
+                    <div class="search-item-info">
+                        <div class="search-item-name">${item.name}</div>
+                        <div class="search-item-price">${item.price}</div>
+                    </div>
+                `;
+                resultItems.appendChild(link);
+            });
+
+            seeMoreBtn.href = `/Product/Index?keyword=${encodeURIComponent(keyword)}`;
+            seeMoreBtn.style.display = "block";
+            seeMoreBtn.innerText = "Xem tất cả kết quả";
+        }
+
+        // Ẩn khi click ra ngoài
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest('.search-input-group')) {
+                dropdown.style.display = "none";
+            }
+        });
+
+        input.addEventListener("focus", function() {
+           if(this.value.trim().length >= 2) dropdown.style.display = "block";
+        });
+    });
+</script>

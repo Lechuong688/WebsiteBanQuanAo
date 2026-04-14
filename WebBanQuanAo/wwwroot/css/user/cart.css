@@ -1,0 +1,81 @@
+﻿/* CSS cho thanh Footer Thanh toán giống ảnh */
+.cart-sticky-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px 20px;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+    .footer-left label {
+        cursor: pointer;
+        margin-bottom: 0;
+        user-select: none;
+    }
+
+.btn-link-action {
+    color: #222;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+    .btn-link-action:hover {
+        color: #ee4d2d;
+    }
+
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.total-price-area {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.price-total-red {
+    color: #ee4d2d;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.btn-checkout {
+    background-color: #ee4d2d;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+    .btn-checkout:hover {
+        background-color: #d73a1e;
+        color: white;
+    }
+
+/* Làm đẹp Checkbox */
+.custom-checkbox {
+    transform: scale(1.2);
+    cursor: pointer;
+    margin-right: 8px;
+}

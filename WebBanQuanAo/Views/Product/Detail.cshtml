@@ -1,153 +1,20 @@
-﻿@model Data.DTO.Product.ProductDetailDTO
+﻿@using Data.DTO.Product
+@model Data.DTO.Product.ProductDetailDTO
 
-<style>
-    :root {
-        --primary-orange: #EE7C6B;
-        --light-orange: #FFF0E6;
-        --hover-orange: #EE7C6B;
-        --text-dark: #2d3436;
-        --text-muted: #636e72;
-    }
+@{
+    // 1. Định nghĩa mảng thứ tự size chuẩn
+    var sizeOrder = new List<string> { "XS", "S", "M", "L", "XL", "XXL", "2XL", "3XL", "4XL", "FREESIZE" };
 
-    body {
-        background-color: #f8f9fa;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .breadcrumb-item a {
-        color: var(--primary-orange);
-        text-decoration: none;
-    }
-
-    .product-image-container {
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid #eee;
-        background: #fff;
-    }
-
-    .thumb-img {
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: all 0.3s;
-        border-radius: 8px;
-    }
-
-        .thumb-img:hover, .thumb-img.active {
-            border-color: var(--primary-orange);
-            opacity: 0.8;
-        }
-
-    .product-title {
-        color: var(--text-dark);
-        font-weight: 700;
-    }
-
-    .product-price {
-        color: var(--primary-orange);
-        font-size: 2rem;
-        font-weight: bold;
-    }
-
-    .star-rating {
-        color: #ffc107;
-        font-size: 0.9rem;
-    }
-
-    .btn-orange {
-        background-color: var(--primary-orange);
-        color: white;
-        border: none;
-        padding: 10px 30px;
-        border-radius: 50px;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-
-        .btn-orange:hover {
-            background-color: var(--hover-orange);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);
-        }
-
-    .quantity-input {
-        width: 60px;
-        text-align: center;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
-    .feature-item i {
-        color: var(--primary-orange);
-        margin-right: 10px;
-    }
-
-    .nav-tabs .nav-link {
-        color: var(--text-muted);
-        border: none;
-        border-bottom: 3px solid transparent;
-    }
-
-        .nav-tabs .nav-link.active {
-            color: var(--primary-orange);
-            border-bottom: 3px solid var(--primary-orange);
-            font-weight: 600;
-            background: none;
-        }
-
-    .thumb-img {
-        opacity: 0.6;
-        transition: 0.2s;
-    }
-
-        .thumb-img:hover,
-        .thumb-img.active {
-            opacity: 1;
-            border: 2px solid #0d6efd;
-        }
-
-    .option-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .option-item {
-        position: relative;
-        cursor: pointer;
-    }
-
-        .option-item span {
-            display: inline-block;
-            padding: 8px 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            background: #fff;
-            font-size: 14px;
-            transition: all .2s;
-        }
-
-        .option-item input:checked + span {
-            border-color: #ff4d4f;
-            color: #ff4d4f;
-            font-weight: 600;
-        }
-
-            /* dấu tick đỏ giống hình */
-            .option-item input:checked + span::after {
-                content: "✔";
-                position: absolute;
-                top: -6px;
-                right: -6px;
-                background: #ff4d4f;
-                color: #fff;
-                font-size: 10px;
-                padding: 2px 4px;
-                border-radius: 50%;
-            }
-
-</style>
+    // 2. Sắp xếp lại danh sách Size của sản phẩm theo mảng chuẩn
+    var sortedSizes = Model.Sizes.OrderBy(s =>
+    {
+        var index = sizeOrder.IndexOf(s.Name.ToUpper());
+        return index == -1 ? 999 : index; // Những size lạ không có trong mảng sẽ bị đẩy xuống cuối
+    }).ThenBy(s => s.Name).ToList();
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/user/productdetail.css" />
+}
 <body>
     <div class="container py-5">
         <nav aria-label="breadcrumb" class="mb-4">
@@ -172,13 +39,12 @@
                     {
                         <div class="col-auto">
                             <img src="@img"
-                                 class="img-thumbnail thumb-img"
-                                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                                 class="img-thumbnail thumb-img @(img == Model.Images.First() ? "active" : "")"
+                                 style="width: 80px; height: 80px; object-fit: cover;"
                                  onclick="changeImage('@img')" />
                         </div>
                     }
                 </div>
-
             </div>
 
             <div class="col-lg-6">
@@ -196,18 +62,15 @@
                 </div>
 
                 <h3 class="product-price mb-4">
-
                     @if (Model.DiscountPercent.HasValue && Model.DiscountPercent > 0)
                     {
-                        <span class="text-muted text-decoration-line-through me-2">
+                        <span class="text-muted text-decoration-line-through me-2" style="font-size: 1.2rem;">
                             @Model.Price.ToString("N0")đ
                         </span>
-
                         <span class="text-primary fw-bold">
                             @Model.FinalPrice.ToString("N0")đ
                         </span>
-
-                        <span class="badge bg-danger">
+                        <span class="badge bg-danger ms-2" style="font-size: 1rem; vertical-align: middle;">
                             -@Model.DiscountPercent%
                         </span>
                     }
@@ -215,74 +78,56 @@
                     {
                         <span>@Model.Price.ToString("N0")đ</span>
                     }
-
                 </h3>
+
                 <div class="mb-3">
                     <div class="fw-bold mb-2">Màu sắc:</div>
                     <div class="option-group">
                         @foreach (var c in Model.Colors)
                         {
                             <label class="option-item">
-                                <input type="radio" name="color" value="@c.Id" hidden>
+                                <input type="radio" name="color" value="@c.Id" hidden @(Model.Colors.Count == 1 ? "checked" : "")>
                                 <span>@c.Name</span>
                             </label>
                         }
                     </div>
                 </div>
+
                 <div class="mb-4">
                     <div class="fw-bold mb-2">Kích thước:</div>
                     <div class="option-group">
-                        @foreach (var s in Model.Sizes)
+                        @foreach (var s in sortedSizes)
                         {
                             <label class="option-item">
-                                <input type="radio" name="size" value="@s.Id" hidden>
+                                <input type="radio" name="size" value="@s.Id" hidden @(sortedSizes.Count == 1 ? "checked" : "")>
                                 <span>@s.Name</span>
                             </label>
                         }
                     </div>
                 </div>
 
-                @* <div class="mb-3">
-                    <label class="fw-bold">Màu sắc</label><br />
-                    @foreach (var c in Model.Colors)
-                    {
-                        <label class="me-3">
-                            <input type="radio" name="color" value="@c.Id"> @c.Name
-                        </label>
-                    }
-                </div>
-
-                <div class="mb-3">
-                    <label class="fw-bold">Size</label><br />
-                    @foreach (var s in Model.Sizes)
-                    {
-                        <label class="me-3">
-                            <input type="radio" name="size" value="@s.Id"> @s.Name
-                        </label>
-                    }
-                </div> *@
-
                 <ul class="list-unstyled mb-4">
                     <li class="feature-item mb-2"><i class="fas fa-check-circle"></i> Uy tín 100%</li>
-                    <li class="feature-item mb-2"><i class="fas fa-truck"></i>Giao hàng nhanh chóng</li>
+                    <li class="feature-item mb-2"><i class="fas fa-truck"></i> Giao hàng nhanh chóng</li>
                     <li class="feature-item mb-2"><i class="fas fa-undo"></i> Đổi trả miễn phí nếu có sự cố</li>
                 </ul>
 
-                <div class="d-flex align-items-center mb-4">
-                    <div class="input-group me-3" style="width: 140px;">
-                        <button class="btn btn-outline-secondary" type="button">-</button>
-                        <input type="text"
-                               class="form-control text-center"
-                               id="quantityInput"
-                               value="1">
-                        <button class="btn btn-outline-secondary" type="button">+</button>
+                <div class="d-flex align-items-center mb-4 flex-wrap gap-3">
+                    <div class="input-group" style="width: 140px;">
+                        <button class="btn btn-outline-secondary" type="button" id="btnMinus">-</button>
+                        <input type="text" class="form-control text-center fw-bold" id="quantityInput" value="1" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="btnPlus">+</button>
                     </div>
-                    <button class="btn btn-orange btn-lg shadow-sm"
-                            id="btnAddToCart"
-                            data-productid="@Model.Id">
-                        <i class="fas fa-shopping-bag me-2"></i> Thêm vào giỏ
-                    </button>
 
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-orange shadow-sm" id="btnAddToCart" data-productid="@Model.Id">
+                            <i class="fas fa-cart-plus me-2"></i> Thêm vào giỏ
+                        </button>
+
+                        <button class="btn btn-orange shadow-sm" id="btnBuyNow" data-productid="@Model.Id">
+                            <i class="fas fa-bolt me-2"></i> Mua ngay
+                        </button>
+                    </div>
                 </div>
 
                 <div class="border-top pt-3">
@@ -293,94 +138,124 @@
         </div>
 
         <div class="row mt-5">
-        <div class="col-12">
-            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button">Mô tả chi tiết</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button">Đánh giá (120)</button>
-                </li>
-            </ul>
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active p-3 bg-white rounded shadow-sm" id="desc">
+            <div class="col-12">
+                <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button">Mô tả chi tiết</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button">Đánh giá (120)</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active p-3 bg-white rounded shadow-sm" id="desc">
                         <p class="text-muted mb-4">
-                            @Html.Raw(@Model.Note)
+                            @Html.Raw(Model.Note)
                         </p>
-                </div>
-                <div class="tab-pane fade p-3 bg-white rounded shadow-sm" id="review">
-                    <div class="d-flex mb-3">
-                        <div class="flex-shrink-0">
-                            <img src="https://via.placeholder.com/50" class="rounded-circle" alt="...">
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Nguyễn Văn A</h6>
-                            <div class="star-rating text-warning mb-1"><small><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></small></div>
-                            <p class="mb-0 text-muted">Cam rất tươi, giao hàng nhanh. Sẽ ủng hộ shop tiếp.</p>
+                    </div>
+                    <div class="tab-pane fade p-3 bg-white rounded shadow-sm" id="review">
+                        <div class="d-flex mb-3 pb-3 border-bottom">
+                            <div class="flex-shrink-0">
+                                <img src="https://via.placeholder.com/50" class="rounded-circle" alt="...">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Nguyễn Văn A</h6>
+                                <div class="star-rating text-warning mb-1"><small><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></small></div>
+                                <p class="mb-0 text-muted">Cam rất tươi, giao hàng nhanh. Sẽ ủng hộ shop tiếp.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-<script>
-    function changeImage(src) {
-        const main = document.getElementById('mainImage');
-        main.src = src;
 
-        document.querySelectorAll('.thumb-img').forEach(img => {
-            img.classList.remove('active');
-            if (img.src === src) {
-                img.classList.add('active');
-            }
-        });
-    }
+    <script>
+        // Đổi ảnh chính khi click vào thumbnail
+        function changeImage(src) {
+            const main = document.getElementById('mainImage');
+            main.src = src;
 
-    const qtyInput = document.getElementById('quantityInput');
+            document.querySelectorAll('.thumb-img').forEach(img => {
+                img.classList.remove('active');
+                if (img.getAttribute('src') === src) {
+                    img.classList.add('active');
+                }
+            });
+        }
 
-    document.querySelector('.btn-outline-secondary:first-child')
-        .addEventListener('click', () => {
+        // Tăng giảm số lượng
+        const qtyInput = document.getElementById('quantityInput');
+        document.getElementById('btnMinus').addEventListener('click', () => {
             let v = parseInt(qtyInput.value);
             if (v > 1) qtyInput.value = v - 1;
         });
 
-    document.querySelector('.btn-outline-secondary:last-child')
-        .addEventListener('click', () => {
+        document.getElementById('btnPlus').addEventListener('click', () => {
             let v = parseInt(qtyInput.value);
             qtyInput.value = v + 1;
         });
 
-            document.getElementById('btnAddToCart').addEventListener('click', function () {
+        // Hàm Xử lý Gửi request Thêm vào giỏ chung cho cả 2 nút
+        // Hàm Xử lý Gửi request Thêm vào giỏ chung cho cả 2 nút
+        function processCartAction(button, actionType) {
+            const productId = button.dataset.productid;
+            const quantity = document.getElementById('quantityInput').value;
 
-        const productId = this.dataset.productid;
-        const quantity = document.getElementById('quantityInput').value;
+            const color = document.querySelector('input[name="color"]:checked');
+            const size = document.querySelector('input[name="size"]:checked');
 
-        const color = document.querySelector('input[name="color"]:checked');
-        const size = document.querySelector('input[name="size"]:checked');
+            if (!color || !size) {
+                alert("⚠️ Vui lòng chọn đầy đủ MÀU SẮC và KÍCH THƯỚC trước khi đặt hàng!");
+                return;
+            }
 
-        if (!color || !size) {
-            alert("⚠️ Vui lòng chọn MÀU SẮC và SIZE");
-            return;
+            // Đổi text nút thành Đang xử lý...
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang xử lý...';
+            button.disabled = true;
+
+            // KIỂM TRA XEM LÀ MUA NGAY HAY THÊM VÀO GIỎ
+            let isBuyNow = (actionType === 'checkout') ? "true" : "false";
+
+            fetch('/Cart/AddToCart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                // Truyền thêm biến isBuyNow xuống Backend
+                body: `productId=${productId}&colorId=${color.value}&sizeId=${size.value}&quantity=${quantity}&isBuyNow=${isBuyNow}`
+            })
+            .then(res => {
+                if (res.ok) {
+                    if (actionType === 'cart') {
+                        window.location.href = '/Cart';
+                    } else if (actionType === 'checkout') {
+                        const selectedKey = `${productId}-${color.value}-${size.value}`;
+                        window.location.href = `/CheckOut/Index?SelectedItems=${selectedKey}`;
+                    }
+                } else {
+                    alert("⚠️ Có lỗi xảy ra, không thể thêm vào giỏ hàng");
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(err => {
+                alert("⚠️ Lỗi kết nối mạng");
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
         }
 
-        fetch('/Cart/AddToCart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body:
-                `productId=${productId}` +
-                `&colorId=${color.value}` +
-                `&sizeId=${size.value}` +
-                `&quantity=${quantity}`
-        })
-        .then(res => {
-            if (res.ok) window.location.href = '/Cart';
-            else alert("Không thể thêm vào giỏ");
+        // Sự kiện: Bấm "Thêm vào giỏ"
+        document.getElementById('btnAddToCart').addEventListener('click', function () {
+            processCartAction(this, 'cart');
         });
-    });
-</script>
 
+        // Sự kiện: Bấm "Mua ngay"
+        document.getElementById('btnBuyNow').addEventListener('click', function () {
+            processCartAction(this, 'checkout');
+        });
 
+    </script>
+</body>

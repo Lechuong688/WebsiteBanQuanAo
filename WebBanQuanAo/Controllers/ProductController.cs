@@ -91,5 +91,19 @@ namespace WebBanQuanAo.Controllers
             return Json(new { isAdded });
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> InstantSearch(string keyword)
+        {
+            var result = await _productRepository.InstantSearch(keyword);
+
+            return Json(result.Select(x => new
+            {
+                id = x.Id,
+                name = x.Name,
+                price = x.FinalPrice.ToString("N0") + "₫",
+                image = (x.Files != null && x.Files.Any()) ? x.Files.First() : "/admin/img/no-image.png"
+            }));
+        }
     }
 }

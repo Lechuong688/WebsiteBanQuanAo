@@ -714,5 +714,51 @@ namespace Data.Repository.Product
                 return true;
             }
         }
+        public async Task<List<ProductListDTO>> InstantSearch(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword)) return new List<ProductListDTO>();
+
+            keyword = keyword.ToLower();
+
+            // 1. Lấy dữ liệu thô từ database (Chỉ lấy Top 10 để tối ưu)
+            var query = (from p in _context.Product
+                         join md in _context.MasterData on p.TypeId equals md.Id
+                         where !p.IsDeleted && !md.IsDeleted && p.Name.Contains(keyword)
+                         select new { p, md }).Take(10).ToList();
+
+            // 2. Map dữ liệu và tính toán giá (tận dụng logic discount bạn đang có)
+            var now = DateTime.Now;
+            var result = query.Select(x =>
+            {
+                // Lấy discount lớn nhất đang còn hạn
+                var maxDiscount = (from pd in _context.ProductDiscount
+                                   join d in _context.Discount on pd.DiscountId equals d.Id
+                                   where pd.ProductId == x.p.Id
+                                         && d.IsActive
+                                         && (d.StartDate == null || d.StartDate <= now)
+                                         && (d.EndDate == null || d.EndDate >= now)
+                                   select (int?)d.Percent).Max() ?? 0;
+
+                return new ProductListDTO
+                {
+                    Id = x.p.Id,
+                    Name = x.p.Name,
+                    Price = x.p.Price,
+                    TypeName = x.md.Name,
+                    DiscountPercent = maxDiscount > 0 ? maxDiscount : null,
+                    FinalPrice = maxDiscount > 0
+                                 ? x.p.Price - (x.p.Price * maxDiscount / 100)
+                                 : x.p.Price,
+                    Files = _context.Attachment
+            .Where(a => a.EntityId == x.p.Id
+                     && a.EntityType == "Product"
+                     && (a.IsDeleted == null || a.IsDeleted == false))
+            .Select(a => a.FilePath!)
+            .ToList()
+                };
+            }).ToList();
+
+            return result;
+        }
     }
 }
