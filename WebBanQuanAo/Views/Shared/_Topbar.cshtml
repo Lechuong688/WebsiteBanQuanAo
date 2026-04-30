@@ -1,8 +1,12 @@
 ﻿@using Data.DTO.Product
 @using Data.Repository.Product
 @inject IProductRepository ProductRepository
+@using Microsoft.AspNetCore.Identity
+@using Data.Entity
+@inject UserManager<UserEntity> UserManager
 @{
     var categories = ProductRepository.GetCategories();
+    var user = await UserManager.GetUserAsync(User);
 }
 
 <style>
@@ -124,7 +128,7 @@
                         }
                         else
                         {
-                            <li class="dropdown-header text-warning fw-semibold">👋 Hi, @User.Identity.Name</li>
+                            <li class="dropdown-header text-warning fw-semibold">👋 Hi, @user?.Name</li>
                             <li><a class="dropdown-item" href="#"><i class="fa fa-user me-2"></i> Tài khoản</a></li>
                             <li><a class="dropdown-item" href="~/Product/ProductWishlist"><i class="fa fa-heart me-2"></i> Yêu thích</a></li>
                             <li><a class="dropdown-item" href="~/Cart/Index"><i class="fa fa-shopping-cart me-2"></i> Giỏ hàng</a></li>

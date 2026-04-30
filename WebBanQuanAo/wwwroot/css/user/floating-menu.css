@@ -1,0 +1,81 @@
+﻿/* --- VÙNG CHỨA CHÍNH --- */
+.floating-menu {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    /* QUAN TRỌNG: Đẩy lên cao nhất để không bị đè */
+    z-index: 9999 !important;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 15px;
+    /* Tránh việc vùng bao quanh (invisible box) che mất các thành phần khác */
+    pointer-events: none;
+}
+
+    /* Cho phép các nút bấm nhận sự kiện click trở lại */
+    .floating-menu button,
+    .floating-menu a {
+        pointer-events: auto;
+    }
+
+/* --- VÙNG CHỨA CÁC NÚT CON --- */
+.menu-items {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Hiển thị khi có class active */
+.floating-menu.active .menu-items {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* --- ĐỊNH DẠNG CHUNG --- */
+.floating-menu button,
+.floating-menu a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    color: #fff;
+    text-decoration: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#main-button {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+    background-color: #111;
+}
+
+/* --- MÀU SẮC CHI TIẾT --- */
+.ai-btn {
+    background: linear-gradient(135deg, #8A2BE2, #B06AB3);
+}
+
+.zalo-btn {
+    background-color: #0068FF;
+    font-weight: bold;
+}
+
+.fb-btn {
+    background-color: #1877F2;
+}
+
+.up-btn {
+    background-color: #6c757d;
+}

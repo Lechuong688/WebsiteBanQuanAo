@@ -32,7 +32,7 @@ function drawDoanhThuTheoThang() {
                 xkey: 'y',
                 ykeys: ['item1'],
                 labels: ['Doanh thu'],
-                lineColors: ['#3c8dbc'],
+                lineColors: ['#FF0000'],
                 hideHover: 'auto',
                 parseTime: false
             });

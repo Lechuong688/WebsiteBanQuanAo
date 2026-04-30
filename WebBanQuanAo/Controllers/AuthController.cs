@@ -2,6 +2,7 @@
 using Data.Service.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebBanQuanAo.Controllers
 {
@@ -115,6 +116,171 @@ namespace WebBanQuanAo.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult GoogleLogin()
+        {
+            var redirectUrl = Url.Action("GoogleResponse", "Auth");
+
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(
+                    "Google",
+                    redirectUrl);
+
+            return Challenge(properties, "Google");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                false);
+
+            // Nếu đã có tài khoản
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Lấy email từ Google
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            if (email == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Kiểm tra user đã tồn tại chưa
+            var existingUser = await _userManager.FindByEmailAsync(email);
+
+            UserEntity user;
+
+            if (existingUser == null)
+            {
+                user = new UserEntity
+                {
+                    UserName = email,
+                    Email = email,
+                    Name = email,
+                    CreatedDate = DateTime.Now
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    ViewBag.Error = "Không tạo được tài khoản";
+                    return View("Login");
+                }
+
+                // Gán role User
+                await _userManager.AddToRoleAsync(user, "User");
+            }
+            else
+            {
+                user = existingUser;
+            }
+
+            // Liên kết Google với tài khoản
+            await _userManager.AddLoginAsync(user, info);
+
+            // Đăng nhập
+            await _signInManager.SignInAsync(user, false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult FacebookLogin()
+        {
+            var redirectUrl = Url.Action("FacebookResponse", "Auth");
+
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(
+                    "Facebook",
+                    redirectUrl);
+
+            return Challenge(properties, "Facebook");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FacebookResponse()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                false);
+
+            // Nếu tài khoản đã tồn tại
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Lấy email từ Facebook
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+            // Facebook đôi khi không trả email
+            if (email == null)
+            {
+                email = Guid.NewGuid().ToString() + "@facebook.com";
+            }
+
+            // Kiểm tra user đã tồn tại chưa
+            var existingUser = await _userManager.FindByEmailAsync(email);
+
+            UserEntity user;
+
+            if (existingUser == null)
+            {
+                user = new UserEntity
+                {
+                    UserName = "fb_" + Guid.NewGuid().ToString("N").Substring(0, 8),
+                    Email = email,
+                    Name = name ?? email,
+                    CreatedDate = DateTime.Now
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    ViewBag.Error = "Không tạo được tài khoản Facebook";
+                    return View("Login");
+                }
+
+                await _userManager.AddToRoleAsync(user, "User");
+            }
+            else
+            {
+                user = existingUser;
+            }
+
+            // Liên kết Facebook với tài khoản
+            await _userManager.AddLoginAsync(user, info);
+
+            // Đăng nhập
+            await _signInManager.SignInAsync(user, false);
+
             return RedirectToAction("Index", "Home");
         }
     }

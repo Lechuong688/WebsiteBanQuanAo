@@ -29,6 +29,7 @@
 
     <!-- Template Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
+    <link href="~/css/user/floating-menu.css" rel="stylesheet">
     @RenderSection("Styles", required: false)
 </head>
 
@@ -78,7 +79,9 @@
     @await Html.PartialAsync("_Copyright", null)
 
     <!-- Back to Top -->
-    <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>
+    @* <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a> *@
+    <partial name="_FloatingMenu" />
+    <partial name="_ChatBot" />
 
 
     <!-- JavaScript Libraries -->
@@ -87,6 +90,7 @@
     <script src="~/lib/wow/wow.min.js"></script>
     <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
 
+    @* <script src="~/js/chatbot.js"></script> *@
 
     <!-- Template Javascript -->
     <script src="~/webbanquanao/js/wishlist.js"></script>

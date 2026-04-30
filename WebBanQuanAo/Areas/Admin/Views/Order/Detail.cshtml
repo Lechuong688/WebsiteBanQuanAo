@@ -6,7 +6,6 @@
 @{
     ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
 
-    // Cập nhật lại hàm lấy màu map thẳng với Soft Badge và Enum cho an toàn tuyệt đối
     string GetStatusColor(int statusId)
     {
         return statusId switch

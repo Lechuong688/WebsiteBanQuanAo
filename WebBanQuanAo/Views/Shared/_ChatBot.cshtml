@@ -1,0 +1,417 @@
+﻿<!-- MÀN HÌNH CHAT -->
+<div id="chatbot-container"
+     class="chatbot-container"
+     style="display: none;">
+
+    <div class="chatbot-header">
+
+        <div class="header-info">
+            <i class="fa fa-robot"></i>
+            <span>Trợ Lý Ảo Vybe AI</span>
+        </div>
+
+        <button class="close-btn"
+                onclick="toggleChatBot()">
+
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
+    <div class="chatbot-messages"
+         id="chat-messages">
+
+        <div class="message bot-message">
+
+            <div class="message-content">
+                Xin chào 👋 Mình là Vybe AI.
+                Bạn đang tìm sản phẩm nào hôm nay?
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="chatbot-input">
+
+        <input type="text"
+               id="chat-input"
+               placeholder="Nhập tin nhắn..."
+               autocomplete="off">
+
+        <button id="send-btn"
+                onclick="sendMessage()">
+
+            <i class="fa fa-paper-plane"></i>
+        </button>
+
+    </div>
+
+</div>
+
+<style>
+
+    /* =========================
+           CHATBOT
+        ========================== */
+
+        .chat-product-wrapper{
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+    .chatbot-container {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 380px;
+        height: 600px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 10000;
+    }
+
+    .chatbot-header {
+        background: linear-gradient(135deg,#8A2BE2,#B06AB3);
+        color: white;
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .chatbot-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f5f5f5;
+    }
+
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message-content {
+        max-width: 85%;
+        padding: 12px 15px;
+        border-radius: 16px;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .bot-message .message-content {
+        background: white;
+        align-self: flex-start;
+        border-bottom-left-radius: 5px;
+    }
+
+    .user-message {
+        align-items: flex-end;
+    }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg,#8A2BE2,#B06AB3);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+    .chatbot-input {
+        display: flex;
+        gap: 10px;
+        padding: 12px;
+        border-top: 1px solid #eee;
+        background: white;
+    }
+
+        .chatbot-input input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px 15px;
+            outline: none;
+        }
+
+        .chatbot-input button {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#8A2BE2,#B06AB3);
+            color: white;
+            cursor: pointer;
+        }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    /* =========================
+           PRODUCT CARD
+        ========================== */
+
+    .chat-product-card {
+        display: flex;
+        gap: 12px;
+        padding: 10px;
+        background: white;
+        border-radius: 14px;
+        margin-top: 10px;
+        text-decoration: none;
+        color: black;
+        transition: 0.2s;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+        .chat-product-card:hover {
+            transform: scale(1.02);
+        }
+
+        .chat-product-card img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+    .chat-product-info {
+        flex: 1;
+    }
+
+    .chat-product-name {
+        font-weight: bold;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .chat-product-price {
+        color: #e74c3c;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+</style>
+
+<script>
+
+    function toggleChatBot() {
+
+        const chatbot =
+            document.getElementById(
+                "chatbot-container");
+
+        if (chatbot.style.display === "none"
+            || chatbot.style.display === "") {
+
+            chatbot.style.display = "flex";
+        }
+        else {
+
+            chatbot.style.display = "none";
+        }
+    }
+
+    async function sendMessage() {
+
+        const input =
+            document.getElementById(
+                "chat-input");
+
+        const text =
+            input.value.trim();
+
+        if (!text) return;
+
+        appendMessage(text, "user-message");
+
+        input.value = "";
+
+        const typingId =
+            appendTypingIndicator();
+
+        try {
+
+            const response =
+                await fetch('/api/chat/send', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        message: text
+                    })
+                });
+
+            const data =
+                await response.json();
+
+            document
+                .getElementById(typingId)
+                .remove();
+
+            if (data.success) {
+
+                appendBotMessage(
+                    data.reply,
+                    data.products);
+            }
+        }
+        catch {
+
+            document
+                .getElementById(typingId)
+                .remove();
+
+            appendMessage(
+                "Lỗi kết nối server.",
+                "bot-message");
+        }
+    }
+
+    function appendMessage(
+        text,
+        className) {
+
+        const container =
+            document.getElementById(
+                "chat-messages");
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "message " + className;
+
+        div.innerHTML =
+            `<div class="message-content">
+                ${text.replace(/\n/g,'<br>')}
+            </div>`;
+
+        container.appendChild(div);
+
+        container.scrollTop =
+            container.scrollHeight;
+    }
+
+    function appendBotMessage(
+        text,
+        products) {
+
+        const container =
+            document.getElementById(
+                "chat-messages");
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "message bot-message";
+
+            let html = `
+    <div class="message-content">
+
+        ${text.replace(/\n/g,'<br>')}
+
+        <div class="chat-product-wrapper">
+    `;
+
+        if (products
+            && products.length > 0) {
+
+            products.forEach(product => {
+
+                html += `
+                <a href="${product.link}"
+                   class="chat-product-card">
+
+                    <img src="${product.image}?v=${Date.now()}" />
+
+                    <div class="chat-product-info">
+
+                        <div class="chat-product-name">
+                            ${product.name}
+                        </div>
+
+                        <div class="chat-product-price">
+                            ${Number(product.price)
+                                .toLocaleString()} đ
+                        </div>
+
+                    </div>
+
+                </a>
+                `;
+            });
+            html += `</div>`;
+        }
+
+        div.innerHTML = html;
+
+        container.appendChild(div);
+
+        container.scrollTop =
+            container.scrollHeight;
+    }
+
+    function appendTypingIndicator() {
+
+        const id =
+            "typing-" + Date.now();
+
+        const container =
+            document.getElementById(
+                "chat-messages");
+
+        const div =
+            document.createElement("div");
+
+        div.id = id;
+
+        div.className =
+            "message bot-message";
+
+        div.innerHTML =
+            `<div class="message-content"
+                  style="color:gray;
+                         font-style:italic;">
+
+                Vybe AI đang trả lời...
+
+            </div>`;
+
+        container.appendChild(div);
+
+        container.scrollTop =
+            container.scrollHeight;
+
+        return id;
+    }
+
+    document
+        .getElementById("chat-input")
+        .addEventListener(
+            "keypress",
+
+            function (e) {
+
+                if (e.key === "Enter") {
+
+                    sendMessage();
+                }
+            });
+
+</script>

@@ -1,0 +1,44 @@
+﻿<div class="floating-menu">
+    <button id="main-button">
+        <i class="fa fa-comments"></i>
+    </button>
+
+    <div class="menu-items">
+        <!-- Nút lên đầu trang -->
+        <a href="#" class="menu-button" onclick="scrollToTop()">
+            <i class="fa fa-arrow-up"></i>
+        </a>
+
+        <!-- Nút Facebook -->
+        <a href="https://www.facebook.com/IAMChuongg/" target="_blank" class="menu-button fb-btn">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <!-- Nút Zalo (Ví dụ đổi chữ E thành icon hoặc giữ nguyên tùy bạn) -->
+        <a href="https://zalo.me" target="_blank" class="menu-button zalo-btn">
+            Z
+        </a>
+
+        <!-- Nút mở ChatBot -->
+        <button type="button" class="menu-button ai-btn" onclick="toggleChatBot()">
+            <i class="fa fa-robot"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Sử dụng var để an toàn khi gộp file Layout
+    var floatingMenu = document.querySelector(".floating-menu");
+    var mainButton = document.getElementById("main-button");
+
+    if (mainButton && floatingMenu) {
+        mainButton.onclick = function (e) {
+            e.stopPropagation();
+            floatingMenu.classList.toggle("active");
+        };
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+</script>

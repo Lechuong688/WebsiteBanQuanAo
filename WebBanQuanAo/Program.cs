@@ -9,6 +9,7 @@ using Data.Repository.Order;
 using Data.Repository.Product;
 using Data.Repository.User;
 using Data.Service.Auth;
+using Data.Service.ChatBot;
 using Data.Service.Order;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,23 @@ builder.Services.AddIdentity<UserEntity, RoleEntity>(options =>
 .AddEntityFrameworkStores<DataContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+
+        options.Scope.Clear();
+        options.Scope.Add("public_profile");
+
+        options.Fields.Add("name");
+    });
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Auth/Login";
@@ -49,6 +67,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
+builder.Services.AddScoped<ChatBotService>();
 // Đăng ký Background Service
 builder.Services.AddHostedService<OrderCleanupService>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
