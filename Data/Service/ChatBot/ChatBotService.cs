@@ -1,15 +1,24 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace Data.Service.ChatBot
 {
     public class ChatBotService
     {
-        private readonly string apiKey =
-            "";
+        private readonly string apiKey;
 
-        private readonly string apiUrl =
-            "https://api.groq.com/openai/v1/chat/completions";
+        private readonly string apiUrl;
+
+        public ChatBotService(
+            IConfiguration configuration)
+        {
+            apiKey =
+                configuration["GroqAI:ApiKey"];
+
+            apiUrl =
+                configuration["GroqAI:ApiUrl"];
+        }
 
         public async Task<string> AskAI(
             string prompt)
@@ -50,6 +59,7 @@ namespace Data.Service.ChatBot
                     },
 
                     temperature = 0.7,
+
                     max_tokens = 300
                 };
 

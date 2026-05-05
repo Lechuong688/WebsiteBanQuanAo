@@ -3903,6 +3903,7 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="wwwroot\uploads\banners\" />
+    <Folder Include="wwwroot\uploads\UploadReviewImages\" />
     <Folder Include="wwwroot\uploads\products\" />
   </ItemGroup>
 

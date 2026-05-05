@@ -13,7 +13,7 @@
     /* 1. Đảm bảo vùng chứa Search có thứ tự hiển thị cao */
     .search-input-group {
         position: relative;
-        z-index: 10001; /* Cao hơn topbar */
+        z-index: 1000; /* Cao hơn topbar */
     }
 
     /* 2. Style cho khối Dropdown kết quả - Sửa lỗi bị đè */
@@ -27,7 +27,7 @@
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         /* QUAN TRỌNG: Hiển thị đè lên mọi thành phần khác */
-        z-index: 99999 !important;
+        z-index: 1040 !important;
         display: none;
         max-height: 480px;
         overflow-y: auto;

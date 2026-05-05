@@ -7,6 +7,7 @@ using Data.Repository.Discount;
 using Data.Repository.MasterData;
 using Data.Repository.Order;
 using Data.Repository.Product;
+using Data.Repository.ProductReview;
 using Data.Repository.User;
 using Data.Service.Auth;
 using Data.Service.ChatBot;
@@ -59,6 +60,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddScoped<IDatabaseSql, DatabaseSql>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMasterDataRepository, MasterDataRepository>();

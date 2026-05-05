@@ -32,6 +32,9 @@ namespace Data.Repository
         public DbSet<ChatSessionEntity> ChatSession { get; set; }
 
         public DbSet<ChatMessageEntity> ChatMessage { get; set; }
+        public DbSet<ProductReviewEntity> ProductReview { get; set; }
+
+        public DbSet<ProductReviewReplyEntity> ProductReviewReply { get; set; }
 
     }
 }

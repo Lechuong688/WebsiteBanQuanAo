@@ -53,13 +53,28 @@
 
                 <div class="d-flex align-items-center mb-3">
                     <div class="star-rating me-3">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+
+                        @{
+                            var fullStar = (int)Math.Floor(Model.AverageRating);
+                        }
+
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= fullStar)
+                            {
+                                <i class="fas fa-star text-warning"></i>
+                            }
+                            else
+                            {
+                                <i class="far fa-star text-warning"></i>
+                            }
+                        }
+
                     </div>
-                    <span class="text-muted">(120 đánh giá)</span>
+                    <span class="text-muted">
+                        @Model.AverageRating.ToString("0.0")
+                        (@Model.ReviewCount đánh giá)
+                    </span>
                 </div>
 
                 <h3 class="product-price mb-4">
@@ -145,7 +160,7 @@
                         <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button">Mô tả chi tiết</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button">Đánh giá (120)</button>
+                        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button">Đánh giá (@Model.ReviewCount)</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
@@ -155,19 +170,98 @@
                         </p>
                     </div>
                     <div class="tab-pane fade p-3 bg-white rounded shadow-sm" id="review">
-                        <div class="d-flex mb-3 pb-3 border-bottom">
-                            <div class="flex-shrink-0">
-                                <img src="https://via.placeholder.com/50" class="rounded-circle" alt="...">
+                        @if (Model.Reviews != null && Model.Reviews.Any())
+                        {
+                            @foreach (var review in Model.Reviews)
+                            {
+                                <div class="d-flex mb-4 pb-3 border-bottom">
+
+                                    <div class="flex-shrink-0">
+                                        <img src="/admin/img/no-image.png"
+                                             class="rounded-circle"
+                                             width="50"
+                                             height="50"
+                                             style="object-fit:cover;">
+                                    </div>
+
+                                    <div class="flex-grow-1 ms-3">
+
+                                        <div class="fw-bold mb-1">
+                                            @(string.IsNullOrEmpty(review.UserName)
+                                                                                ? "Khách hàng"
+                                                                                : review.UserName)
+                                </div>
+
+                                        <div class="mb-2">
+
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="fas fa-star text-warning"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star text-warning"></i>
+                                                }
+                                            }
+
+                                        </div>
+
+                                        <div class="mb-2">
+                                            @review.Comment
+                                        </div>
+                                        @if (review.Images != null && review.Images.Any())
+                                        {
+                                            <div class="d-flex gap-2 flex-wrap mt-3">
+
+                                                @foreach (var img in review.Images)
+                                                {
+                                                    <img src="@img"
+                                                         width="90"
+                                                         height="90"
+                                                         class="rounded border review-image"
+                                                         style="object-fit:cover; cursor:pointer;"
+                                                         onclick="openReviewImage('@img')">
+                                                }
+
+                                            </div>
+                                        }
+
+                                        <small class="text-muted">
+                                            @review.CreatedDate?.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted">
+                                Chưa có đánh giá nào
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">Nguyễn Văn A</h6>
-                                <div class="star-rating text-warning mb-1"><small><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></small></div>
-                                <p class="mb-0 text-muted">......</p>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="reviewImageModal"
+         tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+
+            <div class="modal-content bg-transparent border-0">
+
+                <img id="reviewImagePreview"
+                     class="img-fluid rounded shadow">
+
+            </div>
+
         </div>
     </div>
 
@@ -275,5 +369,13 @@
         document.getElementById('btnBuyNow').addEventListener('click', function () {
             processCartAction(this, 'checkout');
         });
+
+
+                function openReviewImage(src) {
+
+            $('#reviewImagePreview').attr('src', src);
+
+            $('#reviewImageModal').modal('show');
+        }
     </script>
 </body>

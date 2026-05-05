@@ -33,6 +33,8 @@ namespace Data.DTO.Product
         public decimal FinalPrice { get; set; }
         public DateTime CreatedDate {  get; set; }
         public bool IsInWishlist { get; set; }
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
     }
 
 }

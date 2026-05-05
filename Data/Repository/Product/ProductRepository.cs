@@ -94,7 +94,20 @@ namespace Data.Repository.Product
                                 .ToList(),
 
                 IsInWishlist = _context.ProductWishlist
-                                .Any(w => w.ProductId == p.Id && w.UserId == userId)
+                                .Any(w => w.ProductId == p.Id && w.UserId == userId),
+
+                AverageRating = _context.ProductReview
+                                .Where(r =>
+                                    r.ProductId == p.Id &&
+                                    !r.IsDeleted &&
+                                    r.IsApproved)
+                                .Average(r => (double?)r.Rating) ?? 0,
+
+                                            ReviewCount = _context.ProductReview
+                                .Count(r =>
+                                    r.ProductId == p.Id &&
+                                    !r.IsDeleted &&
+                                    r.IsApproved),
             }).ToList();
         }
 
@@ -184,8 +197,20 @@ namespace Data.Repository.Product
 
             IsInWishlist = userId != null &&
             _context.ProductWishlist
-                .Any(w => w.ProductId == x.p.Id && w.UserId == userId)
-        };
+                .Any(w => w.ProductId == x.p.Id && w.UserId == userId),
+            AverageRating = _context.ProductReview
+                .Where(r =>
+                    r.ProductId == x.p.Id &&
+                    !r.IsDeleted &&
+                    r.IsApproved)
+                .Average(r => (double?)r.Rating) ?? 0,
+
+            ReviewCount = _context.ProductReview
+                .Count(r =>
+                    r.ProductId == x.p.Id &&
+                    !r.IsDeleted &&
+                    r.IsApproved),
+                    };
     })
     .ToList();
 
@@ -540,7 +565,52 @@ namespace Data.Repository.Product
                 "Product_GetDetail_XML",
                 param
             );
-            return ds?.FirstOrDefault() ?? new ProductDetailDTO();
+            var product = ds?.FirstOrDefault();
+
+            if (product != null)
+            {
+                product.AverageRating = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .Average(r => (double?)r.Rating) ?? 0;
+
+                product.ReviewCount = _context.ProductReview
+                    .Count(r =>
+                        r.ProductId == id &&
+                        !r.IsDeleted &&
+                        r.IsApproved);
+
+                product.Reviews = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .OrderByDescending(r => r.CreatedDate)
+                    .Select(r => new ProductReviewListDTO
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = _context.Users
+                                .Where(u => u.Id == r.UserId)
+                                .Select(u => u.UserName)
+                                .FirstOrDefault(),
+                        Rating = r.Rating,
+                        Comment = r.Comment,
+                        CreatedDate = r.CreatedDate,
+                        Images = _context.Attachment
+                                .Where(a =>
+                                    a.EntityId == r.Id &&
+                                    a.EntityType == "ProductReview" &&
+                                    a.IsDeleted != true)
+                                .Select(a => a.FilePath!)
+                                .ToList(),
+                    })
+                    .ToList();
+            }
+
+            return product;
         }
 
         public PagedResult<ProductListDTO> GetForCollectionPaged(string collectionCode, int page, int pageSize, int? typeId = null,
@@ -616,7 +686,19 @@ namespace Data.Repository.Product
                     Files = _context.Attachment
                         .Where(a => a.EntityId == x.p.Id && a.EntityType == "Product" && a.IsDeleted != true)
                         .Select(a => a.FilePath!)
-                        .ToList()
+                        .ToList(),
+                    AverageRating = _context.ProductReview
+                        .Where(r =>
+                            r.ProductId == x.p.Id &&
+                            !r.IsDeleted &&
+                            r.IsApproved)
+                        .Average(r => (double?)r.Rating) ?? 0,
+
+                    ReviewCount = _context.ProductReview
+                        .Count(r =>
+                            r.ProductId == x.p.Id &&
+                            !r.IsDeleted &&
+                            r.IsApproved),
                 };
             }).ToList();
 

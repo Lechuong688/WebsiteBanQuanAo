@@ -9,18 +9,17 @@
 }
 
 /* --- TABS TRẠNG THÁI (Đã thêm prefix .history-page-wrapper) --- */
-.history-page-wrapper .order-tabs {
-    background: #fff;
-    display: flex;
-    justify-content: space-between;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
+    .history-page-wrapper .order-tabs {
+        background: #fff;
+        display: flex;
+        justify-content: space-between;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+        z-index: 1;
+    }
 
     .history-page-wrapper .order-tabs .nav-item {
         flex: 1;
@@ -181,4 +180,18 @@
 
 .history-page-wrapper .d-none {
     display: none !important;
+}
+
+.order-item-info .btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 5px;
+}
+
+.history-page-wrapper .modal {
+    z-index: 99999 !important;
+}
+
+.history-page-wrapper .modal-backdrop {
+    z-index: 99998 !important;
 }
