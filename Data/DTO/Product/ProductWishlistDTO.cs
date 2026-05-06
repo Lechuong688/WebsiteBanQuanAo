@@ -24,5 +24,8 @@ namespace Data.DTO.Product
         public int? DiscountPercent { get; set; }
         public decimal FinalPrice { get; set; }
         public bool IsInWishlist { get; set; }
+        public double AverageRating { get; set; }
+
+        public int ReviewCount { get; set; }
     }
 }

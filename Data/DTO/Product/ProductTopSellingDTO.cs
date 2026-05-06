@@ -25,5 +25,8 @@ namespace Data.DTO.Product
         public int TotalSold { get; set; }
 
         public DateTime CreatedDate {  get; set; }
+        public double AverageRating { get; set; }
+
+        public int ReviewCount { get; set; }
     }
 }

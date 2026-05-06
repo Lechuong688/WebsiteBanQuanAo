@@ -2,10 +2,8 @@
 @model Data.DTO.Product.ProductDetailDTO
 
 @{
-    // 1. Định nghĩa mảng thứ tự size chuẩn
     var sizeOrder = new List<string> { "XS", "S", "M", "L", "XL", "XXL", "2XL", "3XL", "4XL", "FREESIZE" };
 
-    // 2. Sắp xếp lại danh sách Size của sản phẩm theo mảng chuẩn
     var sortedSizes = Model.Sizes.OrderBy(s =>
     {
         var index = sizeOrder.IndexOf(s.Name.ToUpper());

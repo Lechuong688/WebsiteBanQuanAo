@@ -275,6 +275,19 @@ namespace Data.Repository.Product
                     .ToList();
             }
 
+            product.AverageRating = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == product.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .Average(r => (double?)r.Rating) ?? 0;
+
+            product.ReviewCount = _context.ProductReview
+                .Count(r =>
+                    r.ProductId == product.Id &&
+                    !r.IsDeleted &&
+                    r.IsApproved);
+
             return product;
         }
 
@@ -723,6 +736,21 @@ namespace Data.Repository.Product
                 new List<SqlParameter>()
             );
 
+            foreach (var item in result)
+            {
+                item.AverageRating = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .Average(r => (double?)r.Rating) ?? 0;
+
+                item.ReviewCount = _context.ProductReview
+                    .Count(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved);
+            }
             return result?.ToList() ?? new List<ProductBestsellerDTO>();
         }
 
@@ -733,6 +761,22 @@ namespace Data.Repository.Product
                 new List<SqlParameter>()
             );
 
+            foreach (var item in result)
+            {
+                item.AverageRating = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .Average(r => (double?)r.Rating) ?? 0;
+
+                item.ReviewCount = _context.ProductReview
+                    .Count(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved);
+            }
+
             return result?.ToList() ?? new List<ProductTopSellingDTO>();
         }
 
@@ -742,6 +786,22 @@ namespace Data.Repository.Product
                 "Product_NewArrival",
                 new List<SqlParameter>()
             );
+
+            foreach (var item in result)
+            {
+                item.AverageRating = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .Average(r => (double?)r.Rating) ?? 0;
+
+                item.ReviewCount = _context.ProductReview
+                    .Count(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved);
+            }
 
             return result?.ToList() ?? new List<ProductNewArrivalDTO>();
         }
@@ -760,6 +820,19 @@ namespace Data.Repository.Product
             {
                 if (!string.IsNullOrWhiteSpace(item.FilesRaw))
                     item.Files = item.FilesRaw.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                item.AverageRating = _context.ProductReview
+                                    .Where(r =>
+                                        r.ProductId == item.Id &&
+                                        !r.IsDeleted &&
+                                        r.IsApproved)
+                                    .Average(r => (double?)r.Rating) ?? 0;
+
+                item.ReviewCount = _context.ProductReview
+                                    .Count(r =>
+                                        r.ProductId == item.Id &&
+                                        !r.IsDeleted &&
+                                        r.IsApproved);
             }
 
             return new PagedResult<ProductWishlistDTO>
@@ -802,17 +875,14 @@ namespace Data.Repository.Product
 
             keyword = keyword.ToLower();
 
-            // 1. Lấy dữ liệu thô từ database (Chỉ lấy Top 10 để tối ưu)
             var query = (from p in _context.Product
                          join md in _context.MasterData on p.TypeId equals md.Id
                          where !p.IsDeleted && !md.IsDeleted && p.Name.Contains(keyword)
                          select new { p, md }).Take(10).ToList();
 
-            // 2. Map dữ liệu và tính toán giá (tận dụng logic discount bạn đang có)
             var now = DateTime.Now;
             var result = query.Select(x =>
             {
-                // Lấy discount lớn nhất đang còn hạn
                 var maxDiscount = (from pd in _context.ProductDiscount
                                    join d in _context.Discount on pd.DiscountId equals d.Id
                                    where pd.ProductId == x.p.Id
@@ -832,11 +902,23 @@ namespace Data.Repository.Product
                                  ? x.p.Price - (x.p.Price * maxDiscount / 100)
                                  : x.p.Price,
                     Files = _context.Attachment
-            .Where(a => a.EntityId == x.p.Id
-                     && a.EntityType == "Product"
-                     && (a.IsDeleted == null || a.IsDeleted == false))
-            .Select(a => a.FilePath!)
-            .ToList()
+                            .Where(a => a.EntityId == x.p.Id
+                                     && a.EntityType == "Product"
+                                     && (a.IsDeleted == null || a.IsDeleted == false))
+                            .Select(a => a.FilePath!)
+                            .ToList(),
+                    AverageRating = _context.ProductReview
+                            .Where(r =>
+                                r.ProductId == x.p.Id &&
+                                !r.IsDeleted &&
+                                r.IsApproved)
+                            .Average(r => (double?)r.Rating) ?? 0,
+
+                    ReviewCount = _context.ProductReview
+                            .Count(r =>
+                                r.ProductId == x.p.Id &&
+                                !r.IsDeleted &&
+                                r.IsApproved),
                 };
             }).ToList();
 
