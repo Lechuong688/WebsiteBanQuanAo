@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Data.Repository.Collection
 {
-    
+
     public class CollectionRepository : ICollectionRepository
     {
         private readonly DataContext _dataContext;
@@ -255,10 +255,23 @@ namespace Data.Repository.Collection
                 if (!string.IsNullOrWhiteSpace(item.FilesRaw))
                 {
                     item.Files = new List<string>
-            {
-                item.FilesRaw.Trim()
-            };
+                    {
+                        item.FilesRaw.Trim()
+                    };
                 }
+                item.AverageRating = _dataContext.ProductReview
+                        .Where(r =>
+                            r.ProductId == item.Id &&
+                            !r.IsDeleted &&
+                            r.IsApproved)
+                        .Average(r => (double?)r.Rating) ?? 0;
+
+                item.ReviewCount = _dataContext.ProductReview
+                    .Count(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved);
+
             }
 
             return list;

@@ -249,6 +249,19 @@ namespace Data.Repository.Product
 
                 if (!string.IsNullOrWhiteSpace(item.SizesRaw))
                     item.Sizes = item.SizesRaw.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                item.AverageRating = _context.ProductReview
+                    .Where(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved)
+                    .Average(r => (double?)r.Rating) ?? 0;
+
+                item.ReviewCount = _context.ProductReview
+                    .Count(r =>
+                        r.ProductId == item.Id &&
+                        !r.IsDeleted &&
+                        r.IsApproved);
             }
 
             return new PagedResult<ProductListDTO>

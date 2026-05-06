@@ -175,7 +175,7 @@
                                 <div class="d-flex mb-4 pb-3 border-bottom">
 
                                     <div class="flex-shrink-0">
-                                        <img src="/admin/img/no-image.png"
+                                        <img src="~/uploads/Users/avatar-trang-4.jpg"
                                              class="rounded-circle"
                                              width="50"
                                              height="50"
@@ -192,7 +192,7 @@
 
                                         <div class="mb-2">
 
-                                            @for (int i = 1; i <= 5; i++)
+                                    @for (int i = 1; i <= 5; i++)
                                             {
                                                 if (i <= review.Rating)
                                                 {
@@ -266,7 +266,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Đổi ảnh chính khi hover/click vào thumbnail
         function changeImage(src) {
             const main = document.getElementById('mainImage');
             main.src = src;
@@ -279,31 +278,23 @@
             });
         }
 
-        // --- BẮT ĐẦU: XỬ LÝ ZOOM ẢNH CHÍNH THEO TỌA ĐỘ CHUỘT ---
         const imgContainer = document.getElementById('imgContainer');
         const mainImg = document.getElementById('mainImage');
 
         imgContainer.addEventListener("mousemove", (e) => {
-            // Lấy tọa độ hộp chứa ảnh
             const rect = imgContainer.getBoundingClientRect();
 
-            // Tính toán vị trí chuột bên trong hộp (theo tỉ lệ phần trăm %)
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-            // Cập nhật tâm điểm phóng to ngay tại vị trí chuột
             mainImg.style.transformOrigin = `${x}% ${y}%`;
-            mainImg.style.transform = "scale(2)"; // Phóng to gấp 2 lần là đẹp nhất
+            mainImg.style.transform = "scale(2)";
         });
 
         imgContainer.addEventListener("mouseleave", () => {
-            // Chuột rời đi thì trả ảnh về trạng thái ban đầu mượt mà
             mainImg.style.transformOrigin = "center center";
             mainImg.style.transform = "scale(1)";
         });
-        // --- KẾT THÚC: XỬ LÝ ZOOM ---
-
-        // Tăng giảm số lượng
         const qtyInput = document.getElementById('quantityInput');
         document.getElementById('btnMinus').addEventListener('click', () => {
             let v = parseInt(qtyInput.value);
@@ -315,7 +306,6 @@
             qtyInput.value = v + 1;
         });
 
-        // Hàm Xử lý Gửi request Thêm vào giỏ chung cho cả 2 nút
         function processCartAction(button, actionType) {
             const productId = button.dataset.productid;
             const quantity = document.getElementById('quantityInput').value;
@@ -339,20 +329,32 @@
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `productId=${productId}&colorId=${color.value}&sizeId=${size.value}&quantity=${quantity}&isBuyNow=${isBuyNow}`
             })
-            .then(res => {
-                if (res.ok) {
-                    if (actionType === 'cart') {
-                        window.location.href = '/Cart';
-                    } else if (actionType === 'checkout') {
-                        const selectedKey = `${productId}-${color.value}-${size.value}`;
-                        window.location.href = `/CheckOut/Index?SelectedItems=${selectedKey}`;
-                    }
-                } else {
-                    alert("⚠️ Có lỗi xảy ra, không thể thêm vào giỏ hàng");
+                    .then(res => {
+            if (res.ok) {
+
+                if (actionType === 'cart') {
+
+                    alert("🛒 Đã thêm sản phẩm vào giỏ hàng!");
+
                     button.innerHTML = originalText;
                     button.disabled = false;
+
+                } else if (actionType === 'checkout') {
+
+                    const selectedKey = `${productId}-${color.value}-${size.value}`;
+
+                    window.location.href =
+                        `/CheckOut/Index?SelectedItems=${selectedKey}`;
                 }
-            })
+
+            } else {
+
+                alert("⚠️ Có lỗi xảy ra, không thể thêm vào giỏ hàng");
+
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        })
             .catch(err => {
                 alert("⚠️ Lỗi kết nối mạng");
                 button.innerHTML = originalText;
