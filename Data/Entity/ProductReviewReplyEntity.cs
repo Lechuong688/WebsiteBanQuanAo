@@ -25,5 +25,8 @@ namespace Data.Entity
         public string? UpdatedBy { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public virtual UserEntity User { get; set; }
+        //public virtual ProductEntity Product { get; set; }
+        public virtual ProductReviewEntity ProductReview { get; set; }
     }
 }

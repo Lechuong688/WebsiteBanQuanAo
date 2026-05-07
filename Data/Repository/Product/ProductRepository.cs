@@ -103,7 +103,7 @@ namespace Data.Repository.Product
                                     r.IsApproved)
                                 .Average(r => (double?)r.Rating) ?? 0,
 
-                                            ReviewCount = _context.ProductReview
+                ReviewCount = _context.ProductReview
                                 .Count(r =>
                                     r.ProductId == p.Id &&
                                     !r.IsDeleted &&
@@ -210,7 +210,7 @@ namespace Data.Repository.Product
                     r.ProductId == x.p.Id &&
                     !r.IsDeleted &&
                     r.IsApproved),
-                    };
+        };
     })
     .ToList();
 
@@ -609,6 +609,8 @@ namespace Data.Repository.Product
                         r.IsApproved);
 
                 product.Reviews = _context.ProductReview
+                    .Include(r => r.Replies)
+                        .ThenInclude(r => r.User)
                     .Where(r =>
                         r.ProductId == id &&
                         !r.IsDeleted &&
@@ -617,21 +619,49 @@ namespace Data.Repository.Product
                     .Select(r => new ProductReviewListDTO
                     {
                         Id = r.Id,
+
+                        ProductId = r.ProductId,
+
                         UserId = r.UserId,
+
                         UserName = _context.Users
-                                .Where(u => u.Id == r.UserId)
-                                .Select(u => u.UserName)
-                                .FirstOrDefault(),
+                            .Where(u => u.Id == r.UserId)
+                            .Select(u => u.UserName)
+                            .FirstOrDefault(),
+
                         Rating = r.Rating,
+
                         Comment = r.Comment,
+
                         CreatedDate = r.CreatedDate,
+
                         Images = _context.Attachment
-                                .Where(a =>
-                                    a.EntityId == r.Id &&
-                                    a.EntityType == "ProductReview" &&
-                                    a.IsDeleted != true)
-                                .Select(a => a.FilePath!)
-                                .ToList(),
+                            .Where(a =>
+                                a.EntityId == r.Id &&
+                                a.EntityType == "ProductReview" &&
+                                a.IsDeleted != true)
+                            .Select(a => a.FilePath!)
+                            .ToList(),
+
+                        Replies = r.Replies
+                            .Where(x => !x.IsDeleted)
+                            .OrderBy(x => x.CreatedDate)
+                            .Select(x => new ProductReviewReplyListDTO
+                            {
+                                Id = x.Id,
+
+                                ProductReviewId = x.ProductReviewId,
+
+                                UserId = x.UserId,
+
+                                UserName = x.User.UserName,
+
+                                Content = x.Content,
+
+                                CreatedDate = x.CreatedDate
+
+                            }).ToList()
+
                     })
                     .ToList();
             }
@@ -694,7 +724,8 @@ namespace Data.Repository.Product
                 })
                 .ToList();
 
-            var items = rawItems.Select(x => {
+            var items = rawItems.Select(x =>
+            {
                 int maxDiscount = x.DiscountPercents.Any() ? x.DiscountPercents.Max() : 0;
                 decimal finalPrice = maxDiscount > 0
                                      ? x.p.Price - (x.p.Price * maxDiscount / 100)

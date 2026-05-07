@@ -1,0 +1,279 @@
+﻿@model List<Data.DTO.Product.ProductReviewListDTO>
+
+@{
+    ViewData["Title"] = "Chi tiết đánh giá";
+}
+
+<style>
+    .modern-page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .modern-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+    }
+
+    .modern-card-body {
+        padding: 24px;
+    }
+
+    .modern-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-soft-warning {
+        background-color: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fef3c7;
+    }
+
+    .modern-control {
+        display: block;
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        color: #1e293b;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
+        resize: vertical;
+    }
+
+        .modern-control:focus {
+            background-color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            outline: none;
+        }
+
+    /* Buttons */
+    .btn-modern {
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 8px 16px;
+        transition: all 0.2s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-outline-secondary-modern {
+        background-color: #ffffff;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+    }
+
+        .btn-outline-secondary-modern:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+    .btn-modern-primary {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+        .btn-modern-primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #1d4ed8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .review-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #334155;
+    }
+
+    .review-image-item {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #e2e8f0;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+    }
+
+        .review-image-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+    .reply-thread {
+        background-color: #f8fafc;
+        border-left: 4px solid #3b82f6;
+        border-radius: 0 8px 8px 0;
+        padding: 16px;
+        margin-top: 20px;
+        margin-left: 20px;
+    }
+
+    .reply-avatar {
+        width: 32px;
+        height: 32px;
+        background-color: #e2e8f0;
+        color: #475569;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="modern-page-title">
+            <i class="fas fa-comments text-primary me-2"></i>Chi tiết đánh giá
+        </h3>
+        <a asp-area="Admin"
+           asp-controller="ProductReview"
+           asp-action="Index"
+           class="btn-modern btn-outline-secondary-modern">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <div class="modern-card mb-4">
+                <div class="modern-card-body">
+
+                    <!-- USER INFO & RATING -->
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle">
+                                @(string.IsNullOrWhiteSpace(item.UserName) ? "U" : item.UserName.Substring(0, 1).ToUpper())
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold text-dark">
+                                    @item.UserName
+                                </h5>
+                                <div class="text-muted" style="font-size: 0.85rem;">
+                                    <i class="far fa-clock me-1"></i>
+                                    @item.CreatedDate?.ToString("dd/MM/yyyy - HH:mm")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modern-badge badge-soft-warning">
+                            @item.Rating <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+
+                    <div class="review-text bg-white p-3 rounded border" style="border-color: #f1f5f9 !important;">
+                        @item.Comment
+                    </div>
+
+                    @if (item.Images != null && item.Images.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            @foreach (var image in item.Images)
+                            {
+                                <img src="@image" class="review-image-item shadow-sm" alt="Ảnh đánh giá" onerror="this.src='/images/no-image.png';" />
+                            }
+                        </div>
+                    }
+
+                    @if (item.Replies != null && item.Replies.Any())
+                    {
+                        <div class="mt-2">
+                            @foreach (var reply in item.Replies)
+                            {
+                                <div class="reply-thread">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="reply-avatar bg-primary text-white">
+                                            <i class="fas fa-user-shield" style="font-size: 0.75rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">@reply.UserName</div>
+                                            <div class="text-muted" style="font-size: 0.8rem;">@reply.CreatedDate?.ToString("dd/MM/yyyy HH:mm")</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-secondary ps-5" style="font-size: 0.95rem; line-height: 1.5;">
+                                        @reply.Content
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="mt-4 pt-4" style="border-top: 1px dashed #e2e8f0;">
+                        <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-reply text-primary me-2"></i>Thêm phản hồi mới</h6>
+                        <form asp-area="Admin"
+                              asp-controller="ProductReview"
+                              asp-action="Reply"
+                              method="post">
+
+                            <input type="hidden" name="ProductReviewId" value="@item.Id" />
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+
+                            <textarea name="Content"
+                              class="modern-control mb-3"
+                              rows="3"
+                              required
+                              placeholder="Viết phản hồi của shop cho khách hàng này (cảm ơn, hỗ trợ bảo hành...)..."></textarea>
+
+                            <button type="submit" class="btn-modern btn-modern-primary">
+                                <i class="fas fa-paper-plane"></i> Gửi phản hồi
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="modern-card text-center py-5">
+            <div class="modern-card-body">
+                <i class="fas fa-exclamation-circle fa-4x mb-3" style="color: #cbd5e1;"></i>
+                <h5 class="fw-bold text-dark mb-2">Không tìm thấy dữ liệu</h5>
+                <p class="text-muted mb-4">Đánh giá này không tồn tại hoặc đã bị xóa khỏi hệ thống.</p>
+                <a asp-action="Index" class="btn-modern btn-outline-secondary-modern">
+                    <i class="fas fa-arrow-left"></i> Trở về danh sách
+                </a>
+            </div>
+        </div>
+    }
+
+</div>

@@ -1,0 +1,288 @@
+﻿@using Data.DTO.Common
+@model PagedResult<Data.DTO.Product.ProductReviewProductDTO>
+
+@{
+    ViewBag.Title = "Quản lý đánh giá";
+}
+
+<style>
+    /* CSS Soft UI Đồng bộ từ trang Product */
+    .modern-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .modern-card-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modern-card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Table Styles */
+    .modern-table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .modern-table thead th {
+            background-color: #ffffff;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #edf2f9;
+            padding: 16px 24px;
+            vertical-align: middle;
+        }
+
+        .modern-table tbody td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf2f9;
+            color: #334155;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+    /* Badges & Text */
+    .modern-badge {
+        padding: 6px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-soft-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-soft-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .product-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #e2e8f0;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.95rem;
+    }
+
+    /* Buttons */
+    .btn-modern {
+        border-radius: 6px;
+        font-size: 0.85rem;
+        padding: 6px 10px;
+        transition: all 0.2s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-outline-info-modern {
+        background-color: #f0fdfa;
+        color: #0d9488;
+        border: 1px solid #99f6e4;
+    }
+
+        .btn-outline-info-modern:hover {
+            background-color: #ccfbf1;
+            color: #0f766e;
+        }
+
+    /* Pagination */
+    .modern-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding-left: 0;
+        list-style: none;
+    }
+
+        .modern-pagination li a {
+            border-radius: 8px !important;
+            border: 1px solid #edf2f9;
+            color: #4b5563;
+            padding: 8px 14px;
+            margin: 0 2px;
+            transition: all 0.2s;
+            text-decoration: none;
+            background: #fff;
+        }
+
+        .modern-pagination li.active a {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .modern-pagination li:not(.active):not(.disabled) a:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .modern-pagination li.disabled a {
+            color: #9ca3af;
+            background-color: #f9fafb;
+            pointer-events: none;
+        }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="modern-card">
+
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-star text-warning"></i> Quản lý đánh giá
+            </h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table modern-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 80px;">Ảnh</th>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">Đánh giá TB</th>
+                        <th class="text-center">Số lượt review</th>
+                        <th class="text-center" style="width: 120px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Đổi Model thành Model.Items vì đang dùng PagedResult -->
+                    @if (Model?.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr class="product-row">
+                                <td class="text-center">
+                                    <img src="@(string.IsNullOrEmpty(item.Thumbnail) ? "/images/no-image.png" : item.Thumbnail)"
+                                         class="product-img"
+                                         alt="@item.ProductName"
+                                         onerror="this.src='/uploads/no-image.png';" />
+                                </td>
+                                <td>
+                                    <div class="product-name">@item.ProductName</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
+                                        Mã SP: #@item.ProductId
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="modern-badge badge-soft-warning">
+                                        <i class="fas fa-star"></i> @item.AverageRating.ToString("0.0")
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="modern-badge badge-soft-secondary">
+                                        @item.TotalReview
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div style="display: flex; gap: 6px; justify-content: center;">
+                                        <a asp-area="Admin"
+                                           asp-controller="ProductReview"
+                                           asp-action="Detail"
+                                           asp-route-productId="@item.ProductId"
+                                           class="btn-modern btn-outline-info-modern"
+                                           title="Xem chi tiết đánh giá">
+                                            <i class="fas fa-eye"></i> Xem
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-comments fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                <p class="mb-0">Chưa có đánh giá nào cho các sản phẩm.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Block Phân Trang -->
+        @if (Model != null && Model.TotalItems > Model.PageSize)
+        {
+            var totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+            var currentPage = Model.Page;
+
+            int startPage = currentPage - 2;
+            int endPage = currentPage + 2;
+
+            if (startPage < 1) { startPage = 1; endPage = Math.Min(5, totalPages); }
+            if (endPage > totalPages) { endPage = totalPages; startPage = Math.Max(1, totalPages - 4); }
+
+            <!-- Nếu sau này có thêm input tìm kiếm thì truyền vào queryString này -->
+            var queryString = "?";
+
+            <nav aria-label="Page navigation">
+                <ul class="modern-pagination">
+                    <li class="@(currentPage == 1 ? "disabled" : "")">
+                        <a href="@queryString&page=1" title="Trang đầu">«</a>
+                    </li>
+                    <li class="@(currentPage == 1 ? "disabled" : "")">
+                        <a href="@queryString&page=@(currentPage - 1)" title="Trang trước">‹</a>
+                    </li>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="@(i == currentPage ? "active" : "")">
+                            <a href="@queryString&page=@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="@(currentPage == totalPages ? "disabled" : "")">
+                        <a href="@queryString&page=@(currentPage + 1)" title="Trang sau">›</a>
+                    </li>
+                    <li class="@(currentPage == totalPages ? "disabled" : "")">
+                        <a href="@queryString&page=@totalPages" title="Trang cuối">»</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+
+    </div>
+</div>

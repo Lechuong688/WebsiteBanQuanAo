@@ -80,6 +80,11 @@
                     <i class="fa fa-percent"></i> <span>Quản lý giảm giá</span>
                 </a>
             </li>
+            <li class="@Html.IsSelected(controller: "ProductReview")">
+                <a href="@Url.Action("Index", "ProductReview")">
+                    <i class="fa fa-star"></i> <span>Quản lý đánh giá</span>
+                </a>
+            </li>
             @* <li><a href="https://adminlte.io/docs"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
             <li class="header">LABELS</li>
             <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>

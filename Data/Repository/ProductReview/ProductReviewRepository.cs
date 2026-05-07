@@ -1,4 +1,5 @@
-﻿using Data.DTO.Product;
+﻿using Data.DTO.Common;
+using Data.DTO.Product;
 using Data.DTO.Product;
 using Data.Entity;
 using Microsoft.AspNetCore.Http;
@@ -98,19 +99,56 @@ namespace Data.Repository.ProductReview
         public List<ProductReviewListDTO> GetByProduct(int productId)
         {
             return _context.ProductReview
+                .Include(x => x.User)
+                .Include(x => x.Replies)
+                    .ThenInclude(x => x.User)
                 .Where(x =>
                     x.ProductId == productId &&
                     !x.IsDeleted &&
-                    x.IsApproved)
+                    x.IsApproved == true)
                 .OrderByDescending(x => x.CreatedDate)
                 .Select(x => new ProductReviewListDTO
                 {
                     Id = x.Id,
+
                     ProductId = x.ProductId,
+
                     UserId = x.UserId,
+
+                    UserName = x.User.UserName,
+
                     Rating = x.Rating,
+
                     Comment = x.Comment,
-                    CreatedDate = x.CreatedDate
+
+                    CreatedDate = x.CreatedDate,
+
+                    Images = _context.Attachment
+                        .Where(a =>
+                            a.EntityId == x.Id &&
+                            a.EntityType == "ProductReview" &&
+                            a.IsDeleted != true)
+                        .Select(a => a.FilePath)
+                        .ToList(),
+
+                    Replies = x.Replies
+                        .Where(r => !r.IsDeleted)
+                        .OrderBy(r => r.CreatedDate)
+                        .Select(r => new ProductReviewReplyListDTO
+                        {
+                            Id = r.Id,
+
+                            ProductReviewId = r.ProductReviewId,
+
+                            UserId = r.UserId,
+
+                            UserName = r.User.UserName,
+
+                            Content = r.Content,
+
+                            CreatedDate = r.CreatedDate
+
+                        }).ToList()
                 })
                 .ToList();
         }
@@ -158,6 +196,110 @@ namespace Data.Repository.ProductReview
                 })
                 .OrderByDescending(x => x.Star)
                 .ToList();
+        }
+
+        public List<ProductReviewListDTO> GetAll()
+        {
+            return _context.ProductReview
+                .Include(x => x.User)
+                .Include(x => x.Replies)
+                    .ThenInclude(x => x.User)
+                .Where(x =>
+                    !x.IsDeleted &&
+                    x.IsApproved)
+                .OrderByDescending(x => x.CreatedDate)
+                .Select(x => new ProductReviewListDTO
+                {
+                    Id = x.Id,
+
+                    ProductId = x.ProductId,
+
+                    UserId = x.UserId,
+
+                    UserName = x.User.UserName,
+
+                    Rating = x.Rating,
+
+                    Comment = x.Comment,
+
+                    CreatedDate = x.CreatedDate,
+
+                    Images = _context.Attachment
+                        .Where(a =>
+                            a.EntityId == x.Id &&
+                            a.EntityType == "ProductReview" &&
+                            a.IsDeleted != true)
+                        .Select(a => a.FilePath)
+                        .ToList(),
+
+                    Replies = x.Replies
+                        .Where(r => !r.IsDeleted)
+                        .Select(r => new ProductReviewReplyListDTO
+                        {
+                            Id = r.Id,
+
+                            ProductReviewId = r.ProductReviewId,
+
+                            UserId = r.UserId,
+
+                            UserName = r.User.UserName,
+
+                            Content = r.Content,
+
+                            CreatedDate = r.CreatedDate
+                        }).ToList()
+                })
+                .ToList();
+        }
+
+        public PagedResult<ProductReviewProductDTO>GetProductReviewList(int page, int pageSize)
+        {
+            var query = _context.ProductReview
+                .Where(x =>
+                    !x.IsDeleted &&
+                    x.IsApproved == true)
+                .GroupBy(x => new
+                {
+                    x.ProductId,
+                    x.Product.Name
+                })
+                .Select(x => new ProductReviewProductDTO
+                {
+                    ProductId = x.Key.ProductId,
+
+                    ProductName = x.Key.Name,
+
+                    Thumbnail = _context.Attachment
+                        .Where(a =>
+                            a.EntityId == x.Key.ProductId &&
+                            a.EntityType == "Product" &&
+                            a.IsDeleted != true)
+                        .Select(a => a.FilePath)
+                        .FirstOrDefault(),
+
+                    AverageRating = x.Average(s => s.Rating),
+
+                    TotalReview = x.Count()
+                });
+
+            var totalItems = query.Count();
+
+            var items = query
+                .OrderByDescending(x => x.TotalReview)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PagedResult<ProductReviewProductDTO>()
+            {
+                Items = items,
+
+                Page = page,
+
+                PageSize = pageSize,
+
+                TotalItems = totalItems
+            };
         }
     }
 }
