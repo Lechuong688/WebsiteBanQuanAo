@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Security.Claims;
+using System.IO;
 using WebBanQuanAo.Models;
 
 namespace WebBanQuanAo.Controllers
@@ -124,14 +125,12 @@ namespace WebBanQuanAo.Controllers
             string userId = null;
             var guestOrderIds = new List<int>();
 
-            // Lấy ID người dùng nếu đã đăng nhập
             if (User.Identity.IsAuthenticated)
             {
                 userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             }
             else
             {
-                // Đọc Cookie nếu là khách vãng lai
                 var guestCookie = Request.Cookies["GuestOrders"];
                 if (!string.IsNullOrEmpty(guestCookie))
                 {
@@ -142,7 +141,6 @@ namespace WebBanQuanAo.Controllers
                 }
             }
 
-            // Giao cho Repository xử lý và trả về DTO
             var orders = _orderRepository.GetOrderHistory(userId, guestOrderIds);
 
             return View(orders);

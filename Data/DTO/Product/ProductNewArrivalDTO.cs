@@ -27,5 +27,6 @@ namespace Data.DTO.Product
         public double AverageRating { get; set; }
 
         public int ReviewCount { get; set; }
+        public bool IsInWishlist { get; set; }
     }
 }

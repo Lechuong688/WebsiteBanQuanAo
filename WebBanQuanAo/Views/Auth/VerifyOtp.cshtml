@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "_AuthLayout";
+}
+
+<div class="container mt-5">
+    <div class="card p-4 mx-auto" style="max-width:400px;">
+        <h4 class="text-center mb-4">
+            Xác thực OTP
+        </h4>
+
+        <form method="post">
+
+            <input type="text"
+                   name="otp"
+                   class="form-control mb-3"
+                   placeholder="Nhập OTP">
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="text-danger mb-3">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <button type="submit"
+                    class="btn btn-dark w-100">
+                Xác nhận
+            </button>
+        </form>
+    </div>
+</div>

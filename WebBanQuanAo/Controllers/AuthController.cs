@@ -10,13 +10,16 @@ namespace WebBanQuanAo.Controllers
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
+        private readonly EmailService _emailService;
 
         public AuthController(
             UserManager<UserEntity> userManager,
-        SignInManager<UserEntity> signInManager)
+        SignInManager<UserEntity> signInManager,
+        EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailService = emailService;
         }
         [HttpGet]
         public IActionResult Login()
@@ -76,40 +79,59 @@ namespace WebBanQuanAo.Controllers
             return View();
         }
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Register(string username, string name, string email, string password, string confirmPassword)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(username)
+                || string.IsNullOrEmpty(email)
+                || string.IsNullOrEmpty(password)
+                || string.IsNullOrEmpty(confirmPassword)
+                || string.IsNullOrEmpty(name))
             {
                 ViewBag.Error = "Vui lòng nhập đầy đủ thông tin";
                 return View();
             }
+
             if (password != confirmPassword)
             {
                 ViewBag.Error = "Mật khẩu nhập lại không khớp";
                 return View();
             }
 
-            var user = new UserEntity
+            // Kiểm tra email đã tồn tại chưa
+            var existingEmail =
+                await _userManager.FindByEmailAsync(email);
+
+            if (existingEmail != null)
             {
-                UserName = username,
-                Email = email,
-                Name = name,
-                CreatedDate = DateTime.Now,
-            };
-
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "User");
-
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                ViewBag.Error = "Email đã tồn tại";
+                return View();
             }
-            ViewBag.Error = string.Join("<br/>",
-    result.Errors.Select(e => e.Description));
 
-            return View();
+            // Tạo OTP
+            var otp =
+                new Random().Next(100000, 999999).ToString();
+
+            // Lưu Session
+            HttpContext.Session.SetString("OTP", otp);
+
+            HttpContext.Session.SetString(
+                "RegisterUsername", username);
+
+            HttpContext.Session.SetString(
+                "RegisterName", name);
+
+            HttpContext.Session.SetString(
+                "RegisterEmail", email);
+
+            HttpContext.Session.SetString(
+                "RegisterPassword", password);
+
+            // Gửi mail
+            await _emailService.SendOtpEmail(email, otp);
+
+            // Chuyển sang màn OTP
+            return RedirectToAction("VerifyOtp");
         }
 
 
@@ -197,6 +219,9 @@ namespace WebBanQuanAo.Controllers
 
             // Đăng nhập
             await _signInManager.SignInAsync(user, false);
+            await _emailService.SendWelcomeEmail( user.Email, user.Name);
+
+            TempData["Success"] = $"🎉 Chào mừng {user.Name} đến với VYBE!";
 
             return RedirectToAction("Index", "Home");
         }
@@ -280,6 +305,56 @@ namespace WebBanQuanAo.Controllers
 
             // Đăng nhập
             await _signInManager.SignInAsync(user, false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult VerifyOtp()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyOtp(string otp)
+        {
+            var sessionOtp = HttpContext.Session.GetString("OTP");
+
+            if (otp != sessionOtp)
+            {
+                ViewBag.Error = "OTP không đúng";
+                return View();
+            }
+
+            var user = new UserEntity
+            {
+                UserName = HttpContext.Session.GetString("RegisterUsername"),
+                Name = HttpContext.Session.GetString("RegisterName"),
+                Email = HttpContext.Session.GetString("RegisterEmail"),
+                CreatedDate = DateTime.Now,
+                EmailConfirmed = true
+            };
+
+            var password =
+                HttpContext.Session.GetString("RegisterPassword");
+
+            var result =
+                await _userManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                ViewBag.Error =
+                    string.Join("<br/>",
+                    result.Errors.Select(x => x.Description));
+
+                return View();
+            }
+
+            await _userManager.AddToRoleAsync(user, "User");
+
+            await _signInManager.SignInAsync(user, false);
+
+            HttpContext.Session.Remove("OTP");
 
             return RedirectToAction("Index", "Home");
         }

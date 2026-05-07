@@ -15,7 +15,7 @@ else
                 <div class="text-start wow fadeInLeft" data-wow-delay="0.1s">
                     <h1>Danh sách sản phẩm yêu thích</h1>
                 </div>
-                <br/>
+                <br />
                 <div class="tab-content">
                     <div id="tab-1" class="tab-pane fade show p-0 active">
                         <div class="row g-4">
@@ -83,7 +83,7 @@ else
                                         <div class="product-item-add border border-top-0 rounded-bottom text-center p-4 pt-0">
                                             <a asp-controller="Product"
                                                asp-action="Detail"
-                                               asp-route-id="@item.Id" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-4"><i class="fas fa-shopping-cart me-2"></i> Add To Cart</a>
+                                               asp-route-id="@item.Id" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-4"><i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ</a>
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div class="d-flex align-items-center">
 
@@ -131,12 +131,18 @@ else
 }
 
 <script>
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', async function (e) {
-            e.preventDefault();
 
-            const productId = this.dataset.productId;
-            const icon = this.querySelector('i');
+    $(document).on('click', '.wishlist-btn', async function (e) {
+
+        e.preventDefault();
+
+        const btn = $(this);
+
+        const productId = btn.data('product-id');
+
+        const icon = btn.find('i');
+
+        try {
 
             const res = await fetch('/Product/AddToWishlist', {
                 method: 'POST',
@@ -147,19 +153,36 @@ else
             });
 
             if (res.status === 401) {
+
                 window.location.href = '/Account/Login';
+
                 return;
             }
 
             const data = await res.json();
 
             if (data.isAdded) {
-                icon.classList.remove('text-dark');
-                icon.classList.add('text-danger');
-            } else {
-                icon.classList.remove('text-danger');
-                icon.classList.add('text-dark');
+
+                icon.removeClass('text-dark');
+                icon.addClass('text-danger');
             }
-        });
+            else {
+
+                icon.removeClass('text-danger');
+                icon.addClass('text-dark');
+
+                if (window.location.pathname.toLowerCase().includes('wishlist')) {
+
+                    btn.closest('.col-lg-6, .col-md-6, .product-item, .wishlist-item').remove();
+                }
+            }
+
+        }
+        catch (err) {
+
+            console.log(err);
+        }
+
     });
+
 </script>

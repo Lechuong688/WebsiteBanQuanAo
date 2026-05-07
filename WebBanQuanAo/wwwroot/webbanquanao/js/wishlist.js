@@ -29,41 +29,64 @@
 
 
 document.addEventListener("click", async function (e) {
+
     const btn = e.target.closest('.wishlist-btn');
+
     if (!btn) return;
 
     e.preventDefault();
 
     const productId = btn.dataset.productId;
+
     const icon = btn.querySelector('i');
 
     try {
+
         const res = await fetch('/Product/ToggleWishlist', {
+
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
             body: JSON.stringify(productId)
         });
 
         if (res.status === 401) {
+
             window.location.href = '/Account/Login';
+
             return;
         }
 
         const data = await res.json();
 
         icon.classList.toggle('text-danger', data.isAdded);
+
         icon.classList.toggle('text-dark', !data.isAdded);
 
         if (data.isAdded) {
+
             showToast("❤️ Đã thêm vào danh sách yêu thích", "success");
-        } else {
+        }
+        else {
+
             showToast("❌ Đã xóa khỏi danh sách yêu thích", "error");
 
-            const item = btn.closest('.col-md-6, .col-lg-4, .col-xl-3');
-            if (item) item.remove();
+            if (window.location.pathname.toLowerCase().includes("wishlist")) {
+
+                const item = btn.closest('.col-md-6, .col-lg-4, .col-xl-3, .col-lg-6');
+
+                if (item) {
+                    item.remove();
+                }
+            }
         }
 
-    } catch (err) {
+    }
+    catch (err) {
+
         console.error(err);
     }
 });

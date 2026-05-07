@@ -70,10 +70,11 @@ builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ChatBotService>();
+builder.Services.AddScoped<EmailService>();
 // Đăng ký Background Service
 builder.Services.AddHostedService<OrderCleanupService>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
-//builder.Services.AddSession();
+builder.Services.AddSession();
 
 
 var app = builder.Build();
@@ -90,7 +91,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-//app.UseSession();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -824,7 +824,7 @@ namespace Data.Repository.Product
             return result?.ToList() ?? new List<ProductTopSellingDTO>();
         }
 
-        public async Task<List<ProductNewArrivalDTO>> GetNewArrival()
+        public async Task<List<ProductNewArrivalDTO>> GetNewArrival(string? userId)
         {
             var result = await _databaseSql.ExecuteProcToList<ProductNewArrivalDTO>(
                 "Product_NewArrival",
@@ -845,6 +845,11 @@ namespace Data.Repository.Product
                         r.ProductId == item.Id &&
                         !r.IsDeleted &&
                         r.IsApproved);
+
+                item.IsInWishlist = userId != null &&
+                    _context.ProductWishlist
+                        .Any(w => w.ProductId == item.Id
+                               && w.UserId == userId);
             }
 
             return result?.ToList() ?? new List<ProductNewArrivalDTO>();

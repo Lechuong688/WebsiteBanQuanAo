@@ -31,7 +31,7 @@ namespace Data.Repository.Product
 
         Task<List<ProductBestsellerDTO>> GetBestseller();
         Task<List<ProductTopSellingDTO>> GetTopSelling();
-        Task<List<ProductNewArrivalDTO>> GetNewArrival();
+        Task<List<ProductNewArrivalDTO>> GetNewArrival(string? userId);
 
         Task<PagedResult<ProductWishlistDTO>> GetProductWishlist(string userId, int page, int pageSize);
 

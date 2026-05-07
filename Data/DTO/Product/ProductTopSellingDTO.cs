@@ -23,7 +23,7 @@ namespace Data.DTO.Product
         public string Files { get; set; }
 
         public int TotalSold { get; set; }
-
+        public bool IsInWishlist { get; set; }
         public DateTime CreatedDate {  get; set; }
         public double AverageRating { get; set; }
 

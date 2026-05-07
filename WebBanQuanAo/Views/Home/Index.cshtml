@@ -9,4 +9,11 @@
 @await Html.PartialAsync("_BestsellerProducts", (List<ProductBestsellerDTO>)ViewBag.BestSeller)
 @* @await Html.PartialAsync("_ProductList") *@
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success text-center">
+        @TempData["Success"]
+    </div>
+}
+
 

@@ -112,7 +112,6 @@ namespace Data.Repository.Order
         }
         public List<OrderHistoryDTO> GetOrderHistory(string userId, List<int> guestOrderIds)
         {
-            // 1. Lọc lấy các Đơn hàng (Order) cơ bản
             var query = _context.Order.AsQueryable();
 
             if (!string.IsNullOrEmpty(userId))
@@ -120,23 +119,19 @@ namespace Data.Repository.Order
             else if (guestOrderIds != null && guestOrderIds.Any())
                 query = query.Where(o => guestOrderIds.Contains(o.Id));
             else
-                return new List<OrderHistoryDTO>(); // Không có data thì trả về list rỗng
+                return new List<OrderHistoryDTO>();
 
             var orders = query.OrderByDescending(o => o.CreatedDate).ToList();
             var orderIds = orders.Select(o => o.Id).ToList();
 
             if (!orderIds.Any()) return new List<OrderHistoryDTO>();
 
-            // 2. Dùng LINQ Join để gom thông tin Sản phẩm, Màu sắc, Kích thước
-            var details = (from od in _context.Set<OrderDetailEntity>() // Trỏ vào bảng OrderDetail
+            var details = (from od in _context.Set<OrderDetailEntity>()
                            join p in _context.Product on od.ProductId equals p.Id
-                           // Lấy tên màu từ MasterData
                            join mc in _context.MasterData on od.ColorId equals mc.Id into colorGrp
                            from color in colorGrp.DefaultIfEmpty()
-                               // Lấy tên size từ MasterData
                            join ms in _context.MasterData on od.SizeId equals ms.Id into sizeGrp
                            from size in sizeGrp.DefaultIfEmpty()
-                               // Lọc theo danh sách đơn hàng đã lấy ở trên
                            where orderIds.Contains(od.OrderId)
                            select new OrderHistoryDetailDTO
                            {
@@ -147,14 +142,12 @@ namespace Data.Repository.Order
                                Price = od.Price,
                                ColorName = color != null ? color.Name : "",
                                SizeName = size != null ? size.Name : "",
-                               // Lấy đường dẫn ảnh đầu tiên
                                Image = _context.Attachment
                                     .Where(a => a.EntityId == p.Id && a.EntityType == "Product" && a.IsDeleted != true)
                                     .Select(a => a.FilePath)
                                     .FirstOrDefault()
                            }).ToList();
 
-            // 3. Gom chi tiết (Details) vào đúng Đơn hàng (Order) của nó
             var result = orders.Select(o => new OrderHistoryDTO
             {
                 Id = o.Id,
@@ -190,10 +183,8 @@ namespace Data.Repository.Order
         }
         public async Task CancelExpiredOrders()
         {
-            // Lấy thời điểm 24h trước
             var expireTime = DateTime.Now.AddHours(-24);
 
-            // Tìm các đơn hàng: Chờ thanh toán (Status = 0) AND Ngày tạo < expireTime
             var expiredOrders = await _context.Order
                 .Where(o => o.Status == 0 && o.CreatedDate < expireTime)
                 .ToListAsync();
@@ -202,7 +193,7 @@ namespace Data.Repository.Order
             {
                 foreach (var order in expiredOrders)
                 {
-                    order.Status = 4; // Cập nhật thành Đã hủy
+                    order.Status = 4;
                     order.Note = (order.Note ?? "") + " | Hệ thống tự động hủy do quá 24h chưa thanh toán.";
                     order.UpdatedDate = DateTime.Now;
                     order.UpdatedBy = "System";

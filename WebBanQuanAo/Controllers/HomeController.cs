@@ -32,14 +32,14 @@ namespace WebBanQuanAo.Controllers
         }
         public async Task<IActionResult> Index(string keyword = null, string size = null, string color = null, decimal? minPrice = null, decimal? maxPrice = null, int page = 1, int pageSize = 8)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var products = await _productRepository.GetList(userId, keyword, size, color, minPrice, maxPrice, page, pageSize);
             var bannerResult = await _bannerRepository.GetList(1, 10, null, true);
             var pinned = await _productRepository.GetPinned();
             var bestSeller = await _productRepository.GetBestseller();
             var topSelling = await _productRepository.GetTopSelling();
-            var newArrival = await _productRepository.GetNewArrival();
+            var newArrival = await _productRepository.GetNewArrival(userId);
             //var productWishlist = await _productRepository.GetProductWishlist(1, 8);
 
             ViewBag.Banners = bannerResult.Items;

@@ -9,61 +9,61 @@
 }
 
 <div class="history-page-wrapper">
-<div class="container py-4">
-    <ul class="nav order-tabs mb-4" id="orderTabs">
-        <li class="nav-item"><button class="nav-link active filter-tab" data-status="all">Tất cả</button></li>
-        <li class="nav-item"><button class="nav-link filter-tab" data-status="0">Chờ thanh toán</button></li>
-        <li class="nav-item"><button class="nav-link filter-tab" data-status="1">Chờ giao hàng</button></li>
-        <li class="nav-item"><button class="nav-link filter-tab" data-status="2">Đang giao</button></li>
-        <li class="nav-item"><button class="nav-link filter-tab" data-status="3">Hoàn thành</button></li>
-        <li class="nav-item"><button class="nav-link filter-tab" data-status="4">Đã hủy</button></li>
-    </ul>
+    <div class="container py-4">
+        <ul class="nav order-tabs mb-4" id="orderTabs">
+            <li class="nav-item"><button class="nav-link active filter-tab" data-status="all">Tất cả</button></li>
+            <li class="nav-item"><button class="nav-link filter-tab" data-status="0">Chờ thanh toán</button></li>
+            <li class="nav-item"><button class="nav-link filter-tab" data-status="1">Chờ giao hàng</button></li>
+            <li class="nav-item"><button class="nav-link filter-tab" data-status="2">Đang giao</button></li>
+            <li class="nav-item"><button class="nav-link filter-tab" data-status="3">Hoàn thành</button></li>
+            <li class="nav-item"><button class="nav-link filter-tab" data-status="4">Đã hủy</button></li>
+        </ul>
 
-    <div id="orderListContainer">
-        @if (Model == null || !Model.Any())
-        {
-            <div class="text-center py-5 text-muted bg-white rounded shadow-sm">
-                <i class="fas fa-clipboard-list fa-4x mb-3 text-light"></i>
-                <h5 class="fw-normal">Chưa có đơn hàng</h5>
-            </div>
-        }
-        else
-        {
-            @foreach (var order in Model)
+        <div id="orderListContainer">
+            @if (Model == null || !Model.Any())
             {
-                // Xác định Text và Màu sắc cho trạng thái
-                string statusText = "";
-                string statusClass = "text-primary";
-
-                switch (order.Status)
+                <div class="text-center py-5 text-muted bg-white rounded shadow-sm">
+                    <i class="fas fa-clipboard-list fa-4x mb-3 text-light"></i>
+                    <h5 class="fw-normal">Chưa có đơn hàng</h5>
+                </div>
+            }
+            else
+            {
+                @foreach (var order in Model)
                 {
-                    case 0: statusText = "CHỜ THANH TOÁN"; statusClass = "text-warning"; break;
-                    case 1: statusText = "CHỜ GIAO HÀNG"; statusClass = "text-info"; break;
-                    case 2: statusText = "ĐANG VẬN CHUYỂN"; statusClass = "text-primary"; break;
-                    case 3: statusText = "HOÀN THÀNH"; statusClass = "text-success"; break;
-                    case 4: statusText = "ĐÃ HỦY"; statusClass = "text-danger"; break;
-                    default: statusText = "KHÔNG XÁC ĐỊNH"; break;
-                }
+                    // Xác định Text và Màu sắc cho trạng thái
+                    string statusText = "";
+                    string statusClass = "text-primary";
 
-                <div class="order-card order-item-card" data-status="@order.Status">
-                    <div class="order-header">
-                        <div>
-                            <span class="shop-badge">VYBE</span>
-                            <strong>Mã ĐH: @order.TransactionCode</strong>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            @if (order.Status == 3)
-                            {
-                                <span class="text-success me-3 small"><i class="fas fa-truck"></i> Đơn hàng đã được giao thành công</span>
-                            }
-                            <span class="order-status-text @statusClass">@statusText</span>
-                        </div>
-                    </div>
-
-                    @foreach (var detail in order.Details)
+                    switch (order.Status)
                     {
-                        <div class="order-body">
-                            <img src="@(!string.IsNullOrEmpty(detail.Image) ? detail.Image : "/admin/img/no-image.png")" class="order-item-img" alt="Product">
+                        case 0: statusText = "CHỜ THANH TOÁN"; statusClass = "text-warning"; break;
+                        case 1: statusText = "CHỜ GIAO HÀNG"; statusClass = "text-info"; break;
+                        case 2: statusText = "ĐANG VẬN CHUYỂN"; statusClass = "text-primary"; break;
+                        case 3: statusText = "HOÀN THÀNH"; statusClass = "text-success"; break;
+                        case 4: statusText = "ĐÃ HỦY"; statusClass = "text-danger"; break;
+                        default: statusText = "KHÔNG XÁC ĐỊNH"; break;
+                    }
+
+                    <div class="order-card order-item-card" data-status="@order.Status">
+                        <div class="order-header">
+                            <div>
+                                <span class="shop-badge">VYBE</span>
+                                <strong>Mã ĐH: @order.TransactionCode</strong>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                @if (order.Status == 3)
+                                {
+                                    <span class="text-success me-3 small"><i class="fas fa-truck"></i> Đơn hàng đã được giao thành công</span>
+                                }
+                                <span class="order-status-text @statusClass">@statusText</span>
+                            </div>
+                        </div>
+
+                        @foreach (var detail in order.Details)
+                        {
+                            <div class="order-body">
+                                <img src="@(!string.IsNullOrEmpty(detail.Image) ? detail.Image : "/admin/img/no-image.png")" class="order-item-img" alt="Product">
 
                                 <div class="order-item-info">
                                     <div class="order-item-name">@detail.ProductName</div>
@@ -78,27 +78,22 @@
                                     </div>
                                 </div>
 
-                            <div class="order-item-price d-flex align-items-center justify-content-end">
-                                <span class="text-primary fw-bold" style="color: var(--vybe-orange) !important;">
-                                    @detail.Price.ToString("N0")₫
-                                </span>
+                                <div class="order-item-price d-flex align-items-center justify-content-end">
+                                    <span class="text-primary fw-bold" style="color: var(--vybe-orange) !important;">
+                                        @detail.Price.ToString("N0")₫
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
 
-                    <div class="order-footer">
-                        <div class="total-price-section">
-                            <span class="text-dark">Thành tiền:</span>
-                            <span class="total-price-number">@order.Total.ToString("N0")₫</span>
-                        </div>
-                        <div class="action-buttons">
-                            <span class="action-note">Ngày đặt: @order.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
-                            <div class="d-flex gap-2">
-                                @if (order.Status == 0)
-                                {
-                                    <a href="/Order/Payment/@order.Id" class="btn btn-action-main">Thanh toán ngay</a>
-                                    <button class="btn btn-action-sub">Hủy đơn hàng</button>
-                                }
+                        <div class="order-footer">
+                            <div class="total-price-section">
+                                <span class="text-dark">Thành tiền:</span>
+                                <span class="total-price-number">@order.Total.ToString("N0")₫</span>
+                            </div>
+                            <div class="action-buttons">
+                                <span class="action-note">Ngày đặt: @order.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                <div class="d-flex gap-2">
                                     @if (order.Status == 0)
                                     {
                                         <a href="/Order/Payment/@order.Id" class="btn btn-action-main">Thanh toán ngay</a>
@@ -141,14 +136,14 @@
                                     {
                                         <button class="btn btn-action-sub">Xem chi tiết</button>
                                     }
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
             }
-        }
+        </div>
     </div>
-</div>
 </div>
 <div class="modal fade"
      id="reviewModal"
