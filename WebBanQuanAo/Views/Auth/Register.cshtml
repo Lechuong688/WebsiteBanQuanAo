@@ -4,7 +4,6 @@
 
 <style>
     .auth-wrapper {
-        /* Sử dụng cùng ảnh nền trẻ trung như trang đăng nhập */
         background-image: url('/uploads/nendangky.jpg');
         background-size: cover;
         background-position: center;
@@ -17,7 +16,6 @@
         position: relative;
     }
 
-        /* Hiệu ứng làm mờ nền phía sau */
         .auth-wrapper::after {
             content: "";
             position: absolute;
@@ -31,7 +29,6 @@
             z-index: 0;
         }
 
-    /* Hiệu ứng thẻ kính mờ (Glassmorphism) */
     .glass-card {
         z-index: 1;
         background: rgba(255, 255, 255, 0.9) !important;
@@ -65,7 +62,6 @@
 </style>
 
 <div class="auth-wrapper">
-    <!-- Card form được áp dụng class glass-card, giữ nguyên width 480px của bạn -->
     <div class="card glass-card shadow p-4" style="width: 480px; border: none;">
         <h4 class="text-center mb-4">Trang đăng ký</h4>
 

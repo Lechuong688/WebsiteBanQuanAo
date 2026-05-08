@@ -25,11 +25,21 @@
                         @foreach (var item in categories)
                         {
                             <li>
-                                <div class="categories-item">
-                                    <a href="#" class="text-dark category-filter" data-typeid="@item.Id">
-                                        <i class="fas fa-chevron-right text-primary me-2" style="font-size: 10px;"></i>
+                                <div class="categories-item d-flex justify-content-between align-items-center category-filter"
+                                     data-typeid="@item.Id"
+                                     style="cursor:pointer;">
+
+                                    <span class="text-dark">
+                                        <i class="fas fa-circle text-primary me-2"
+                                           style="font-size: 6px; vertical-align: middle;"></i>
+
                                         @item.Name
-                                    </a>
+                                    </span>
+
+                                    <span class="badge rounded-pill bg-light text-dark">
+                                        @item.ProductCount
+                                    </span>
+
                                 </div>
                             </li>
                         }
@@ -244,7 +254,15 @@
         function renderActiveFilters() {
             let html = '';
             if (typeId) {
-                let name = $('.category-filter[data-typeid="' + typeId + '"]').text().trim();
+                    let name = $('.category-filter[data-typeid="' + typeId + '"]')
+                        .find('.text-dark')
+                        .first()
+                        .contents()
+                        .filter(function () {
+                            return this.nodeType === 3;
+                        })
+                        .text()
+                        .trim();
                 html += filterTag('Danh mục', name, 'type');
             }
             colorIds.forEach(function (id) {

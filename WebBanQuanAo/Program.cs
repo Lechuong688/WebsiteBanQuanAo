@@ -70,7 +70,7 @@ builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ChatBotService>();
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 // Đăng ký Background Service
 builder.Services.AddHostedService<OrderCleanupService>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
