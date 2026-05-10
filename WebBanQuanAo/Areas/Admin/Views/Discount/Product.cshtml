@@ -140,14 +140,12 @@
         }
     }
 
-    // Gắn sự kiện click cho các item bên cột nguồn
     document.querySelectorAll(".product-source").forEach(item => {
         item.addEventListener("click", function () {
             addSelected(this.dataset.id, this.dataset.name, this.dataset.image);
         });
     });
 
-    // Khởi tạo hiển thị các sản phẩm đã có sẵn trong Discount
     selectedIds.forEach(id => {
         const item = document.querySelector(`.product-source[data-id="${id}"]`);
         if (item) {
@@ -155,7 +153,6 @@
         }
     });
 
-    // Tạo animation
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
         @@keyframes fadeInItem {
@@ -165,7 +162,6 @@
     `;
     document.head.appendChild(styleSheet);
 
-    // Lọc tìm kiếm Client-side
     const searchInput = document.getElementById("searchKeyword");
     searchInput.addEventListener("input", function () {
         const keyword = normalizeText(this.value.trim());
@@ -187,7 +183,6 @@
                 next = next.nextElementSibling;
             }
 
-            // Ẩn luôn cái tiêu đề danh mục nếu không có sản phẩm nào khớp
             header.style.display = hasVisibleItem ? "flex" : "none";
         });
     });

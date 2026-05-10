@@ -358,15 +358,13 @@ namespace WebBanQuanAo.Controllers
 
         public IActionResult Success(int id)
         {
-            // Tìm lại đơn hàng bằng Repo để lấy TransactionCode
             var order = _orderRepository.GetOrderById(id);
 
             if (order == null)
             {
-                return RedirectToAction("Index", "Home"); // Tránh lỗi nếu ko tìm thấy
+                return RedirectToAction("Index", "Home");
             }
 
-            // Truyền mã xịn ra View
             ViewBag.TransactionCode = order.TransactionCode;
 
             return View();

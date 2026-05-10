@@ -149,29 +149,22 @@
         let searchTimer;
 
         $(document).ready(function () {
-            // 1. Đọc các tham số từ thanh địa chỉ (URL)
             const urlParams = new URLSearchParams(window.location.search);
 
-            // 2. Kiểm tra xem URL có truyền typeId không (từ Menu dropdown)
             if (urlParams.has('typeId')) {
                 typeId = parseInt(urlParams.get('typeId'));
             }
 
-            // 3. Kiểm tra xem URL có truyền keyword không (từ thanh tìm kiếm Topbar)
             if (urlParams.has('keyword')) {
                 keyword = urlParams.get('keyword');
-                $('#searchKeyword').val(keyword); // Gán từ khóa vào ô input cho khách thấy
+                $('#searchKeyword').val(keyword);
             }
 
-            // 4. Cập nhật giao diện bộ lọc (hiện các tag Đang chọn)
             renderActiveFilters();
 
-            // 5. Gọi AJAX load sản phẩm với các tham số vừa lấy được
             loadProducts();
         });
 
-
-           // LOAD PRODUCTS
 
         function loadProducts() {
 
@@ -212,7 +205,6 @@
 
         }
 
-           // PAGINATION
 
         $(document).on('click', '.page-link', function (e) {
 
@@ -229,7 +221,6 @@
         });
 
 
-           // TAB VIEW MODE
 
         $('.nav-pills a').on('shown.bs.tab', function (e) {
 
@@ -242,7 +233,6 @@
         });
 
 
-           // CATEGORY FILTER
 
         $('.category-filter').click(function (e) {
 
@@ -259,7 +249,6 @@
         });
 
 
-           // PRICE FILTER
 
         $('#rangeInput').on('input', function () {
 
@@ -282,7 +271,6 @@
         });
 
 
-           // SEARCH
 
         $('#searchKeyword').on('keyup', function () {
 
@@ -303,7 +291,6 @@
         });
 
 
-           // SORT
 
         $('#sortSelect').change(function () {
 
@@ -317,8 +304,6 @@
 
         });
 
-
-           // COLOR FILTER
 
         $(document).on('change', '.color-filter', function () {
 
@@ -336,8 +321,6 @@
 
         });
 
-
-           // RESET FILTER
 
         $('#resetFilters').click(function () {
 
@@ -360,8 +343,6 @@
 
         });
 
-
-           // RENDER ACTIVE FILTER
 
         function renderActiveFilters() {
 
@@ -408,8 +389,6 @@
         }
 
 
-           // CREATE FILTER TAG
-
         function filterTag(label, value, type, id = null) {
 
             return `
@@ -424,8 +403,6 @@
 
         }
 
-
-           // REMOVE FILTER
 
         $(document).on('click', '.remove-filter', function () {
 

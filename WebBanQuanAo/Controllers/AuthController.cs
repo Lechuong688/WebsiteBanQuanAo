@@ -10,12 +10,12 @@ namespace WebBanQuanAo.Controllers
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
 
         public AuthController(
             UserManager<UserEntity> userManager,
         SignInManager<UserEntity> signInManager,
-        EmailService emailService)
+        IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -98,7 +98,6 @@ namespace WebBanQuanAo.Controllers
                 return View();
             }
 
-            // Kiểm tra email đã tồn tại chưa
             var existingEmail =
                 await _userManager.FindByEmailAsync(email);
 
@@ -108,11 +107,9 @@ namespace WebBanQuanAo.Controllers
                 return View();
             }
 
-            // Tạo OTP
             var otp =
                 new Random().Next(100000, 999999).ToString();
 
-            // Lưu Session
             HttpContext.Session.SetString("OTP", otp);
 
             HttpContext.Session.SetString(
@@ -127,10 +124,8 @@ namespace WebBanQuanAo.Controllers
             HttpContext.Session.SetString(
                 "RegisterPassword", password);
 
-            // Gửi mail
             await _emailService.SendOtpEmail(email, otp);
 
-            // Chuyển sang màn OTP
             return RedirectToAction("VerifyOtp");
         }
 
@@ -169,13 +164,11 @@ namespace WebBanQuanAo.Controllers
                 info.ProviderKey,
                 false);
 
-            // Nếu đã có tài khoản
             if (result.Succeeded)
             {
                 return RedirectToAction("Index", "Home");
             }
 
-            // Lấy email từ Google
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
 
             if (email == null)
@@ -183,7 +176,6 @@ namespace WebBanQuanAo.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Kiểm tra user đã tồn tại chưa
             var existingUser = await _userManager.FindByEmailAsync(email);
 
             UserEntity user;
@@ -206,7 +198,6 @@ namespace WebBanQuanAo.Controllers
                     return View("Login");
                 }
 
-                // Gán role User
                 await _userManager.AddToRoleAsync(user, "User");
             }
             else
@@ -214,10 +205,8 @@ namespace WebBanQuanAo.Controllers
                 user = existingUser;
             }
 
-            // Liên kết Google với tài khoản
             await _userManager.AddLoginAsync(user, info);
 
-            // Đăng nhập
             await _signInManager.SignInAsync(user, false);
             await _emailService.SendWelcomeEmail( user.Email, user.Name);
 
@@ -254,23 +243,19 @@ namespace WebBanQuanAo.Controllers
                 info.ProviderKey,
                 false);
 
-            // Nếu tài khoản đã tồn tại
             if (result.Succeeded)
             {
                 return RedirectToAction("Index", "Home");
             }
 
-            // Lấy email từ Facebook
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             var name = info.Principal.FindFirstValue(ClaimTypes.Name);
 
-            // Facebook đôi khi không trả email
             if (email == null)
             {
                 email = Guid.NewGuid().ToString() + "@facebook.com";
             }
 
-            // Kiểm tra user đã tồn tại chưa
             var existingUser = await _userManager.FindByEmailAsync(email);
 
             UserEntity user;
@@ -300,10 +285,8 @@ namespace WebBanQuanAo.Controllers
                 user = existingUser;
             }
 
-            // Liên kết Facebook với tài khoản
             await _userManager.AddLoginAsync(user, info);
 
-            // Đăng nhập
             await _signInManager.SignInAsync(user, false);
 
             return RedirectToAction("Index", "Home");

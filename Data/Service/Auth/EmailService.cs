@@ -151,7 +151,6 @@ namespace Data.Service.Auth
             {
                 mail.From = new MailAddress(fromEmail);
 
-                // MAIL ADMIN NHẬN
                 mail.To.Add(fromEmail);
 
                 mail.Subject = $"📩 Liên hệ mới - {subject}";

@@ -19,7 +19,6 @@ namespace Data.Helper
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            //This not works for Populate (on existingValue)
             return serializer.Deserialize<JToken>(reader).ToObjectCollectionSafe(objectType, serializer);
         }
 
@@ -45,7 +44,6 @@ namespace Data.Helper
             {
                 if (!expectArray)
                 {
-                    //to object via singel
                     if (jArray.Count == 0)
                         return JValue.CreateNull().ToObject(objectType, jsonSerializer);
 
@@ -55,7 +53,6 @@ namespace Data.Helper
             }
             else if (expectArray)
             {
-                //to object via JArray
                 return new JArray(jToken).ToObject(objectType, jsonSerializer);
             }
 

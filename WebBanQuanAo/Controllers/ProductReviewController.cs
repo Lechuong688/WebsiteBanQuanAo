@@ -15,9 +15,6 @@ namespace WebBanQuanAo.Controllers
             _productReviewRepository = productReviewRepository;
         }
 
-        // =========================
-        // TẠO REVIEW
-        // =========================
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateProductReviewDTO dto)
@@ -53,9 +50,6 @@ namespace WebBanQuanAo.Controllers
             }
         }
 
-        // =========================
-        // LẤY REVIEW THEO PRODUCT
-        // =========================
 
         [HttpGet]
         public IActionResult GetByProduct(int productId)
@@ -65,10 +59,6 @@ namespace WebBanQuanAo.Controllers
 
             return Json(data);
         }
-
-        // =========================
-        // REPLY REVIEW
-        // =========================
 
         [HttpPost]
         public async Task<IActionResult> Reply(CreateProductReviewReplyDTO dto)
@@ -82,10 +72,6 @@ namespace WebBanQuanAo.Controllers
             });
         }
 
-        // =========================
-        // LẤY REPLY
-        // =========================
-
         [HttpGet]
         public IActionResult GetReply(int reviewId)
         {
@@ -95,10 +81,6 @@ namespace WebBanQuanAo.Controllers
             return Json(data);
         }
 
-        // =========================
-        // SAO TRUNG BÌNH
-        // =========================
-
         [HttpGet]
         public IActionResult GetAverageRating(int productId)
         {
@@ -107,10 +89,6 @@ namespace WebBanQuanAo.Controllers
 
             return Json(data);
         }
-
-        // =========================
-        // THỐNG KÊ SỐ SAO
-        // =========================
 
         [HttpGet]
         public IActionResult GetStatistic(int productId)

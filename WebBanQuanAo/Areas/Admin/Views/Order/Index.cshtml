@@ -7,7 +7,6 @@
 
     var currentStatus = Context.Request.Query["status"].ToString();
 
-    // Map thẳng trạng thái sang class màu Soft UI
     string GetStatusStyle(int statusId)
     {
         return statusId switch
@@ -168,7 +167,6 @@
                 startPage = Math.Max(1, totalPages - windowSize + 1);
             }
 
-            // Gộp chuỗi Query String
             var queryString = $"?status={ViewBag.Status}&keyword={Context.Request.Query["keyword"]}&fromDate={Context.Request.Query["fromDate"]}&toDate={Context.Request.Query["toDate"]}";
 
             <nav aria-label="Page navigation">

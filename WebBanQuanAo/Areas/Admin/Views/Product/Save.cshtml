@@ -83,14 +83,12 @@
                             <label class="modern-label"><i class="fas fa-ruler text-muted" style="margin-right: 5px;"></i> Kích cỡ (Size)</label>
                             <div class="pill-group">
                                 @{
-                                    // 1. Tạo một danh sách quy định thứ tự chuẩn từ nhỏ đến lớn
                                     var sizeOrder = new List<string> { "XS", "S", "M", "L", "XL", "XXL", "2XL", "3XL", "4XL", "FREESIZE" };
 
-                                    // 2. Sắp xếp lại danh sách Size của Model dựa trên danh sách chuẩn ở trên
                                     var sortedSizes = Model.Sizes.OrderBy(s =>
                                     {
                                         var index = sizeOrder.IndexOf(s.Name.Trim().ToUpper());
-                                        return index == -1 ? 999 : index; // Nếu size nào lạ không có trong list thì đẩy xuống cuối cùng
+                                        return index == -1 ? 999 : index;
                                     }).ToList();
                                 }
 
@@ -166,7 +164,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         CKEDITOR.replace('editor1', {
-            height: 350, // Tăng nhẹ chiều cao Editor cho cân đối
+            height: 350,
             toolbar: [
                 { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline'] },
                 { name: 'paragraph', items: ['NumberedList', 'BulletedList'] },
@@ -177,10 +175,9 @@
         });
 
         $(document).ready(function() {
-            // Kích hoạt thanh chọn màu
             $('.select2-multi').select2({
                 width: '100%',
-                closeOnSelect: false // Giữ menu mở để chọn liên tiếp nhiều màu
+                closeOnSelect: false
             });
         });
     </script>

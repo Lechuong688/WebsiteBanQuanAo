@@ -1,6 +1,7 @@
 ﻿using Data.Entity;
 using Data.Repository;
 using Data.Repository.Banner;
+using Data.Repository.Chat;
 using Data.Repository.Collection;
 using Data.Repository.Dashboard;
 using Data.Repository.Discount;
@@ -69,14 +70,14 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<ChatBotService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 // Đăng ký Background Service
 builder.Services.AddHostedService<OrderCleanupService>();
 //builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSession();
-
-
+builder.Services.AddSignalR();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -113,4 +114,5 @@ app.MapControllerRoute(
 );
 
 app.MapControllers();
+app.MapHub<Data.Service.ChatHub>("/chatHub");
 app.Run();

@@ -16,11 +16,11 @@
 
                         @if (Model.IsAuthenticated)
                         {
-                            <input name="FullName" class="form-control" value="@Model.FullName" required />
+                            <input name="FullName" class="form-control" value="@Model.FullName"  />
                         }
                         else
                         {
-                            <input name="FullName" class="form-control" required />
+                            <input name="FullName" class="form-control"  />
                         }
 
                     </div>
@@ -31,11 +31,11 @@
 
                                 @if (Model.IsAuthenticated)
                                 {
-                                    <input name="Email" class="form-control" value="@Model.Email" required />
+                                    <input name="Email" class="form-control" value="@Model.Email"  />
                                 }
                                 else
                                 {
-                                    <input name="Email" class="form-control" required />
+                                    <input name="Email" class="form-control"  />
                                 }
 
                             </div>
@@ -46,11 +46,11 @@
 
                                 @if (Model.IsAuthenticated)
                                 {
-                                    <input name="PhoneNumber" class="form-control" value="@Model.PhoneNumber" required />
+                                    <input name="PhoneNumber" class="form-control" value="@Model.PhoneNumber"  />
                                 }
                                 else
                                 {
-                                    <input name="PhoneNumber" class="form-control" required />
+                                    <input name="PhoneNumber" class="form-control"  />
                                 }
 
                             </div>
@@ -58,13 +58,13 @@
                     </div>
                     <div class="form-item">
                         <label>Địa chỉ *</label>
-                        <input name="Address" class="form-control" required />
+                        <input name="Address" class="form-control" value="@Model.Address" />
                     </div>
                     
                     <hr>
                     <div class="form-item">
                         <label class="form-label my-3">Ghi chú đơn hàng</label>
-                        <textarea name="Note" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Nhập ghi chú"></textarea>
+                        <textarea name="Note" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Nhập ghi chú" >@Model.Note</textarea>
                     </div>
                     @if (!Model.IsAuthenticated)
                     {
@@ -188,18 +188,9 @@
                                             @* <p class="mb-0 text-dark">
                                                 @((Model.Cart.Total - Model.DiscountAmount)?.ToString("N0")) ₫
                                             </p> *@
-                                            @if (Model.DiscountAmount > 0)
-                                            {
-                                                <p class="mb-0 text-dark">
-                                                    @((Model.Cart.SubTotal + Model.Cart.ShippingFee - Model.DiscountAmount)?.ToString("N0")) ₫
-                                                </p>
-                                            }
-                                            else
-                                            {
-                                                <p class="mb-0 text-dark">
-                                                    @Model.Cart.Total.ToString("N0") ₫
-                                                </p>
-                                            }
+                                            <p class="mb-0 text-dark">
+                                                @Model.Cart.Total.ToString("N0") ₫
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>

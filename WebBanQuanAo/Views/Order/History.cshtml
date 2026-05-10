@@ -249,10 +249,6 @@
 @section Scripts {
     <script>
 
-        // =========================
-        // FILTER ORDER TAB
-        // =========================
-
         $(document).ready(function () {
 
             $('.filter-tab').click(function () {
@@ -284,9 +280,6 @@
             });
         });
 
-        // =========================
-        // REVIEW
-        // =========================
 
         let currentReviewOrder = null;
 
@@ -294,7 +287,6 @@
 
             currentReviewOrder = order;
 
-            // RESET DATA
             $('#review-comment').val('');
 
             $('#review-images').val('');
@@ -327,9 +319,6 @@
             $('#reviewModal').modal('show');
         }
 
-        // =========================
-        // PREVIEW IMAGE
-        // =========================
 
         $(document).on('change', '#review-images', function () {
 
@@ -356,9 +345,6 @@
             }
         });
 
-        // =========================
-        // SUBMIT REVIEW
-        // =========================
 
         async function submitReview() {
 
@@ -377,9 +363,6 @@
 
                 let imagePaths = [];
 
-                // =========================
-                // UPLOAD IMAGE
-                // =========================
 
                 const files = $('#review-images')[0].files;
 
@@ -413,9 +396,6 @@
                     imagePaths = JSON.parse(uploadText);
                 }
 
-                // =========================
-                // CREATE REVIEW
-                // =========================
 
                 for (const detail of currentReviewOrder.Details) {
 
@@ -452,7 +432,6 @@
 
                 $('#reviewModal').modal('hide');
 
-                // RESET
                 $('#review-comment').val('');
 
                 $('#review-images').val('');

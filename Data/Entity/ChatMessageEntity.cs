@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Data.Entity
 {
@@ -19,5 +21,6 @@ namespace Data.Entity
         public DateTime CreatedDate { get; set; }
 
         public bool IsDeleted { get; set; }
+        [ForeignKey("ChatSessionId")] public virtual ChatSessionEntity ChatSession { get; set; }
     }
 }

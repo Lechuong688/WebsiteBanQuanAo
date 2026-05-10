@@ -55,7 +55,6 @@
         $(document).ready(function () {
             loadUsers(1);
 
-            // Bổ sung UX: Nhấn Enter ở ô tìm kiếm sẽ tự động gọi nút Tìm
             $('#keyword').on('keypress', function (e) {
                 if (e.which === 13) {
                     loadUsers(1);

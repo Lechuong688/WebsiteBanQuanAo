@@ -23,7 +23,11 @@ namespace Data.Entity
         //public string? Email { get; set; }
         //[DataType(DataType.Password), Required(ErrorMessage = "Yêu cầu nhập mật khẩu")]
         //public string Password { get; set; }
-        //public string Address { get; set; }
+        public string? Address { get; set; }
+
+        public int? AvatarId { get; set; }
+
+        public AttachmentEntity? Avatar { get; set; }
         public bool IsDeleted { get; set; } = false;
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }

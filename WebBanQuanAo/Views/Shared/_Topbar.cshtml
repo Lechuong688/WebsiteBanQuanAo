@@ -129,7 +129,7 @@
                         else
                         {
                             <li class="dropdown-header text-warning fw-semibold">👋 Hi, @user?.Name</li>
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-user me-2"></i> Tài khoản</a></li>
+                            <li><a class="dropdown-item" href="/Profile/Index"><i class="fa fa-user me-2"></i> Tài khoản</a></li>
                             <li><a class="dropdown-item" href="~/Product/ProductWishlist"><i class="fa fa-heart me-2"></i> Yêu thích</a></li>
                             <li><a class="dropdown-item" href="~/Cart/Index"><i class="fa fa-shopping-cart me-2"></i> Giỏ hàng</a></li>
                             <li><a class="dropdown-item" href="~/Order/History"><i class="fa fa-shopping-cart me-2"></i> Đơn hàng đã mua</a></li>
@@ -244,7 +244,6 @@
             seeMoreBtn.innerText = "Xem tất cả kết quả";
         }
 
-        // Ẩn khi click ra ngoài
         document.addEventListener("click", function (e) {
             if (!e.target.closest('.search-input-group')) {
                 dropdown.style.display = "none";

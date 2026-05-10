@@ -134,7 +134,6 @@
         });
     });
 
-    // Khởi tạo các sản phẩm đã có sẵn
     selectedIds.forEach(id => {
         const item = document.querySelector(`.product-source[data-id="${id}"]`);
         if (item) {
@@ -142,7 +141,6 @@
         }
     });
 
-    // Search Logic
     const searchInput = document.getElementById("searchKeyword");
     searchInput.addEventListener("input", function () {
         const keyword = normalizeText(this.value.trim());
@@ -170,7 +168,6 @@
         return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
     }
 
-    // Animation cho đẹp
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
         @@keyframes fadeInItem {

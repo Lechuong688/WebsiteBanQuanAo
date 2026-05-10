@@ -12,7 +12,7 @@ namespace Data.Service.Order
     public class OrderCleanupService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(30); // Cứ 30 phút quét 1 lần
+        private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(30);
 
         public OrderCleanupService(IServiceScopeFactory scopeFactory)
         {
@@ -25,7 +25,6 @@ namespace Data.Service.Order
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
-                    // Vì OrderRepository là Scoped, nên phải khởi tạo qua Scope trong BackgroundService
                     var orderRepository = scope.ServiceProvider.GetRequiredService<IOrderRepository>();
 
                     try
@@ -38,7 +37,6 @@ namespace Data.Service.Order
                     }
                 }
 
-                // Đợi 30 phút rồi mới quét tiếp
                 await Task.Delay(_checkInterval, stoppingToken);
             }
         }

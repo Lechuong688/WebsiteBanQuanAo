@@ -50,7 +50,6 @@
                             var isMain = item.GroupId == 0;
                             var parent = isMain ? null : Model.FirstOrDefault(x => x.Id == item.GroupId);
 
-                            // Gán data-attributes để JS đọc và lọc
                             <tr class="attribute-row @(isMain ? "row-main-category" : "")"
                                 data-name="@item.Name"
                                 data-code="@item.Code"
@@ -117,7 +116,6 @@
 </div>
 
 <script>
-    // JS Xử lý lọc và tìm kiếm Client-side cho Thuộc tính
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("searchAttribute");
         const filterType = document.getElementById("filterType");
@@ -132,10 +130,8 @@
                 const code = normalizeText(row.getAttribute("data-code") || "");
                 const type = row.getAttribute("data-type");
 
-                // Check điều kiện tìm kiếm
                 const matchesKeyword = keyword === "" || name.includes(keyword) || code.includes(keyword);
 
-                // Check điều kiện lọc loại
                 const matchesType = typeValue === "all" || typeValue === type;
 
                 if (matchesKeyword && matchesType) {

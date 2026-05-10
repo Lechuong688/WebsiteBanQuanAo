@@ -1,4 +1,5 @@
-﻿using Data.Entity;
+﻿using Data.DTO.User;
+using Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,9 @@ namespace Data.Repository.User
     {
         Task<(List<UserEntity> Users, int Total)> GetUserAsync(string? keyword, int page, int pageSize);
         Task<Dictionary<string, List<string>>> GetUserRolesAsync(List<UserEntity> users);
+
+        Task<ProfileDTO?> GetProfileAsync(string userId);
+
+        Task<bool> UpdateProfileAsync(ProfileDTO model);
     }
 }

@@ -1,65 +1,63 @@
-﻿<!-- MÀN HÌNH CHAT -->
-<div id="chatbot-container"
-     class="chatbot-container"
-     style="display: none;">
+﻿<div id="chatbot-container" class="chatbot-container" style="display: none;">
+    <div class="chatbot-body">
 
-    <div class="chatbot-header">
+        <div class="history-overlay" onclick="toggleHistory()"></div>
 
-        <div class="header-info">
-            <i class="fa fa-robot"></i>
-            <span>Trợ Lý Ảo Vybe AI</span>
+        <div class="chat-history" id="chat-history-panel">
+
+            <button class="new-chat-btn" onclick="startNewConversation()">
+                <i class="fas fa-plus"></i> Chat mới
+            </button>
+
+            <div class="history-title">Lịch sử gần đây</div>
+            <div id="history-list"></div>
+
         </div>
 
-        <button class="close-btn"
-                onclick="toggleChatBot()">
+        <div class="chat-main">
+            <div class="chatbot-header">
+                <div class="header-info">
+                    <button class="menu-btn" onclick="toggleHistory()" title="Lịch sử chat">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <i class="fas fa-robot"></i>
+                    <span>Trợ Lý Vybe AI</span>
+                </div>
 
-            <i class="fa fa-times"></i>
-        </button>
-    </div>
-
-    <div class="chatbot-messages"
-         id="chat-messages">
-
-        <div class="message bot-message">
-
-            <div class="message-content">
-                Xin chào 👋 Mình là Vybe AI.
-                Bạn đang tìm sản phẩm nào hôm nay?
+                <button class="close-btn" onclick="toggleChatBot()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
+            <div class="chatbot-messages" id="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Xin chào 👋 Mình là Vybe AI.
+                        Bạn đang tìm sản phẩm nào hôm nay?
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-support-bar">
+                <button onclick="switchToAdminChat()" class="admin-support-btn">
+                    <i class="fas fa-headset"></i> Chat với Admin
+                </button>
+            </div>
+
+            <div class="chatbot-input">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button id="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
-
     </div>
-
-    <div class="chatbot-input">
-
-        <input type="text"
-               id="chat-input"
-               placeholder="Nhập tin nhắn..."
-               autocomplete="off">
-
-        <button id="send-btn"
-                onclick="sendMessage()">
-
-            <i class="fa fa-paper-plane"></i>
-        </button>
-
-    </div>
-
 </div>
 
 <style>
-
     /* =========================
-           CHATBOT
+           CHATBOT CƠ BẢN
         ========================== */
-
-        .chat-product-wrapper{
-    margin-top:12px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
     .chatbot-container {
         position: fixed;
         bottom: 100px;
@@ -73,24 +71,175 @@
         flex-direction: column;
         overflow: hidden;
         z-index: 10000;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .chatbot-body {
+        flex: 1;
+        display: flex;
+        height: 100%;
+        position: relative; /* Quan trọng để sidebar trượt lên trên */
+        overflow: hidden;
+    }
+
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
     }
 
     .chatbot-header {
-        background: linear-gradient(135deg,#8A2BE2,#B06AB3);
+        background: linear-gradient(135deg, #8A2BE2, #B06AB3);
         color: white;
         padding: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-weight: bold;
+        flex-shrink: 0;
     }
 
+    .header-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .menu-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+    }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    /* =========================
+           SIDEBAR LỊCH SỬ (TRƯỢT)
+        ========================== */
+    .chat-history {
+        position: absolute;
+        top: 0;
+        left: -100%; /* Ẩn ra ngoài màn hình bên trái */
+        width: 250px;
+        height: 100%;
+        background: #f8fafc;
+        border-right: 1px solid #e2e8f0;
+        overflow-y: auto;
+        padding: 15px;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+        z-index: 20;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+        .chat-history.show {
+            left: 0; /* Trượt vào trong màn hình */
+        }
+
+    .history-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 15;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+    }
+
+        .history-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    .new-chat-btn {
+        width: 100%;
+        padding: 12px;
+        background: white;
+        border: 1px solid #d8b4e2;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #8A2BE2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+        .new-chat-btn:hover {
+            background: #f3e8f7;
+        }
+
+    .history-title {
+        font-weight: 700;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+
+    .history-item {
+        padding: 12px;
+        background: white;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        transition: 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .history-item:hover {
+            background: #e2e8f0;
+        }
+
+    /* =========================
+           TIN NHẮN & INPUT
+        ========================== */
     .chatbot-messages {
         flex: 1;
         overflow-y: auto;
         padding: 15px;
-        background: #f5f5f5;
+        background: #f1f5f9;
+        scroll-behavior: smooth;
     }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
 
     .message {
         margin-bottom: 15px;
@@ -109,7 +258,8 @@
     .bot-message .message-content {
         background: white;
         align-self: flex-start;
-        border-bottom-left-radius: 5px;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
     .user-message {
@@ -119,299 +269,365 @@
         .user-message .message-content {
             background: linear-gradient(135deg,#8A2BE2,#B06AB3);
             color: white;
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 4px;
         }
 
     .chatbot-input {
         display: flex;
         gap: 10px;
         padding: 12px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid #e2e8f0;
         background: white;
     }
 
         .chatbot-input input {
             flex: 1;
-            border: 1px solid #ddd;
+            border: 1px solid #cbd5e1;
             border-radius: 20px;
             padding: 10px 15px;
             outline: none;
         }
 
         .chatbot-input button {
-            width: 45px;
-            height: 45px;
+            width: 42px;
+            height: 42px;
             border: none;
             border-radius: 50%;
             background: linear-gradient(135deg,#8A2BE2,#B06AB3);
             color: white;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
-    .close-btn {
-        background: none;
+    .admin-support-bar {
+        padding: 10px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .admin-support-btn {
+        width: 100%;
         border: none;
+        padding: 10px;
+        border-radius: 12px;
+        background: #10b981;
         color: white;
-        font-size: 18px;
+        font-weight: 600;
         cursor: pointer;
     }
 
-    /* =========================
-           PRODUCT CARD
-        ========================== */
+    /* Sản phẩm Card */
+    .chat-product-wrapper {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
     .chat-product-card {
         display: flex;
         gap: 12px;
         padding: 10px;
-        background: white;
-        border-radius: 14px;
-        margin-top: 10px;
+        background: #f8fafc;
+        border-radius: 10px;
         text-decoration: none;
         color: black;
-        transition: 0.2s;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
     }
 
-        .chat-product-card:hover {
-            transform: scale(1.02);
-        }
-
         .chat-product-card img {
-            width: 90px;
-            height: 90px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
     .chat-product-info {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .chat-product-name {
         font-weight: bold;
-        margin-bottom: 8px;
-        font-size: 14px;
+        margin-bottom: 4px;
+        font-size: 13px;
     }
 
     .chat-product-price {
         color: #e74c3c;
-        font-size: 18px;
+        font-size: 14px;
         font-weight: bold;
     }
-
 </style>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script>
+    let currentChatMode = "AI";
+
+    let currentConversation = [];
+    let currentConversationId = Date.now();
 
     function toggleChatBot() {
+        const chatbot = document.getElementById("chatbot-container");
+        chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
+    }
 
-        const chatbot =
-            document.getElementById(
-                "chatbot-container");
+    function toggleHistory() {
+        const panel = document.getElementById("chat-history-panel");
+        const overlay = document.querySelector(".history-overlay");
+        panel.classList.toggle("show");
+        overlay.classList.toggle("show");
+    }
 
-        if (chatbot.style.display === "none"
-            || chatbot.style.display === "") {
-
-            chatbot.style.display = "flex";
-        }
-        else {
-
-            chatbot.style.display = "none";
+    function switchToAdminChat() {
+        const btn = document.querySelector(".admin-support-btn");
+        if (currentChatMode === "AI") {
+            currentChatMode = "ADMIN";
+            btn.innerHTML = `<i class="fas fa-robot"></i> Chat với Trợ lý AI`;
+            btn.style.background = "#8A2BE2";
+            appendBotMessage("Bạn đã chuyển sang chế độ hỗ trợ với Admin 👨‍💻", []);
+        } else {
+            currentChatMode = "AI";
+            btn.innerHTML = `<i class="fas fa-headset"></i> Chat với Admin`;
+            btn.style.background = "#10b981";
+            appendBotMessage("Bạn đã quay lại trò chuyện với Vybe AI 🤖", []);
         }
     }
 
     async function sendMessage() {
-
-        const input =
-            document.getElementById(
-                "chat-input");
-
-        const text =
-            input.value.trim();
-
+        const input = document.getElementById("chat-input");
+        const text = input.value.trim();
         if (!text) return;
 
         appendMessage(text, "user-message");
-
         input.value = "";
 
-        const typingId =
-            appendTypingIndicator();
+        let typingId = null;
+        if(currentChatMode === "AI") {
+            typingId = appendTypingIndicator();
+        }
 
         try {
-
-            const response =
-                await fetch('/api/chat/send', {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body: JSON.stringify({
-                        message: text
-                    })
-                });
-
-            const data =
-                await response.json();
-
-            document
-                .getElementById(typingId)
-                .remove();
-
-            if (data.success) {
-
-                appendBotMessage(
-                    data.reply,
-                    data.products);
+            const response = await fetch('/api/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, mode: currentChatMode })
+            });
+            const data = await response.json();
+            if (data.sessionId) {
+                clientConnection.invoke("JoinSession", data.sessionId.toString()).catch(e => console.error(e));
             }
-        }
-        catch {
+            if(typingId) removeTypingIndicator(typingId);
 
-            document
-                .getElementById(typingId)
-                .remove();
-
-            appendMessage(
-                "Lỗi kết nối server.",
-                "bot-message");
+            if (data.success && currentChatMode === "AI") {
+                appendBotMessage(data.reply, data.products || []);
+            }
+        } catch {
+            if(typingId) removeTypingIndicator(typingId);
+            appendBotMessage("Lỗi kết nối server.", []);
         }
     }
 
-    function appendMessage(
-        text,
-        className) {
+    function renderMessageToDOM(msg) {
+        const container = document.getElementById("chat-messages");
+        const div = document.createElement("div");
+        div.className = "message " + msg.type;
 
-        const container =
-            document.getElementById(
-                "chat-messages");
+        let html = `<div class="message-content">${msg.text.replace(/\n/g,'<br>')}`;
 
-        const div =
-            document.createElement("div");
-
-        div.className =
-            "message " + className;
-
-        div.innerHTML =
-            `<div class="message-content">
-                ${text.replace(/\n/g,'<br>')}
-            </div>`;
-
-        container.appendChild(div);
-
-        container.scrollTop =
-            container.scrollHeight;
-    }
-
-    function appendBotMessage(
-        text,
-        products) {
-
-        const container =
-            document.getElementById(
-                "chat-messages");
-
-        const div =
-            document.createElement("div");
-
-        div.className =
-            "message bot-message";
-
-            let html = `
-    <div class="message-content">
-
-        ${text.replace(/\n/g,'<br>')}
-
-        <div class="chat-product-wrapper">
-    `;
-
-        if (products
-            && products.length > 0) {
-
-            products.forEach(product => {
-
+        if (msg.products && msg.products.length > 0) {
+            html += `<div class="chat-product-wrapper">`;
+            msg.products.forEach(product => {
                 html += `
-                <a href="${product.link}"
-                   class="chat-product-card">
-
-                    <img src="${product.image}?v=${Date.now()}" />
-
+                <a href="${product.link}" class="chat-product-card">
+                    <img src="${product.image}" />
                     <div class="chat-product-info">
-
-                        <div class="chat-product-name">
-                            ${product.name}
-                        </div>
-
-                        <div class="chat-product-price">
-                            ${Number(product.price)
-                                .toLocaleString()} đ
-                        </div>
-
+                        <div class="chat-product-name">${product.name}</div>
+                        <div class="chat-product-price">${Number(product.price).toLocaleString()} đ</div>
                     </div>
-
-                </a>
-                `;
+                </a>`;
             });
             html += `</div>`;
         }
-
+        html += `</div>`;
         div.innerHTML = html;
-
         container.appendChild(div);
+    }
 
-        container.scrollTop =
-            container.scrollHeight;
+    function appendMessage(text, className) {
+        const msgObj = { type: className, text: text };
+        currentConversation.push(msgObj);
+        renderMessageToDOM(msgObj);
+        scrollBottom();
+        saveCurrentConversation();
+    }
+
+    function appendBotMessage(text, products = []) {
+        const msgObj = { type: "bot-message", text: text, products: products };
+        currentConversation.push(msgObj);
+        renderMessageToDOM(msgObj);
+        scrollBottom();
+        saveCurrentConversation();
     }
 
     function appendTypingIndicator() {
-
-        const id =
-            "typing-" + Date.now();
-
-        const container =
-            document.getElementById(
-                "chat-messages");
-
-        const div =
-            document.createElement("div");
-
-        div.id = id;
-
-        div.className =
-            "message bot-message";
-
-        div.innerHTML =
-            `<div class="message-content"
-                  style="color:gray;
-                         font-style:italic;">
-
-                Vybe AI đang trả lời...
-
-            </div>`;
-
+        const id = "typing-" + Date.now();
+        const container = document.getElementById("chat-messages");
+        const div = document.createElement("div");
+        div.id = id; div.className = "message bot-message";
+        div.innerHTML = `<div class="message-content" style="color:gray; font-style:italic;">Vybe AI đang trả lời...</div>`;
         container.appendChild(div);
-
-        container.scrollTop =
-            container.scrollHeight;
-
+        scrollBottom();
         return id;
     }
 
-    document
-        .getElementById("chat-input")
-        .addEventListener(
-            "keypress",
+    function removeTypingIndicator(id) {
+        const typing = document.getElementById(id);
+        if (typing) typing.remove();
+    }
 
-            function (e) {
+    function scrollBottom() {
+        const container = document.getElementById("chat-messages");
+        container.scrollTop = container.scrollHeight;
+    }
 
-                if (e.key === "Enter") {
+    function saveCurrentConversation() {
+        sessionStorage.setItem("current_conversation_id", currentConversationId);
 
-                    sendMessage();
-                }
-            });
+        updateHistoryUI();
+    }
 
+    function updateHistoryUI() {
+        const historyList = document.getElementById("history-list");
+        historyList.innerHTML = "";
+        const histories = JSON.parse(sessionStorage.getItem("chat_histories") || "[]");
+
+        histories.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "history-item";
+            div.innerText = item.title;
+            div.onclick = () => {
+                loadConversation(item.id);
+                toggleHistory();
+            };
+            historyList.appendChild(div);
+        });
+    }
+
+    function loadConversation(id) {
+        const histories = JSON.parse(sessionStorage.getItem("chat_histories") || "[]");
+        const conversation = histories.find(h => h.id === id);
+        if (!conversation) return;
+
+        currentConversationId = conversation.id;
+        currentConversation = conversation.messages;
+        sessionStorage.setItem("current_conversation", JSON.stringify(currentConversation));
+        sessionStorage.setItem("current_conversation_id", currentConversationId);
+
+        const container = document.getElementById("chat-messages");
+        container.innerHTML = "";
+        currentConversation.forEach(msg => {
+            renderMessageToDOM(msg);
+        });
+        scrollBottom();
+    }
+
+    function startNewConversation() {
+        currentConversationId = Date.now();
+        currentConversation = [];
+        sessionStorage.removeItem("current_conversation");
+        sessionStorage.setItem("current_conversation_id", currentConversationId);
+
+        document.getElementById("chat-messages").innerHTML = `
+            <div class="message bot-message">
+                <div class="message-content">
+                    Xin chào 👋 Mình là Vybe AI.<br>Bạn cần hỗ trợ gì ạ?
+                </div>
+            </div>
+        `;
+
+        toggleHistory();
+    }
+
+    document.getElementById("chat-input").addEventListener("keypress", function(e) {
+        if(e.key === "Enter") sendMessage();
+    });
+
+    window.onload = async function() {
+        try {
+            const res = await fetch('/api/chat/messages');
+            const data = await res.json();
+
+            const container = document.getElementById("chat-messages");
+            container.innerHTML = "";
+            currentConversation = [];
+
+            if (data.messages && data.messages.length > 0) {
+                currentConversationId = data.sessionId;
+
+                data.messages.forEach(msg => {
+                    let type = "";
+                    if (msg.sender === "AI") type = "bot-message";
+                    else if (msg.sender === "USER_AI") type = "user-message";
+                    else if (msg.sender === "USER_ADMIN") type = "user-message";
+                    else if (msg.sender === "ADMIN") type = "bot-message";
+
+                    const msgObj = {
+                        type: type,
+                        text: msg.message,
+                        products: []
+                    };
+
+                    currentConversation.push(msgObj);
+                    renderMessageToDOM(msgObj);
+                });
+            } else {
+                currentConversationId = Date.now();
+                startNewConversation();
+            }
+
+            updateHistoryUI();
+            scrollBottom();
+
+            if (data.sessionId) {
+                startClientSignalR(data.sessionId);
+            }
+
+        } catch (err) {
+            console.error("Lỗi tải lịch sử chat:", err);
+            startNewConversation();
+        }
+    }
+
+    const clientConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    clientConnection.on("ReceiveMessage", function (senderType, message, createdDate) {
+        if (senderType === "ADMIN") {
+            appendBotMessage("👨‍💻 Admin: " + message, []);
+            const chatbot = document.getElementById("chatbot-container");
+            if (chatbot.style.display === "none") {
+                chatbot.style.display = "flex";
+            }
+        }
+    });
+
+    async function startClientSignalR(sessionIdToJoin) {
+        try {
+            await clientConnection.start();
+            console.log("Khách hàng đã kết nối Realtime thành công!");
+
+            if (sessionIdToJoin && sessionIdToJoin > 0) {
+                await clientConnection.invoke("JoinSession", sessionIdToJoin.toString());
+            }
+        } catch (err) {
+            console.error("Lỗi SignalR Client:", err);
+            setTimeout(() => startClientSignalR(sessionIdToJoin), 5000);
+        }
+    }
+
+    startClientSignalR();
 </script>

@@ -158,10 +158,8 @@
                 const name = normalizeText(row.getAttribute("data-name"));
                 const status = row.getAttribute("data-status");
 
-                // Kiểm tra xem tên có chứa từ khóa không
                 const matchesKeyword = keyword === "" || name.includes(keyword);
 
-                // Kiểm tra trạng thái (all, active, inactive)
                 const matchesStatus = statusValue === "all" || statusValue === status;
 
                 if (matchesKeyword && matchesStatus) {
@@ -172,12 +170,10 @@
             });
         }
 
-        // Bỏ dấu tiếng Việt để tìm kiếm dễ hơn (Vd: gõ "ao" vẫn ra "áo")
         function normalizeText(text) {
             return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
         }
 
-        // Lắng nghe sự kiện người dùng gõ phím hoặc đổi Select
         searchInput.addEventListener("input", filterTable);
         filterStatus.addEventListener("change", filterTable);
     });

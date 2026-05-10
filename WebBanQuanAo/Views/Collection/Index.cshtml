@@ -135,7 +135,6 @@
 
 @section Scripts {
     <script>
-        // GIỮ NGUYÊN TOÀN BỘ BIẾN VÀ LOGIC CỦA BẠN
         let page = 1;
         let pageSize = 8;
         let typeId = null;
@@ -151,7 +150,6 @@
         $(document).ready(function () {
             loadProducts();
 
-            // Logic tìm màu nhanh
             $('#colorSearch').on('keyup', function() {
                 let value = $(this).val().toLowerCase().trim();
                 $(".color-filter-item").filter(function() {

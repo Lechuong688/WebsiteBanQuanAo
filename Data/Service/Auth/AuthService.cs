@@ -15,17 +15,5 @@ namespace Data.Service.Auth
         {
             _userRepository = userRepository;
         }
-        //public UserEntity? Login(string username, string password)
-        //{
-        //    var user = _userRepository.GetByUsername(username);
-
-        //    if (user == null)
-        //        return null;
-
-        //    //if (user.Password.Trim() != password.Trim())
-        //    //    return null;
-
-        //    return user;
-        //}
     }
 }

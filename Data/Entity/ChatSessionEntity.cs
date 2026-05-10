@@ -21,5 +21,8 @@ namespace Data.Entity
         public DateTime? UpdatedDate { get; set; }
 
         public bool IsDeleted { get; set; }
+        public bool IsAdminSupport { get; set; }
+        public virtual ICollection<ChatMessageEntity>ChatMessages{ get; set; } = new List<ChatMessageEntity>();
+
     }
 }

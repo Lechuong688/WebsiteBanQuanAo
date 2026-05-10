@@ -1,8 +1,58 @@
 ﻿@{
-    ViewData["Title"] = "Access Denied";
+    ViewData["Title"] = "Truy cập bị từ chối";
 }
 
-<h2>Bạn không có quyền truy cập trang này</h2>
-<p>Vui lòng đăng nhập bằng tài khoản Admin.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-lg border-0 py-5">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="text-danger bi bi-shield-lock" viewBox="0 0 16 16">
+                            <path d="M8 1a2 2 0 0 1 2 2v2H6V3a2 2 0 0 1 2-2zm3 4V3a3 3 0 0 0-6 0v2H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zM4.5 7a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V7z" />
+                        </svg>
+                    </div>
 
-<a href="/">Quay về trang chủ</a>
+                    <h2 class="fw-bold text-dark">Dừng lại một chút!</h2>
+                    <p class="text-muted fs-5">
+                        Bạn không có quyền truy cập vào khu vực này. <br />
+                        Khu vực này chỉ dành riêng cho <strong>Quản trị viên</strong>.
+                    </p>
+
+                    <div class="mt-4 d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a href="/Account/Login" class="btn btn-primary btn-lg px-4 gap-3 shadow-sm">
+                            Đăng nhập ngay
+                        </a>
+                        <a href="/" class="btn btn-outline-secondary btn-lg px-4 shadow-sm">
+                            Về trang chủ
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <p class="mt-4 text-muted small">
+                Nếu bạn cho rằng đây là lỗi, vui lòng liên hệ bộ phận hỗ trợ kỹ thuật.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+        border: none;
+    }
+</style>

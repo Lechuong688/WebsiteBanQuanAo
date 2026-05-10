@@ -122,12 +122,10 @@
     </div>
 </div>
 <script>
-    // Hàm format tiền tệ
     function formatCurrency(value) {
         return value.toLocaleString('vi-VN') + " ₫";
     }
 
-    // 1. TÍNH TỔNG TIỀN VÀ SỐ LƯỢNG
     function calculateSelectedTotal() {
         let total = 0;
         let count = 0;
@@ -144,35 +142,29 @@
             }
         });
 
-        // Cập nhật giao diện
         document.getElementById("cartTotal").innerText = formatCurrency(total);
         document.getElementById("selectedItemsCount").innerText = count;
 
-        // Đồng bộ nút "Chọn tất cả"
         const allCheckboxes = document.querySelectorAll('.item-checkbox');
         const selectAllCb = document.getElementById('selectAll');
         if (allCheckboxes.length > 0) {
             selectAllCb.checked = allCheckboxes.length === count;
         }
 
-        // Khóa nút Mua Hàng nếu chưa chọn gì
         document.getElementById('btnSubmitCart').disabled = count === 0;
         document.getElementById('btnSubmitCart').style.opacity = count === 0 ? "0.6" : "1";
     }
 
-    // Chạy tính tổng ngay khi vừa load trang để reset về 0đ
     document.addEventListener('DOMContentLoaded', function() {
         calculateSelectedTotal();
     });
 
-    // Lắng nghe sự kiện click Checkbox từng item
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('item-checkbox')) {
             calculateSelectedTotal();
         }
     });
 
-    // 2. CHỌN TẤT CẢ
     document.addEventListener('change', function (e) {
         if (e.target.id === 'selectAll') {
             const isChecked = e.target.checked;
@@ -183,7 +175,6 @@
         }
     });
 
-    // 3. TĂNG GIẢM SỐ LƯỢNG (Dùng AJAX)
     function changeQty(productId, colorId, sizeId, delta) {
         const key = `${productId}-${colorId}-${sizeId}`;
         const input = document.querySelector(`.qty-input[data-key="${key}"]`);
@@ -217,7 +208,6 @@
         });
     }
 
-    // 4. XÓA SẢN PHẨM
     document.addEventListener('click', function (e) {
         const btn = e.target.closest('.btn-remove');
         if (!btn) return;
@@ -238,7 +228,6 @@
         });
     });
 
-    // Xóa nhiều (Tính năng mở rộng cho nút Xóa dưới footer)
     document.getElementById('btnDeleteSelected')?.addEventListener('click', function() {
         const selected = document.querySelectorAll('.item-checkbox:checked');
         if(selected.length === 0) {
@@ -247,7 +236,6 @@
         }
         if(!confirm(`Bạn muốn xóa ${selected.length} sản phẩm đã chọn?`)) return;
 
-        // Vòng lặp gọi API xóa (Hoặc bạn có thể viết API xóa nhiều ở Backend sau)
         selected.forEach(cb => {
             const row = cb.closest('tr');
             const btn = row.querySelector('.btn-remove');
@@ -258,12 +246,10 @@
             });
         });
 
-        setTimeout(() => { reloadCartView(); }, 500); // Reload sau khi chạy xong
+        setTimeout(() => { reloadCartView(); }, 500);
     });
 
-    // 5. RELOAD GIAO DIỆN MÀ KHÔNG MẤT TRẠNG THÁI CHECKBOX
     function reloadCartView() {
-        // Lưu lại danh sách các item đang được chọn trước khi load lại html
         const selectedKeys = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
 
         fetch('/Cart')
@@ -279,13 +265,12 @@
                     currentCart.innerHTML = newCart.innerHTML;
                 }
 
-                // Phục hồi lại trạng thái checkbox sau khi render HTML mới
                 setTimeout(() => {
                     selectedKeys.forEach(key => {
                         const cb = document.querySelector(`.item-checkbox[value="${key}"]`);
                         if(cb) cb.checked = true;
                     });
-                    calculateSelectedTotal(); // Tính lại tổng sau khi phục hồi
+                    calculateSelectedTotal();
                 }, 50);
             });
     }

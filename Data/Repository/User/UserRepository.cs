@@ -1,4 +1,5 @@
-﻿using Data.Entity;
+﻿using Data.DTO.User;
+using Data.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -55,6 +56,49 @@ namespace Data.Repository.User
                 userRoles[user.Id] = (await _userManager.GetRolesAsync(user)).ToList();
             }
             return userRoles;
+        }
+
+        public async Task<ProfileDTO?> GetProfileAsync(string userId)
+        {
+            var user = await _userManager.Users
+                .Include(x => x.Avatar)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new ProfileDTO
+            {
+                Id = user.Id,
+                FullName = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                AvatarId = user.AvatarId,
+                AvatarPath = user.Avatar?.FilePath
+            };
+        }
+
+        public async Task<bool> UpdateProfileAsync(ProfileDTO model)
+        {
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Name = model.FullName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = model.Address;
+            user.AvatarId = model.AvatarId;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
     }
 }

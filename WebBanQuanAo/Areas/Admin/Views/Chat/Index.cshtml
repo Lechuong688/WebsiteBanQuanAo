@@ -1,0 +1,227 @@
+﻿@model IEnumerable<Data.Entity.ChatSessionEntity>
+
+<style>
+    /* CSS Soft UI */
+    .modern-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+        margin-bottom: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .modern-card-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modern-card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Table Styles */
+    .modern-table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .modern-table thead th {
+            background-color: #ffffff;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #edf2f9;
+            padding: 16px 24px;
+            vertical-align: middle;
+            text-align: left;
+        }
+
+        .modern-table tbody td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf2f9;
+            color: #334155;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+    /* Badges & Text */
+    .modern-badge {
+        padding: 6px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-soft-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .badge-soft-primary {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    .chat-title {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.95rem;
+    }
+
+    /* Buttons */
+    .btn-modern {
+        border-radius: 6px;
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        transition: all 0.2s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-outline-info-modern {
+        background-color: #f0fdfa;
+        color: #0d9488;
+        border: 1px solid #99f6e4;
+    }
+
+        .btn-outline-info-modern:hover {
+            background-color: #ccfbf1;
+            color: #0f766e;
+        }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="modern-card">
+
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-robot text-primary"></i> Quản lý Chat AI
+            </h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Mã</th>
+                        <th>Khách hàng (UserId)</th>
+                        <th>Tiêu đề chat</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-center" style="width: 120px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>#@item.Id</strong>
+                                </td>
+                                <td>
+                                    <span class="modern-badge badge-soft-primary">
+                                        <i class="fas fa-user"></i> @item.UserId
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="chat-title">@item.Title</div>
+                                </td>
+                                <td>
+                                    <span class="modern-badge badge-soft-secondary">
+                                        <i class="far fa-calendar-alt"></i> @item.CreatedDate
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Detail"
+                                       asp-route-id="@item.Id"
+                                       class="btn-modern btn-outline-info-modern"
+                                       title="Xem lịch sử chat">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted" style="text-align: center;">
+                                <i class="fas fa-comment-dots fa-3x mb-3" style="color: #cbd5e1; display:block; margin: 0 auto 10px;"></i>
+                                <p style="margin:0;">Chưa có phiên chat nào.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.on("NewSessionCreated", function () {
+
+        Toastify({
+            text: "🔔 Có khách hàng mới vừa nhắn tin! Đang tải lại danh sách...",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                borderRadius: "10px"
+            }
+        }).showToast();
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    });
+
+    async function startListSignalR() {
+        try {
+            await connection.start();
+            console.log("Admin List đã kết nối Realtime!");
+        } catch (err) {
+            setTimeout(startListSignalR, 5000);
+        }
+    }
+
+    startListSignalR();
+</script>

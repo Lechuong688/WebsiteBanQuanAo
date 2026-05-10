@@ -149,7 +149,6 @@
 </section>
 
 <script>
-    // JS Xử lý lọc và tìm kiếm Client-side
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("searchCollection");
         const filterStatus = document.getElementById("filterStatus");
@@ -164,10 +163,8 @@
                 const code = normalizeText(row.getAttribute("data-code") || "");
                 const status = row.getAttribute("data-status");
 
-                // Check điều kiện tìm kiếm
                 const matchesKeyword = keyword === "" || name.includes(keyword) || code.includes(keyword);
 
-                // Check điều kiện lọc trạng thái
                 const matchesStatus = statusValue === "all" || statusValue === status;
 
                 if (matchesKeyword && matchesStatus) {

@@ -20,7 +20,6 @@ namespace Data.Repository.Discount
         void SaveProducts(int discountId, List<int> productIds);
         Task<List<ProductListDTO>> GetProductsByDiscount(int discountId);
 
-        //DiscountCode
         Task<PagedResult<DiscountCodeListDTO>> GetListDiscountCode(int page, int pageSize);
         DiscountCodeEntity GetByIdDiscountCode(int id);
         void SaveDiscountCode(DiscountCodeEntity discountCode);

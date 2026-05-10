@@ -1,0 +1,370 @@
+﻿@model IEnumerable<Data.Entity.ChatMessageEntity>
+
+<style>
+    /* Reset & Fullscreen setup */
+    body {
+        background-color: #f1f5f9;
+        overflow: hidden; /* Chống cuộn toàn trang */
+    }
+
+    .chat-wrapper {
+        height: calc(100vh - 80px); /* Ép chiều cao tối đa bằng màn hình */
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* CSS Soft UI cho Card - Fullscreen */
+    .modern-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        border: 1px solid #e2e8f0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 0; /* Quan trọng: Ép card vừa khít không gian */
+        min-height: 0;
+        width: 100%;
+        margin: 0;
+    }
+
+    .modern-card-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* Không bao giờ bị ép nhỏ */
+    }
+
+    .modern-card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* KHUNG CHAT - CHÌA KHÓA ĐỂ HIỆN THANH CUỘN */
+    .chat-box {
+        padding: 20px;
+        flex: 1 1 0; /* Quan trọng nhất: Cho phép khung tự co lại và hiện thanh cuộn */
+        min-height: 0;
+        overflow-y: auto; /* Bật thanh cuộn dọc */
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background-color: #f8fafc;
+        scroll-behavior: smooth;
+    }
+
+        /* CSS THANH CUỘN GIỐNG ẢNH CỦA BẠN */
+        .chat-box::-webkit-scrollbar {
+            width: 8px; /* Độ rộng thanh cuộn */
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: #888; /* Màu xám đậm */
+            border-radius: 10px; /* Bo góc tròn trịa */
+            border: 2px solid #f8fafc; /* Viền để tạo khoảng cách */
+        }
+
+            .chat-box::-webkit-scrollbar-thumb:hover {
+                background-color: #555; /* Đậm hơn khi di chuột vào */
+            }
+
+    /* Định dạng chung cho dòng chat */
+    .message-row {
+        display: flex;
+        width: 100%;
+    }
+
+    .message-bubble {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        position: relative;
+        line-height: 1.6;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .message-sender {
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .message-text {
+        font-size: 0.95rem;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        margin-top: 6px;
+        text-align: right;
+        display: block;
+    }
+
+    /* 1. Tin nhắn của USER (Bên trái) */
+    .message-row.user {
+        justify-content: flex-start;
+    }
+
+        .message-row.user .message-bubble {
+            background-color: #eff6ff;
+            color: #0f172a;
+            border: 1px solid #bfdbfe;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-row.user .message-sender {
+            display: none;
+        }
+
+        .message-row.user .message-time {
+            color: #64748b;
+        }
+
+    /* 2. Tin nhắn của AI (Bên phải) */
+    .message-row.ai {
+        justify-content: flex-end;
+    }
+
+        .message-row.ai .message-bubble {
+            background-color: #ffffff;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-row.ai .message-sender {
+            color: #475569;
+        }
+
+        .message-row.ai .message-time {
+            color: #94a3b8;
+        }
+
+    /* 3. Tin nhắn của ADMIN (Bên phải) */
+    .message-row.admin {
+        justify-content: flex-end;
+    }
+
+        .message-row.admin .message-bubble {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-row.admin .message-sender {
+            color: #047857;
+        }
+
+        .message-row.admin .message-time {
+            color: #059669;
+            opacity: 0.8;
+        }
+</style>
+
+<div class="container-fluid chat-wrapper">
+    <div class="modern-card">
+
+        <div class="modern-card-header">
+            <h4 class="modern-card-title">
+                <i class="fas fa-history text-info"></i> Lịch sử chat chi tiết
+            </h4>
+        </div>
+
+        <!-- Cấu trúc Flexbox chia đôi -->
+        <div class="row g-3 p-3" style="flex: 1 1 0; min-height: 0; margin: 0;">
+
+            <!-- CỘT 1: AI CHAT -->
+            <div class="col-md-6" style="height: 100%;">
+                <div class="border rounded-3 shadow-sm" style="background:#fff; height: 100%; display: flex; flex-direction: column;">
+
+                    <div class="p-3 border-bottom bg-light flex-shrink-0">
+                        <b class="text-primary d-flex align-items-center gap-2">
+                            <i class="fas fa-robot"></i> Chat với AI
+                        </b>
+                    </div>
+
+                    <div class="chat-box">
+                        @foreach (var item in Model.Where(x => x.SenderType == "USER_AI" || x.SenderType == "AI"))
+                        {
+                            var isAI = item.SenderType == "AI";
+                            <div class="message-row @(isAI ? "ai" : "user")">
+                                <div class="message-bubble">
+                                    @if (isAI)
+                                    {
+                                        <div class="message-sender"><i class="fas fa-robot"></i> AI Assistant</div>
+                                    }
+                                    <div class="message-text">@item.Message</div>
+                                    <small class="message-time">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CỘT 2: ADMIN CHAT -->
+            <div class="col-md-6" style="height: 100%;">
+                <div class="border rounded-3 shadow-sm" style="background:#fff; height: 100%; display: flex; flex-direction: column;">
+
+                    <div class="p-3 border-bottom bg-light flex-shrink-0">
+                        <b class="text-success d-flex align-items-center gap-2">
+                            <i class="fas fa-headset"></i> Chat với Admin
+                        </b>
+                    </div>
+
+                    <div class="chat-box">
+                        @foreach (var item in Model.Where(x => x.SenderType == "USER_ADMIN" || x.SenderType == "ADMIN").OrderBy(x => x.CreatedDate))
+                        {
+                            var isAdmin = item.SenderType == "ADMIN";
+                            <div class="message-row @(isAdmin ? "admin" : "user")">
+                                <div class="message-bubble">
+                                    @if (isAdmin)
+                                    {
+                                        <div class="message-sender"><i class="fas fa-headset"></i> Admin Support</div>
+                                    }
+                                    <div class="message-text">@item.Message</div>
+                                    <small class="message-time">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="border-top p-3 bg-white flex-shrink-0">
+                        <form method="post" asp-action="ReplyAdmin" style="margin: 0; width: 100%;">
+                            <input type="hidden" name="sessionId" value="@ViewBag.Session?.Id" />
+                            <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%; flex-wrap: nowrap;">
+                                <textarea name="message"
+                                          class="form-control"
+                                          rows="1"
+                                          style="resize: none; border-radius: 20px; padding: 10px 15px; flex-grow: 1; max-width: none !important; min-width: 0;"
+                                          placeholder="Nhập phản hồi..."
+                                          required></textarea>
+
+                                <button type="submit" class="btn btn-primary" style="border-radius: 50%; width: 42px; height: 42px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0;">
+                                    <i class="fas fa-paper-plane" style="margin-left: -2px;"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+<script>
+    const sessionId = '@ViewBag.Session?.Id';
+
+    const forms = document.querySelectorAll("form[action$='ReplyAdmin']");
+    forms.forEach(form => {
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const textarea = form.querySelector("textarea[name='message']");
+            const message = textarea.value.trim();
+            if (!message) return;
+
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, { method: 'POST', body: formData });
+                if (response.ok) {
+                    textarea.value = "";
+                    textarea.focus();
+                } else {
+                    alert("Có lỗi xảy ra khi gửi tin nhắn!");
+                }
+            } catch (error) { console.error("Error:", error); }
+        });
+    });
+
+    document.querySelectorAll("textarea[name='message']").forEach(textarea => {
+        textarea.addEventListener("keydown", function(e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                this.closest("form").dispatchEvent(new Event("submit", { cancelable: true }));
+            }
+        });
+    });
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.on("ReceiveMessage", function (senderType, message, createdDate) {
+        const chatBoxes = document.querySelectorAll(".chat-box");
+        let targetBox = (senderType === "ADMIN" || senderType === "USER_ADMIN") ? chatBoxes[1] : chatBoxes[0];
+
+        if (targetBox) {
+            const msgRow = document.createElement("div");
+            if (senderType === "ADMIN") msgRow.className = "message-row admin";
+            else if (senderType === "AI") msgRow.className = "message-row ai";
+            else msgRow.className = "message-row user";
+
+            let senderHtml = "";
+            if(senderType === "ADMIN") senderHtml = `<div class="message-sender"><i class="fas fa-headset"></i> Admin Support</div>`;
+            else if (senderType === "AI") senderHtml = `<div class="message-sender"><i class="fas fa-robot"></i> AI Assistant</div>`;
+
+            msgRow.innerHTML = `
+                <div class="message-bubble">
+                    ${senderHtml}
+                    <div class="message-text">${message.replace(/\n/g, "<br/>")}</div>
+                    <small class="message-time">${createdDate}</small>
+                </div>
+            `;
+
+            targetBox.appendChild(msgRow);
+
+            setTimeout(() => {
+                targetBox.scrollTop = targetBox.scrollHeight;
+            }, 50);
+        }
+    });
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            document.querySelectorAll(".chat-box").forEach(box => {
+                box.scrollTop = box.scrollHeight;
+            });
+        }, 100);
+    }
+
+    async function startSignalR() {
+        try {
+            await connection.start();
+            if (sessionId) await connection.invoke("JoinSession", sessionId.toString());
+            scrollToBottom();
+        } catch (err) {
+            setTimeout(startSignalR, 5000);
+        }
+    }
+
+    startSignalR();
+
+    document.addEventListener("DOMContentLoaded", scrollToBottom);
+</script>

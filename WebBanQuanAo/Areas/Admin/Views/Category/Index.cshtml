@@ -50,7 +50,6 @@
                             var isMain = item.GroupId == 0;
                             var parent = isMain ? null : Model.FirstOrDefault(x => x.Id == item.GroupId);
 
-                            // Gán data-attributes để JS đọc và lọc
                             <tr class="category-row @(isMain ? "row-main-category" : "")"
                                 data-name="@item.Name"
                                 data-code="@item.Code"
@@ -117,7 +116,6 @@
 </div>
 
 <script>
-    // JS Xử lý lọc và tìm kiếm Client-side
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("searchCategory");
         const filterType = document.getElementById("filterType");
@@ -132,10 +130,8 @@
                 const code = normalizeText(row.getAttribute("data-code") || "");
                 const type = row.getAttribute("data-type");
 
-                // Check điều kiện tìm kiếm (khớp tên hoặc mã)
                 const matchesKeyword = keyword === "" || name.includes(keyword) || code.includes(keyword);
 
-                // Check điều kiện lọc loại (all, main, sub)
                 const matchesType = typeValue === "all" || typeValue === type;
 
                 if (matchesKeyword && matchesType) {
@@ -150,7 +146,6 @@
             return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "d");
         }
 
-        // Lắng nghe sự kiện gõ phím và chọn dropdown
         searchInput.addEventListener("input", filterTable);
         filterType.addEventListener("change", filterTable);
     });

@@ -129,8 +129,6 @@ namespace Data.Repository.Discount
             return result?.ToList() ?? new List<ProductListDTO>();
         }
 
-
-        //DiscountRepository
         public async Task<PagedResult<DiscountCodeListDTO>> GetListDiscountCode(int page, int pageSize)
         {
             var par = new List<SqlParameter>()

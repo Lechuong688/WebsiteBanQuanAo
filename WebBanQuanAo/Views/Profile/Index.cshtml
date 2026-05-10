@@ -1,0 +1,159 @@
+﻿@model Data.DTO.User.ProfileDTO
+
+<div class="container py-5">
+
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+
+                <div class="text-center">
+
+                    <img src="@(string.IsNullOrEmpty(Model.AvatarPath)
+                                                 ? "/uploads/Users/avatar-trang-4.jpg"
+                                                 : Model.AvatarPath)"
+                         class="rounded-circle shadow"
+                         style="width:140px;
+                                height:140px;
+                                object-fit:cover;" />
+
+                    <h4 class="mt-3">
+                        @Model.FullName
+                    </h4>
+
+                    <p class="text-muted">
+                        @Model.Email
+                    </p>
+
+                </div>
+
+                <hr />
+
+                <div class="list-group border-0">
+
+                    <a href="/Profile/Index"
+                       class="list-group-item list-group-item-action border-0">
+                        👤 Hồ sơ cá nhân
+                    </a>
+
+                    <a href="/Profile/ChangePassword"
+                       class="list-group-item list-group-item-action border-0">
+                        🔒 Đổi mật khẩu
+                    </a>
+
+                    <a href="/Order/History"
+                       class="list-group-item list-group-item-action border-0">
+                        📦 Đơn hàng
+                    </a>
+
+                    <a href="/Product/ProductWishlist"
+                       class="list-group-item list-group-item-action border-0">
+                        ❤️ Wishlist
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+        <div class="col-md-9">
+
+            <div class="card border-0 shadow-sm rounded-4 p-5">
+
+                <h3 class="mb-4">
+                    Hồ sơ cá nhân
+                </h3>
+
+                <form asp-action="Update"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <input type="hidden"
+                           asp-for="Id" />
+
+                    <input type="hidden"
+                           asp-for="AvatarId" />
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Họ tên
+                            </label>
+
+                            <input asp-for="FullName"
+                                   class="form-control form-control-lg" />
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input asp-for="Email"
+                                   readonly
+                                   class="form-control form-control-lg bg-light" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Số điện thoại
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control form-control-lg" />
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Ảnh đại diện
+                            </label>
+
+                            <input type="file"
+                                   name="avatarFile"
+                                   class="form-control form-control-lg" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="form-label">
+                            Địa chỉ
+                        </label>
+
+                        <textarea asp-for="Address"
+                                  rows="4"
+                                  class="form-control"></textarea>
+
+                    </div>
+
+                    <button class="btn btn-dark btn-lg px-5 rounded-pill">
+                        Cập nhật
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
