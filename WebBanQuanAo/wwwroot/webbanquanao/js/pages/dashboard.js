@@ -1,28 +1,75 @@
-﻿/*
- * Author: Abdullah A Almsaeed
- * Date: 4 Jan 2014
- * Description:
- *      This is a demo file used only for the main dashboard (index.html)
- **/
-
+﻿
 var dashboardStartDate;
 var dashboardEndDate;
+function updateChartModeOptions(days) {
 
+    var html = '';
+
+    if (days <= 7) {
+
+        html += '<option value=\"day\">Ngày</option>';
+        html += '<option value=\"week\">Tuần</option>';
+
+    }
+
+    else if (days <= 31) {
+
+        html += '<option value=\"day\">Ngày</option>';
+        html += '<option value=\"week\">Tuần</option>';
+        html += '<option value=\"month\">Tháng</option>';
+
+    }
+
+    else if (days <= 90) {
+
+        html += '<option value=\"day\">Ngày</option>';
+        html += '<option value=\"week\">Tuần</option>';
+        html += '<option value=\"month\">Tháng</option>';
+        html += '<option value=\"quarter\">Quý</option>';
+
+    }
+
+    else {
+
+        html += '<option value=\"day\">Ngày</option>';
+        html += '<option value=\"week\">Tuần</option>';
+        html += '<option value=\"month\">Tháng</option>';
+        html += '<option value=\"quarter\">Quý</option>';
+        html += '<option value=\"year\">Năm</option>';
+
+    }
+
+    $('#chart-mode').html(html);
+
+}
 function drawDoanhThuTheoThang() {
-    // Sales chart
-    fetch('/Admin/Dashboard/GetRevenueChart?startDate=' + dashboardStartDate + '&endDate=' + dashboardEndDate)
+
+    var mode = $('#chart-mode').val();
+
+    fetch('/Admin/Dashboard/GetRevenueChart?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate
+        + '&mode='
+        + mode)
+
         .then(res => res.json())
+
         .then(data => {
-            document.getElementById('revenue-chart').innerHTML = '';
+
+            $('#revenue-chart').html('');
+
             console.log(data);
 
             var chartData = [];
 
             data.forEach(x => {
+
                 chartData.push({
-                    y: 'T' + x.month,
+                    y: x.label,
                     item1: parseFloat(x.revenue)
                 });
+
             });
 
             Morris.Area({
@@ -32,12 +79,315 @@ function drawDoanhThuTheoThang() {
                 xkey: 'y',
                 ykeys: ['item1'],
                 labels: ['Doanh thu'],
-                lineColors: ['#FF0000'],
+                lineColors: ['#1f3d99'],
                 hideHover: 'auto',
                 parseTime: false
             });
 
         });
+
+}
+function drawOrderStatusChart() {
+
+    fetch('/Admin/Dashboard/GetOrderStatusChart?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            var labels = data.map(x => x.label);
+
+            var values = data.map(x => x.value);
+
+            var type =
+                $('#order-status-type').val();
+
+            $('#order-status-chart').empty();
+
+            if (type == 'bar') {
+
+                Morris.Bar({
+
+                    element: 'order-status-chart',
+
+                    data: data.map(x => ({
+                        label: x.label,
+                        value: x.value
+                    })),
+
+                    xkey: 'label',
+
+                    ykeys: ['value'],
+
+                    labels: ['Số lượng'],
+
+                    resize: true,
+
+                    barColors: [
+
+                        '#3c8dbc', //Đã xác nhận
+
+                        '#f39c12', //Đang giao
+
+                        '#00a65a', //Hoàn thành
+
+                        '#dd4b39', //Đã hủy
+
+                        '#605ca8' //Đơn mới
+
+                    ],
+
+                });
+
+            }
+            else {
+
+                Morris.Donut({
+
+                    element: 'order-status-chart',
+
+                    data: data.map(x => ({
+                        label: x.label,
+                        value: x.value
+                    })),
+
+                    resize: true,
+
+                    colors: [
+
+                        '#3c8dbc', //Đã xác nhận
+
+                        '#f39c12', //Đang giao
+
+                        '#00a65a', //Hoàn thành
+
+                        '#dd4b39', //Đã hủy
+
+                        '#605ca8' //Đơn mới
+
+                    ]
+
+                });
+
+            }
+
+        });
+
+}
+function drawTopProducts() {
+
+    var top = $('#top-product-limit').val();
+
+    fetch('/Admin/Dashboard/GetTopProducts?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate
+        + '&top='
+        + top)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            var html = '';
+
+            data.forEach(x => {
+
+                html += `
+                    <tr>
+
+                        <td style="width:70px">
+
+                            <img src="${x.imagePath}"
+                                 style="
+                                    width:50px;
+                                    height:50px;
+                                    object-fit:cover;
+                                    border-radius:8px">
+
+                        </td>
+
+                        <td>${x.productName}</td>
+
+                        <td>${x.quantitySold}</td>
+
+                        <td>
+                            ${parseFloat(x.revenue)
+                                .toLocaleString()} đ
+                        </td>
+
+                    </tr >
+    `;
+
+            });
+
+            $('#top-product-body').html(html);
+
+        });
+
+}
+
+function drawRecentOrders() {
+
+    var top = $('#recent-order-limit').val();
+
+    fetch('/Admin/Dashboard/GetRecentOrders?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate
+        + '&top='
+        + top)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            var html = '';
+
+            data.forEach(x => {
+
+                let color = '#605ca8';
+
+                if (x.status == 'Đơn mới')
+                    color = '#605ca8';
+
+                else if (x.status == 'Đã xác nhận')
+                    color = '#3c8dbc';
+
+                else if (x.status == 'Đang giao')
+                    color = '#f39c12';
+
+                else if (x.status == 'Hoàn thành')
+                    color = '#00a65a';
+
+                else if (x.status == 'Đã huỷ')
+                    color = '#dd4b39';
+
+                html += `
+                    <tr>
+
+                        <td>${x.transactionCode}</td>
+
+                        <td>${x.customerName}</td>
+
+                        <td>
+                            ${parseFloat(x.totalAmount)
+                        .toLocaleString()} đ
+                        </td>
+
+                        <td>
+
+                            <span class="label"
+                                  style="
+                                    background:${color};
+                                    color:white;
+                                  ">
+
+                                ${x.status}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+                `;
+
+            });
+
+            $('#recent-order-body').html(html);
+
+        });
+
+}
+
+function drawLowStockProducts() {
+
+    var quantity =
+        $('#low-stock-limit').val();
+
+    fetch('/Admin/Dashboard/GetLowStockProducts?quantity='
+        + quantity)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            var html = '';
+
+            data.forEach(x => {
+
+                html += `
+                    <tr>
+
+                        <td style="width:70px">
+
+                            <img src="${x.imagePath}"
+                                 style="
+                                    width:50px;
+                                    height:50px;
+                                    object-fit:cover;
+                                    border-radius:8px">
+
+                        </td>
+
+                        <td>${x.productName}</td>
+
+                        <td>
+
+                            <span class="label label-danger">
+                                ${x.quantity}
+                            </span>
+
+                        </td>
+
+                    </tr>
+                `;
+
+            });
+
+            $('#low-stock-body').html(html);
+
+        });
+
+}
+$('#top-product-limit').change(function () {
+
+    drawTopProducts();
+
+});
+
+$('#recent-order-limit').change(function () {
+
+    drawRecentOrders();
+
+});
+
+$('#low-stock-limit').change(function () {
+
+    drawLowStockProducts();
+
+});
+
+$('#order-status-type').change(function () {
+
+    drawOrderStatusChart();
+
+});
+function reloadDashboard() {
+
+    drawDoanhThuTheoThang();
+
+    drawOrderStatusChart();
+
+    drawTopProducts();
+
+    drawRecentOrders();
+
+    drawLowStockProducts();
+
 }
 
 $(document).ready(function () {
@@ -63,24 +413,25 @@ $(document).ready(function () {
   });
 
   // bootstrap WYSIHTML5 - text editor
-  $('.textarea').wysihtml5();
-  drawDoanhThuTheoThang();
-  //$('.daterange').daterangepicker({
-  //  ranges   : {
-  //    'Today'       : [moment(), moment()],
-  //    'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-  //    'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-  //    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-  //    'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-  //    'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-  //  },
-  //  startDate: moment().subtract(29, 'days'),
-  //  endDate  : moment()
-  //}, function (start, end) {
-  //  window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    //});
+    $('.textarea').wysihtml5();
 
+    dashboardStartDate = moment()
+        .startOf('year')
+        .format('YYYY-MM-DD');
 
+    dashboardEndDate = moment()
+        .endOf('year')
+        .format('YYYY-MM-DD');
+
+    updateChartModeOptions(365);
+
+    $('#chart-mode').val('month');
+
+    reloadDashboard();
+
+    $('#chart-mode').change(function () {
+        drawDoanhThuTheoThang();
+    });
     //Lọc tổng
     $('#dashboard-date-range').daterangepicker({
         ranges: {
@@ -93,174 +444,18 @@ $(document).ready(function () {
             'This Year': [moment().startOf('year'), moment().endOf('year')],
             'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
         },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment()
+        startDate: moment().startOf('year'),
+        endDate: moment().endOf('year')
     }, function (start, end) {
         dashboardStartDate = start.format('YYYY-MM-DD');
         dashboardEndDate = end.format('YYYY-MM-DD');
+        var days = end.diff(start, 'days') + 1;
+
+        updateChartModeOptions(days);
+
+        reloadDashboard();
         //drawDoanhThuTheoThang()
         //window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
-    //$('#dashboard-date-range').click
-
-
-    //Lọc riêng
-    $('#dashboard-date-range1').daterangepicker({
-        ranges: {
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-       },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment()
-    }, function (start, end) {
-        dashboardStartDate = start.format('YYYY-MM-DD');
-        dashboardEndDate = end.format('YYYY-MM-DD');
-        //drawDoanhThuTheoThang()
-        //window.alert('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    });
-  /* jQueryKnob */
-  $('.knob').knob();
-
-  // jvectormap data
-  var visitorsData = {
-    US: 398, // USA
-    SA: 400, // Saudi Arabia
-    CA: 1000, // Canada
-    DE: 500, // Germany
-    FR: 760, // France
-    CN: 300, // China
-    AU: 700, // Australia
-    BR: 600, // Brazil
-    IN: 800, // India
-    GB: 320, // Great Britain
-    RU: 3000 // Russia
-  };
-  // World map by jvectormap
-  $('#world-map').vectorMap({
-    map              : 'world_mill_en',
-    backgroundColor  : 'transparent',
-    regionStyle      : {
-      initial: {
-        fill            : '#e4e4e4',
-        'fill-opacity'  : 1,
-        stroke          : 'none',
-        'stroke-width'  : 0,
-        'stroke-opacity': 1
-      }
-    },
-    series           : {
-      regions: [
-        {
-          values           : visitorsData,
-          scale            : ['#92c1dc', '#ebf4f9'],
-          normalizeFunction: 'polynomial'
-        }
-      ]
-    },
-    onRegionLabelShow: function (e, el, code) {
-      if (typeof visitorsData[code] != 'undefined')
-        el.html(el.html() + ': ' + visitorsData[code] + ' new visitors');
-    }
-  });
-
-  // Sparkline charts
-  var myvalues = [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021];
-  $('#sparkline-1').sparkline(myvalues, {
-    type     : 'line',
-    lineColor: '#92c1dc',
-    fillColor: '#ebf4f9',
-    height   : '50',
-    width    : '80'
-  });
-  myvalues = [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921];
-  $('#sparkline-2').sparkline(myvalues, {
-    type     : 'line',
-    lineColor: '#92c1dc',
-    fillColor: '#ebf4f9',
-    height   : '50',
-    width    : '80'
-  });
-  myvalues = [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21];
-  $('#sparkline-3').sparkline(myvalues, {
-    type     : 'line',
-    lineColor: '#92c1dc',
-    fillColor: '#ebf4f9',
-    height   : '50',
-    width    : '80'
-  });
-
-  // The Calender
-  $('#calendar').datepicker();
-
-  // SLIMSCROLL FOR CHAT WIDGET
-  $('#chat-box').slimScroll({
-    height: '250px'
-  });
-
-    /* Morris.js Charts */
-  var line = new Morris.Line({
-    element          : 'line-chart',
-    resize           : true,
-    data             : [
-      { y: '2011 Q1', item1: 2666 },
-      { y: '2011 Q2', item1: 2778 },
-      { y: '2011 Q3', item1: 4912 },
-      { y: '2011 Q4', item1: 3767 },
-      { y: '2012 Q1', item1: 6810 },
-      { y: '2012 Q2', item1: 5670 },
-      { y: '2012 Q3', item1: 4820 },
-      { y: '2012 Q4', item1: 15073 },
-      { y: '2013 Q1', item1: 10687 },
-      { y: '2013 Q2', item1: 8432 }
-    ],
-    xkey             : 'y',
-    ykeys            : ['item1'],
-    labels           : ['Item 1'],
-    lineColors       : ['#efefef'],
-    lineWidth        : 2,
-    hideHover        : 'auto',
-    gridTextColor    : '#fff',
-    gridStrokeWidth  : 0.4,
-    pointSize        : 4,
-    pointStrokeColors: ['#efefef'],
-    gridLineColor    : '#efefef',
-    gridTextFamily   : 'Open Sans',
-    gridTextSize     : 10
-  });
-
-    // Donut Chart
-    var donut;
-    fetch('/Admin/Dashboard/GetOrderStatusChart')
-        .then(res => res.json())
-        .then(data => {
-
-            donut = new Morris.Donut({
-                element: 'sales-chart',
-                resize: true,
-                colors: ['#FFCCCC','#559CC6', '#f39c12', '#00a65a', '#f56954'],
-                data: data,
-                hideHover: 'auto'
-            });
-
-        });
-
-  // Fix for charts under tabs
-    $('.box ul.nav a').on('shown.bs.tab', function () {
-        //if (area) area.redraw();
-        if (donut) donut.redraw();
-        if (line) line.redraw();
-    });
-
-  /* The todo list plugin */
-  $('.todo-list').todoList({
-    onCheck  : function () {
-      window.console.log($(this), 'The element has been checked');
-    },
-    onUnCheck: function () {
-      window.console.log($(this), 'The element has been unchecked');
-    }
-  });
 
 });

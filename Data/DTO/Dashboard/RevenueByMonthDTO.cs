@@ -8,7 +8,10 @@ namespace Data.DTO.Dashboard
 {
     public class RevenueByMonthDTO
     {
-        public int Month { get; set; }
+        public string Label { get; set; }
+
         public decimal Revenue { get; set; }
+
+        public DateTime GroupKey { get; set; }
     }
 }

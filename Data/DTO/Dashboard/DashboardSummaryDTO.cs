@@ -12,7 +12,7 @@ namespace Data.DTO.Dashboard
 
         public decimal TotalRevenue { get; set; }
 
-        public int NewUsers { get; set; }
+        public int TotalUsers { get; set; }
 
         public int ProductsSold { get; set; }
     }
