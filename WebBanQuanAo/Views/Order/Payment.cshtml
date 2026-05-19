@@ -1,31 +1,166 @@
 ﻿<div class="payment-wrapper">
     <div class="payment-card">
-        <h2>Thanh toán đơn hàng</h2>
 
-        <img src="@ViewBag.QR" width="250" alt="Mã QR Thanh Toán" />
+        <!-- PAYMENT -->
+        <div id="payment-box">
 
-        <p class="payment-info payment-total">Số tiền: <b>@Model.Total VNĐ</b></p>
+            <h2>Thanh toán đơn hàng</h2>
 
-        <p class="payment-info">Nội dung chuyển khoản:</p>
-        <h3 class="transaction-code">@Model.TransactionCode</h3>
+            <img id="qr-image"
+                 src="@ViewBag.QR"
+                 width="250"
+                 alt="Mã QR Thanh Toán" />
 
-        <p class="waiting-status">
-            <span class="spinner">⏳</span> Đang chờ thanh toán...
-        </p>
+            <p class="payment-info payment-total">
+                Số tiền: <b>@String.Format("{0:N0}", Model.Total) VNĐ</b>
+            </p>
+
+            <p class="payment-info">
+                Nội dung chuyển khoản:
+            </p>
+
+            <h3 class="transaction-code">
+                @Model.TransactionCode
+            </h3>
+
+            <p id="countdown"></p>
+
+            <p class="waiting-status">
+                ⏳ Đang chờ thanh toán...
+            </p>
+
+        </div>
+
+        <!-- EXPIRED -->
+        <div id="expired-box" style="display:none;">
+
+            <h2 style="color:red;">
+                Mã QR đã hết hạn ❌
+            </h2>
+
+            <p>
+                Bạn sẽ được chuyển về trang chủ sau 1 phút...
+            </p>
+
+            <button id="reload-btn">
+                Tải lại mã QR
+            </button>
+
+        </div>
+
     </div>
 </div>
 
 <script>
-    setInterval(async () => {
+
+
+    const checkPayment = setInterval(async () => {
+
         try {
-            let res = await fetch('/Order/CheckStatus?id=@Model.Id');
+
+            let res =
+                await fetch('/Order/CheckStatus?id=@Model.Id');
+
             let data = await res.json();
 
             if (data.status == 1 || data.status === "Paid") {
-                window.location.href = "/CheckOut/Success?id=@Model.Id";
+
+                clearInterval(checkPayment);
+
+                window.location.href =
+                    "/CheckOut/Success?id=@Model.Id";
             }
+
         } catch (error) {
-            console.error("Lỗi khi kiểm tra trạng thái:", error);
+
+            console.error(error);
+
         }
+
     }, 3000);
+
+
+    let expireMinutes = 10;
+
+    let expireTime;
+
+    let timer;
+
+    let redirectTimer;
+
+
+    const paymentBox =
+        document.getElementById("payment-box");
+
+    const expiredBox =
+        document.getElementById("expired-box");
+
+    const countdown =
+        document.getElementById("countdown");
+
+    const reloadBtn =
+        document.getElementById("reload-btn");
+
+
+    function startQrTimer() {
+
+        expireTime =
+            new Date().getTime() +
+            (expireMinutes * 60 * 1000);
+
+        clearInterval(timer);
+
+        timer = setInterval(() => {
+
+            const now =
+                new Date().getTime();
+
+            const distance =
+                expireTime - now;
+
+            if (distance <= 0) {
+
+                clearInterval(timer);
+
+                paymentBox.style.display = "none";
+
+                expiredBox.style.display = "block";
+
+                redirectTimer = setTimeout(() => {
+
+                    window.location.href = "/";
+
+                }, 60000);
+
+                return;
+            }
+
+            const minutes =
+                Math.floor(distance / (1000 * 60));
+
+            const seconds =
+                Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdown.innerHTML =
+                `Mã QR hết hạn sau: ${minutes}m ${seconds}s`;
+
+        }, 1000);
+    }
+
+
+    reloadBtn.addEventListener("click", () => {
+
+        clearTimeout(redirectTimer);
+
+        paymentBox.style.display = "block";
+
+        expiredBox.style.display = "none";
+
+        startQrTimer();
+
+    });
+
+
+    startQrTimer();
+
 </script>

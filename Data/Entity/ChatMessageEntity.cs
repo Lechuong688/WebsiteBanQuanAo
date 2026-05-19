@@ -21,6 +21,8 @@ namespace Data.Entity
         public DateTime CreatedDate { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public string? ProductsJson { get; set; }
         [ForeignKey("ChatSessionId")] public virtual ChatSessionEntity ChatSession { get; set; }
     }
 }

@@ -41,13 +41,14 @@ namespace Data.Repository.Chat
             return session;
         }
 
-        public async Task<ChatMessageEntity> SaveMessageAsync(int sessionId, string senderType, string message)
+        public async Task<ChatMessageEntity> SaveMessageAsync(int sessionId, string senderType, string message, string? productsJson = null)
         {
             var chatMsg = new ChatMessageEntity
             {
                 ChatSessionId = sessionId,
                 SenderType = senderType,
                 Message = message,
+                ProductsJson = productsJson,
                 CreatedDate = DateTime.Now,
                 IsDeleted = false
             };

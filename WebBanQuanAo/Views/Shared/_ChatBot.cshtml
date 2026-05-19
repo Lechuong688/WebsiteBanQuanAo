@@ -367,6 +367,7 @@
 
     let currentConversation = [];
     let currentConversationId = Date.now();
+    let currentSessionId = null;
 
     function toggleChatBot() {
         const chatbot = document.getElementById("chatbot-container");
@@ -412,9 +413,15 @@
             const response = await fetch('/api/chat/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, mode: currentChatMode })
+                    body: JSON.stringify({
+                        message: text,
+                        mode: currentChatMode,
+                        sessionId: currentSessionId
+                    })
             });
             const data = await response.json();
+            currentSessionId = data.sessionId;
+                sessionStorage.setItem("current_session_id", currentSessionId);
             if (data.sessionId) {
                 clientConnection.invoke("JoinSession", data.sessionId.toString()).catch(e => console.error(e));
             }
@@ -492,8 +499,38 @@
         container.scrollTop = container.scrollHeight;
     }
 
-    function saveCurrentConversation() {
-        sessionStorage.setItem("current_conversation_id", currentConversationId);
+        function saveCurrentConversation() {
+
+        let histories =
+            JSON.parse(sessionStorage.getItem("chat_histories") || "[]");
+
+        const existingIndex =
+            histories.findIndex(h => h.id === currentConversationId);
+
+        const historyData = {
+            id: currentConversationId,
+
+            title:
+                currentConversation[0]?.text?.substring(0, 30)
+                || "Chat mới",
+
+            messages: currentConversation
+        };
+
+        if (existingIndex >= 0) {
+
+            histories[existingIndex] = historyData;
+
+        } else {
+
+            histories.unshift(historyData);
+
+        }
+
+        sessionStorage.setItem(
+            "chat_histories",
+            JSON.stringify(histories)
+        );
 
         updateHistoryUI();
     }
@@ -521,6 +558,7 @@
         if (!conversation) return;
 
         currentConversationId = conversation.id;
+        currentSessionId = id;
         currentConversation = conversation.messages;
         sessionStorage.setItem("current_conversation", JSON.stringify(currentConversation));
         sessionStorage.setItem("current_conversation_id", currentConversationId);
@@ -534,6 +572,8 @@
     }
 
     function startNewConversation() {
+        currentSessionId = null;
+        sessionStorage.removeItem("current_session_id");
         currentConversationId = Date.now();
         currentConversation = [];
         sessionStorage.removeItem("current_conversation");
@@ -556,7 +596,9 @@
 
     window.onload = async function() {
         try {
-            const res = await fetch('/api/chat/messages');
+                const savedSessionId = sessionStorage.getItem("current_session_id");
+
+                const res = await fetch(`/api/chat/messages?sessionId=${savedSessionId}`);
             const data = await res.json();
 
             const container = document.getElementById("chat-messages");
@@ -573,11 +615,13 @@
                     else if (msg.sender === "USER_ADMIN") type = "user-message";
                     else if (msg.sender === "ADMIN") type = "bot-message";
 
-                    const msgObj = {
-                        type: type,
-                        text: msg.message,
-                        products: []
-                    };
+                        const msgObj = {
+                            type: type,
+                            text: msg.message,
+                            products: msg.products
+                                ? JSON.parse(msg.products)
+                                : []
+                        };
 
                     currentConversation.push(msgObj);
                     renderMessageToDOM(msgObj);

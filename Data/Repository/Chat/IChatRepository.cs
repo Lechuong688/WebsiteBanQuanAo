@@ -7,7 +7,7 @@ namespace Data.Repository.Chat
     public interface IChatRepository
     {
         Task<ChatSessionEntity> GetOrCreateSessionAsync(string userId);
-        Task<ChatMessageEntity> SaveMessageAsync(int sessionId, string senderType, string message);
+        Task<ChatMessageEntity> SaveMessageAsync(int sessionId, string senderType, string message, string? productsJson = null);
         Task<List<ChatMessageEntity>> GetSessionHistoryAsync(int sessionId);
 
         Task<List<ProductEntity>> GetOutfitProductsAsync(string message, bool isOffice);

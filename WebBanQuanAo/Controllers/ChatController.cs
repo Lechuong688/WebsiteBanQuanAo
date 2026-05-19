@@ -5,6 +5,7 @@ using Data.Service;
 using Data.Service.ChatBot;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +21,18 @@ namespace WebBanQuanAo.Controllers
         private readonly ChatBotService _chatBotService;
         private readonly IChatRepository _chatRepo;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly DataContext _context;
 
         public ChatController(
             ChatBotService chatBotService,
             IChatRepository chatRepo,
-            IHubContext<ChatHub> hubContext)
+            IHubContext<ChatHub> hubContext,
+            DataContext context)
         {
             _chatBotService = chatBotService;
             _chatRepo = chatRepo;
             _hubContext = hubContext;
+            _context = context;
         }
 
         [HttpPost("send")]
@@ -43,7 +47,26 @@ namespace WebBanQuanAo.Controllers
             string userMessageLower = NormalizeText(userMessage.ToLower());
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var session = await _chatRepo.GetOrCreateSessionAsync(userId);
+            ChatSessionEntity session;
+
+            if (request.SessionId.HasValue)
+            {
+                session = await _context.ChatSession
+                    .FirstOrDefaultAsync(x => x.Id == request.SessionId.Value);
+            }
+            else
+            {
+                session = new ChatSessionEntity
+                {
+                    UserId = userId,
+                    Title = userMessage,
+                    CreatedDate = DateTime.Now,
+                    IsDeleted = false
+                };
+
+                _context.ChatSession.Add(session);
+                await _context.SaveChangesAsync();
+            }
             string senderType = request.Mode == "ADMIN" ? "USER_ADMIN" : "USER_AI";
 
             var userChat = await _chatRepo.SaveMessageAsync(session.Id, senderType, userMessage);
@@ -52,7 +75,7 @@ namespace WebBanQuanAo.Controllers
 
             string reply = "";
             var relatedProducts = new List<ProductEntity>();
-
+            var productsResponse = new List<object>();
             if (request.Mode != "ADMIN")
             {
                 var chatHistory = await _chatRepo.GetSessionHistoryAsync(session.Id);
@@ -140,23 +163,22 @@ Hãy dựa vào câu chat của khách và Dữ liệu Sản phẩm để đưa 
 
                 reply = await _chatBotService.AskAI(systemPrompt, userMessage, chatHistory);
 
-                var aiChat = await _chatRepo.SaveMessageAsync(session.Id, "AI", reply);
+                foreach (var p in relatedProducts)
+                {
+                    var img = await _chatRepo.GetProductImageUrlAsync(p.Id);
+                    productsResponse.Add(new
+                    {
+                        id = p.Id,
+                        name = p.Name,
+                        price = p.Price,
+                        image = img,
+                        link = $"/Product/Detail/{p.Id}"
+                    });
+                }
+
+                var aiChat = await _chatRepo.SaveMessageAsync(session.Id, "AI", reply, Newtonsoft.Json.JsonConvert.SerializeObject(productsResponse));
                 var aiTime = aiChat.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss");
                 await _hubContext.Clients.Group(session.Id.ToString()).SendAsync("ReceiveMessage", "AI", reply, aiTime);
-            }
-
-            var productsResponse = new List<object>();
-            foreach (var p in relatedProducts)
-            {
-                var img = await _chatRepo.GetProductImageUrlAsync(p.Id);
-                productsResponse.Add(new
-                {
-                    id = p.Id,
-                    name = p.Name,
-                    price = p.Price,
-                    image = img,
-                    link = $"/Product/Detail/{p.Id}"
-                });
             }
 
             return Ok(new
@@ -190,21 +212,32 @@ Hãy dựa vào câu chat của khách và Dữ liệu Sản phẩm để đưa 
         }
 
         [HttpGet("messages")]
-        public async Task<IActionResult> GetMessages()
+        public async Task<IActionResult> GetMessages(int? sessionId)
         {
-            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) return Ok(new { sessionId = 0, messages = new List<object>() });
+            if (!sessionId.HasValue)
+            {
+                return Ok(new
+                {
+                    sessionId = 0,
+                    messages = new List<object>()
+                });
+            }
 
-            var session = await _chatRepo.GetOrCreateSessionAsync(userId);
+            var messages =
+                await _chatRepo.GetSessionHistoryAsync(sessionId.Value);
 
-            var messages = await _chatRepo.GetSessionHistoryAsync(session.Id);
-
-            var result = messages.Select(x => new {
+            var result = messages.Select(x => new
+            {
                 sender = x.SenderType,
-                message = x.Message
+                message = x.Message,
+                products = x.ProductsJson
             });
 
-            return Ok(new { sessionId = session.Id, messages = result });
+            return Ok(new
+            {
+                sessionId = sessionId.Value,
+                messages = result
+            });
         }
     }
 
@@ -212,5 +245,6 @@ Hãy dựa vào câu chat của khách và Dữ liệu Sản phẩm để đưa 
     {
         public string Message { get; set; }
         public string? Mode { get; set; }
+        public int? SessionId { get; set; }
     }
 }

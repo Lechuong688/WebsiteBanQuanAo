@@ -33,6 +33,7 @@ namespace WebBanQuanAo.Controllers
                            $"?amount={(int)order.Total}&addInfo={order.TransactionCode}";
 
             ViewBag.QR = qrUrl;
+            ViewBag.QRExpire = order.CreatedDate?.AddMinutes(10);
 
             return View(order);
         }
