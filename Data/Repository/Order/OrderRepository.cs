@@ -199,7 +199,7 @@ namespace Data.Repository.Order
                     order.UpdatedBy = "System";
                 }
                 await _context.SaveChangesAsync();
-                Console.WriteLine($"--- Đã tự động hủy {expiredOrders.Count} đơn hàng quá hạn ---");
+
             }
         }
     }
