@@ -63,30 +63,21 @@ namespace WebBanQuanAo.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetTopProducts(
-    DateTime startDate,
-    DateTime endDate,
-    int top = 5)
+        public async Task<IActionResult> GetTopProducts(DateTime startDate, DateTime endDate, int top = 5)
         {
             var data = await _dashboardRepository
                 .GetTopSellingProducts(startDate, endDate, top);
 
             return Json(data);
         }
-        public async Task<IActionResult> GetRecentOrders(
-    DateTime startDate,
-    DateTime endDate,
-    int top = 5)
+        public async Task<IActionResult> GetRecentOrders(DateTime startDate, DateTime endDate, int top = 5)
         {
             var data = await _dashboardRepository
                 .GetRecentOrders(startDate, endDate, top);
 
             return Json(data);
         }
-        public async Task<IActionResult> GetRevenueChart(
-    DateTime startDate,
-    DateTime endDate,
-    string mode = "month")
+        public async Task<IActionResult> GetRevenueChart(DateTime startDate, DateTime endDate, string mode = "month")
         {
             var data = await _dashboardRepository
                 .GetRevenueByMonth(startDate, endDate, mode);
@@ -94,9 +85,7 @@ namespace WebBanQuanAo.Controllers
             return Json(data);
         }
 
-        public async Task<IActionResult> GetOrderStatusChart(
-    DateTime startDate,
-    DateTime endDate)
+        public async Task<IActionResult> GetOrderStatusChart(DateTime startDate, DateTime endDate)
         {
             var data = await _dashboardRepository
                 .GetOrderStatus(startDate, endDate);
@@ -108,6 +97,36 @@ namespace WebBanQuanAo.Controllers
         {
             var data = await _dashboardRepository
                 .GetLowStockProducts(quantity);
+
+            return Json(data);
+        }
+
+        public async Task<IActionResult> GetTopCustomers(DateTime startDate, DateTime endDate, int top = 5)
+        {
+            var data = await _dashboardRepository
+                .GetTopCustomers(startDate, endDate, top);
+
+            return Json(data);
+        }
+
+        public async Task<IActionResult>GetBestShoppingTime(DateTime startDate, DateTime endDate)
+        {
+            var data =
+                await _dashboardRepository
+                .GetBestShoppingTime(startDate, endDate);
+
+            return Json(data);
+        }
+
+        public async Task<IActionResult>
+        GetOrderStatistic(
+    DateTime startDate,
+    DateTime endDate,
+    string mode = "month")
+        {
+            var data =
+                await _dashboardRepository
+                .GetOrderStatistic(startDate, endDate, mode);
 
             return Json(data);
         }

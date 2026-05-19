@@ -24,5 +24,11 @@ namespace Data.Repository.Dashboard
             DateTime endDate);
 
         Task<List<LowStockProductDTO>> GetLowStockProducts(int quantity);
+
+        Task<List<TopCustomerDTO>> GetTopCustomers(DateTime startDate, DateTime endDate, int top);
+
+        Task<BestShoppingTimeDTO> GetBestShoppingTime(DateTime startDate, DateTime endDate);
+
+        Task<List<OrderStatisticDTO>>GetOrderStatistic(DateTime startDate, DateTime endDate, string mode);
     }
 }

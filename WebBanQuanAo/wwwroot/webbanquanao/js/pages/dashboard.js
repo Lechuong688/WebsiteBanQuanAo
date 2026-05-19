@@ -230,6 +230,178 @@ function drawTopProducts() {
 
 }
 
+function drawTopCustomers() {
+
+    var top =
+        $('#top-customer-limit').val();
+
+    fetch('/Admin/Dashboard/GetTopCustomers?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate
+        + '&top='
+        + top)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            var html = '';
+
+            data.forEach(x => {
+
+                html += `
+                    <tr>
+
+                        <td style="width:70px">
+
+                            <img src="${x.avatarPath ?? '/uploads/Users/avatar-trang-4.jpg'}"
+                                 style="
+                                    width:50px;
+                                    height:50px;
+                                    border-radius:50%;
+                                    object-fit:cover;
+                                    border:2px solid #ddd">
+
+                        </td>
+
+                        <td>
+
+                            <b>${x.customerName}</b>
+
+                            <br>
+
+                            <small>
+                                ${x.phoneNumber}
+                            </small>
+
+                        </td>
+
+                        <td>
+
+                            <span class="label bg-blue">
+
+                                ${x.totalOrders}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <b>
+
+                                ${parseFloat(x.totalSpent)
+                                    .toLocaleString()} đ
+
+                            </b>
+
+                        </td>
+
+                    </tr >
+    `;
+
+            });
+
+            $('#top-customer-body').html(html);
+
+        });
+
+}
+
+var orderChart = null;
+
+function drawOrderStatisticChart() {
+
+    var mode =
+        $('#order-chart-mode').val();
+
+    fetch('/Admin/Dashboard/GetOrderStatistic?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate
+        + '&mode='
+        + mode)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            const canvas =
+                document.getElementById('orderChart');
+
+            if (!canvas) {
+
+                console.log('Không tìm thấy canvas');
+
+                return;
+            }
+
+            var labels =
+                data.map(x => x.label);
+
+            var values =
+                data.map(x => x.totalOrders);
+
+            if (orderChart != null) {
+
+                orderChart.destroy();
+
+            }
+
+            const ctx =
+                canvas.getContext('2d');
+
+            orderChart = new Chart(ctx, {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [{
+
+                        label: 'Số lượng đơn hàng',
+
+                        data: values,
+
+                        backgroundColor: '#00a65a',
+
+                        borderRadius: 8
+
+                    }]
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: true,
+
+                    plugins: {
+
+                        legend: {
+
+                            display: true
+                        }
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true
+                        }
+                    }
+                }
+
+            });
+
+        });
+
+}
+
 function drawRecentOrders() {
 
     var top = $('#recent-order-limit').val();
@@ -303,6 +475,30 @@ function drawRecentOrders() {
 
 }
 
+function drawBestShoppingTime() {
+
+    fetch('/Admin/Dashboard/GetBestShoppingTime?startDate='
+        + dashboardStartDate
+        + '&endDate='
+        + dashboardEndDate)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            $('#best-hour')
+                .html('🔥 ' + data.bestHour);
+
+            $('#best-day')
+                .html('📅 ' + data.bestDay);
+
+            $('#best-month')
+                .html('🛒 ' + data.bestMonth);
+
+        });
+
+}
+
 function drawLowStockProducts() {
 
     var quantity =
@@ -359,6 +555,12 @@ $('#top-product-limit').change(function () {
 
 });
 
+$('#order-chart-mode').change(function () {
+
+    drawOrderStatisticChart();
+
+});
+
 $('#recent-order-limit').change(function () {
 
     drawRecentOrders();
@@ -376,6 +578,12 @@ $('#order-status-type').change(function () {
     drawOrderStatusChart();
 
 });
+
+$('#top-customer-limit').change(function () {
+
+    drawTopCustomers();
+
+});
 function reloadDashboard() {
 
     drawDoanhThuTheoThang();
@@ -384,7 +592,13 @@ function reloadDashboard() {
 
     drawTopProducts();
 
+    drawTopCustomers();
+
+    drawOrderStatisticChart();
+
     drawRecentOrders();
+
+    drawBestShoppingTime();
 
     drawLowStockProducts();
 
@@ -435,14 +649,14 @@ $(document).ready(function () {
     //Lọc tổng
     $('#dashboard-date-range').daterangepicker({
         ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-            'This Year': [moment().startOf('year'), moment().endOf('year')],
-            'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            'Hôm nay': [moment(), moment()],
+            'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            '7 ngày qua': [moment().subtract(6, 'days'), moment()],
+            '30 ngày qua': [moment().subtract(29, 'days'), moment()],
+            'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+            'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Năm này': [moment().startOf('year'), moment().endOf('year')],
+            'Năm trước': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
         },
         startDate: moment().startOf('year'),
         endDate: moment().endOf('year')

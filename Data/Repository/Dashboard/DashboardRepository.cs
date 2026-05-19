@@ -118,4 +118,69 @@ public class DashboardRepository : IDashboardRepository
 
         return result?.ToList() ?? new List<LowStockProductDTO>();
     }
+    public async Task<List<TopCustomerDTO>> GetTopCustomers(
+    DateTime startDate,
+    DateTime endDate,
+    int top)
+    {
+        var par = new List<SqlParameter>()
+    {
+        new SqlParameter("@FromDate", startDate),
+        new SqlParameter("@ToDate", endDate),
+        new SqlParameter("@Top", top)
+    };
+
+        var result = await _databaseSql.ExecuteProcToList<TopCustomerDTO>(
+            "Dashboard_GetTopCustomers",
+            par
+        );
+
+        return result?.ToList()
+               ?? new List<TopCustomerDTO>();
+    }
+
+    public async Task<BestShoppingTimeDTO>
+    GetBestShoppingTime(
+        DateTime startDate,
+        DateTime endDate)
+        {
+            var par = new List<SqlParameter>()
+        {
+            new SqlParameter("@FromDate", startDate),
+            new SqlParameter("@ToDate", endDate)
+        };
+
+            var result =
+                await _databaseSql.ExecuteProcToList<BestShoppingTimeDTO>(
+                    "Dashboard_GetBestShoppingTime",
+                    par
+                );
+
+            return result.FirstOrDefault()
+                   ?? new BestShoppingTimeDTO();
+    }
+
+    public async Task<List<OrderStatisticDTO>>
+    GetOrderStatistic(
+    DateTime startDate,
+    DateTime endDate,
+    string mode)
+    {
+        var par = new List<SqlParameter>()
+    {
+        new SqlParameter("@FromDate", startDate),
+        new SqlParameter("@ToDate", endDate),
+        new SqlParameter("@GroupBy", mode)
+    };
+
+        var result =
+            await _databaseSql.ExecuteProcToList<OrderStatisticDTO>(
+                "Dashboard_OrderStatistic",
+                par
+            );
+
+        return result?.ToList()
+               ?? new List<OrderStatisticDTO>();
+    }
+
 }
