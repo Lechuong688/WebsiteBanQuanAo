@@ -47,7 +47,11 @@
                             <div class="col-md-6">
                                 <div class="modern-form-group">
                                     <label class="modern-label">Giá bán (VNĐ)</label>
-                                    <input type="number" name="Price" value="@Model.Price" class="modern-control" placeholder="0" required />
+                                    @* <input type="number" name="Price" value="@Model.Price" class="modern-control" placeholder="0" required /> *@
+                                    <input asp-for="Price"
+                                           type="number"
+                                           value="@Model.Price.ToString("0", System.Globalization.CultureInfo.InvariantCulture)"
+                                           class="modern-control" />
                                 </div>
                             </div>
                             <div class="col-md-6">

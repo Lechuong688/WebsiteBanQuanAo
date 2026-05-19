@@ -1,0 +1,59 @@
+﻿@{
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-card">
+
+    <div class="auth-icon">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="26"
+             height="26"
+             fill="currentColor"
+             viewBox="0 0 16 16">
+            <path d="M2 2a2 2 0 0 0-2 2v8a2
+                     2 0 0 0 2 2h12a2 2 0 0 0
+                     2-2V4a2 2 0 0 0-2-2H2zm0
+                     1h12a1 1 0 0 1 1 1v.217l-7
+                     4.2-7-4.2V4a1 1 0 0 1 1-1z" />
+        </svg>
+    </div>
+
+    <h3 class="auth-title">
+        Xác thực OTP
+    </h3>
+
+    <p class="auth-subtitle">
+        Vui lòng nhập mã OTP đã được gửi về email của bạn.
+    </p>
+
+    <form method="post">
+
+        <div class="mb-4">
+
+            <label class="form-label fw-medium">
+                Mã OTP
+            </label>
+
+            <input type="text"
+                   name="otp"
+                   class="form-control text-center"
+                   placeholder="Nhập mã OTP"
+                   maxlength="6"
+                   required>
+
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Error
+            </div>
+        }
+
+        <button type="submit"
+                class="btn btn-dark w-100">
+            Xác nhận OTP
+        </button>
+
+    </form>
+</div>

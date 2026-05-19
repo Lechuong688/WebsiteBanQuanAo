@@ -366,7 +366,7 @@
 
             colorIds.forEach(function (id) {
 
-                let name = $('label[for="color-' + id + '"] span').text();
+                let name = $('label[for="color-' + id + '"]').text().trim();
 
                 html += filterTag('Màu', name, 'color', id);
 

@@ -341,5 +341,162 @@ namespace WebBanQuanAo.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                ViewBag.Error = "Vui lòng nhập email";
+                return View();
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                ViewBag.Error = "Email không tồn tại";
+                return View();
+            }
+
+            var otp = new Random()
+                .Next(100000, 999999)
+                .ToString();
+
+            HttpContext.Session.SetString(
+                "ResetOTP",
+                otp);
+
+            HttpContext.Session.SetString(
+                "ResetEmail",
+                email);
+
+            HttpContext.Session.SetString(
+                "ResetOtpCreatedAt",
+                DateTime.Now.ToString());
+
+            await _emailService.SendEmailAsync(
+                email,
+                "Mã OTP đặt lại mật khẩu",
+                $@"
+        <h2>Đặt lại mật khẩu</h2>
+
+        <p>Mã OTP của bạn là:</p>
+
+        <h1>{otp}</h1>
+
+        <p>OTP có hiệu lực trong 5 phút.</p>
+        "
+            );
+
+            return RedirectToAction("VerifyResetOtp");
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(
+    string password,
+    string confirmPassword)
+        {
+            if (password != confirmPassword)
+            {
+                ViewBag.Error =
+                    "Mật khẩu nhập lại không khớp";
+
+                return View();
+            }
+
+            var email =
+                HttpContext.Session.GetString("ResetEmail");
+
+            var user =
+                await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                ViewBag.Error = "Không tìm thấy tài khoản";
+                return View();
+            }
+
+            var token =
+                await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result =
+                await _userManager.ResetPasswordAsync(
+                    user,
+                    token,
+                    password);
+
+            if (!result.Succeeded)
+            {
+                ViewBag.Error =
+                    string.Join("<br>",
+                    result.Errors.Select(x => x.Description));
+
+                return View();
+            }
+
+            HttpContext.Session.Remove("ResetOTP");
+            HttpContext.Session.Remove("ResetEmail");
+
+            TempData["Success"] =
+                "Đổi mật khẩu thành công";
+
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public IActionResult VerifyResetOtp()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult VerifyResetOtp(string otp)
+        {
+            var sessionOtp =
+                HttpContext.Session.GetString("ResetOTP");
+
+            var createdAtString =
+                HttpContext.Session.GetString("ResetOtpCreatedAt");
+
+            if (string.IsNullOrEmpty(createdAtString))
+            {
+                ViewBag.Error = "OTP đã hết hạn";
+                return View();
+            }
+
+            var createdAt =
+                DateTime.Parse(createdAtString);
+
+            if (DateTime.Now > createdAt.AddMinutes(5))
+            {
+                HttpContext.Session.Remove("ResetOTP");
+
+                ViewBag.Error = "OTP đã hết hạn";
+
+                return View();
+            }
+
+            if (otp != sessionOtp)
+            {
+                ViewBag.Error = "OTP không đúng";
+
+                return View();
+            }
+            HttpContext.Session.Remove("ResetOTP");
+            return RedirectToAction("ResetPassword");
+        }
     }
 }

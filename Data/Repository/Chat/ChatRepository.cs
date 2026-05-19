@@ -69,47 +69,130 @@ namespace Data.Repository.Chat
         {
             var relatedProducts = new List<ProductEntity>();
 
-            var topQuery = _context.Product.Where(p => p.Name.ToLower().Contains("sơ mi") || p.Name.ToLower().Contains("polo") || p.Name.ToLower().Contains("áo"));
-            var bottomQuery = _context.Product.Where(p => p.Name.ToLower().Contains("quần") || p.Name.ToLower().Contains("jeans") || p.Name.ToLower().Contains("tây") || p.Name.ToLower().Contains("kaki"));
-            var accessoryQuery = _context.Product.Where(p => p.Name.ToLower().Contains("giày") || p.Name.ToLower().Contains("thắt lưng") || p.Name.ToLower().Contains("ví") || p.Name.ToLower().Contains("mũ") || p.Name.ToLower().Contains("nón"));
-
             message = message.ToLower();
 
-            if (message.Contains("áo thun") || message.Contains("phông")) topQuery = _context.Product.Where(p => p.Name.ToLower().Contains("thun") || p.Name.ToLower().Contains("phông"));
-            else if (message.Contains("sơ mi")) topQuery = _context.Product.Where(p => p.Name.ToLower().Contains("sơ mi"));
-            else if (message.Contains("áo khoác") || message.Contains("hoodie")) topQuery = _context.Product.Where(p => p.Name.ToLower().Contains("khoác") || p.Name.ToLower().Contains("hoodie"));
+            IQueryable<ProductEntity> topQuery = _context.Product
+                .Where(p => !p.IsDeleted &&
+                       (p.Name.ToLower().Contains("sơ mi")
+                     || p.Name.ToLower().Contains("polo")
+                     || p.Name.ToLower().Contains("áo")));
 
-            if (message.Contains("jeans") || message.Contains("bò")) bottomQuery = _context.Product.Where(p => p.Name.ToLower().Contains("jean") || p.Name.ToLower().Contains("bò"));
-            else if (message.Contains("quần tây") || message.Contains("quần âu")) bottomQuery = _context.Product.Where(p => p.Name.ToLower().Contains("tây") || p.Name.ToLower().Contains("âu"));
+            IQueryable<ProductEntity> bottomQuery = _context.Product
+                .Where(p => !p.IsDeleted &&
+                       (p.Name.ToLower().Contains("quần")
+                     || p.Name.ToLower().Contains("jeans")
+                     || p.Name.ToLower().Contains("tây")
+                     || p.Name.ToLower().Contains("kaki")));
 
-            if (message.Contains("mũ") || message.Contains("nón")) accessoryQuery = _context.Product.Where(p => p.Name.ToLower().Contains("mũ") || p.Name.ToLower().Contains("nón"));
-            else if (message.Contains("giày")) accessoryQuery = _context.Product.Where(p => p.Name.ToLower().Contains("giày"));
-            else if (message.Contains("ví")) accessoryQuery = _context.Product.Where(p => p.Name.ToLower().Contains("ví"));
+            IQueryable<ProductEntity> accessoryQuery = _context.Product
+                .Where(p => !p.IsDeleted &&
+                       (p.Name.ToLower().Contains("giày")
+                     || p.Name.ToLower().Contains("thắt lưng")
+                     || p.Name.ToLower().Contains("ví")
+                     || p.Name.ToLower().Contains("mũ")
+                     || p.Name.ToLower().Contains("nón")));
+
+            if (message.Contains("áo thun") || message.Contains("phông"))
+            {
+                topQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    (p.Name.ToLower().Contains("thun")
+                  || p.Name.ToLower().Contains("phông")));
+            }
+            else if (message.Contains("sơ mi"))
+            {
+                topQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    p.Name.ToLower().Contains("sơ mi"));
+            }
+            else if (message.Contains("áo khoác") || message.Contains("hoodie"))
+            {
+                topQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    (p.Name.ToLower().Contains("khoác")
+                  || p.Name.ToLower().Contains("hoodie")));
+            }
+
+            if (message.Contains("jeans") || message.Contains("bò"))
+            {
+                bottomQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    (p.Name.ToLower().Contains("jean")
+                  || p.Name.ToLower().Contains("bò")));
+            }
+            else if (message.Contains("quần tây") || message.Contains("quần âu"))
+            {
+                bottomQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    (p.Name.ToLower().Contains("tây")
+                  || p.Name.ToLower().Contains("âu")));
+            }
+
+            if (message.Contains("mũ") || message.Contains("nón"))
+            {
+                accessoryQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    (p.Name.ToLower().Contains("mũ")
+                  || p.Name.ToLower().Contains("nón")));
+            }
+            else if (message.Contains("giày"))
+            {
+                accessoryQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    p.Name.ToLower().Contains("giày"));
+            }
+            else if (message.Contains("ví"))
+            {
+                accessoryQuery = _context.Product.Where(p =>
+                    !p.IsDeleted &&
+                    p.Name.ToLower().Contains("ví"));
+            }
 
             if (isOffice)
             {
-                bottomQuery = bottomQuery.Where(p => !p.Name.ToLower().Contains("short") && !p.Name.ToLower().Contains("đùi"));
+                bottomQuery = bottomQuery.Where(p =>
+                    !p.Name.ToLower().Contains("short") &&
+                    !p.Name.ToLower().Contains("đùi"));
             }
 
-            var top = await topQuery.OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
-            var bottom = await bottomQuery.OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
-            var accessory = await accessoryQuery.OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
+            var top = await topQuery
+                .OrderBy(x => Guid.NewGuid())
+                .FirstOrDefaultAsync();
 
-            if (top != null) relatedProducts.Add(top);
-            if (bottom != null) relatedProducts.Add(bottom);
-            if (accessory != null) relatedProducts.Add(accessory);
+            var bottom = await bottomQuery
+                .OrderBy(x => Guid.NewGuid())
+                .FirstOrDefaultAsync();
+
+            var accessory = await accessoryQuery
+                .OrderBy(x => Guid.NewGuid())
+                .FirstOrDefaultAsync();
+
+            if (top != null)
+                relatedProducts.Add(top);
+
+            if (bottom != null)
+                relatedProducts.Add(bottom);
+
+            if (accessory != null)
+                relatedProducts.Add(accessory);
 
             return relatedProducts;
         }
 
         public async Task<List<ProductEntity>> GetHotProductsAsync(int count)
         {
-            return await _context.Product.OrderByDescending(x => x.Id).Take(count).ToListAsync();
+            return await _context.Product
+                            .Where(x => !x.IsDeleted)
+                            .OrderByDescending(x => x.Id)
+                            .Take(count)
+                            .ToListAsync();
         }
 
         public async Task<List<ProductEntity>> SearchProductsAsync(string message, bool isSummer, bool isWinter, int count)
         {
-            var query = _context.Product.AsQueryable();
+            var query = _context.Product
+                            .Where(p => !p.IsDeleted)
+                            .AsQueryable();
             bool hasCategoryMatch = false;
 
             if (message.Contains("áo thun") || message.Contains("áo phông") || message.Contains("tee"))

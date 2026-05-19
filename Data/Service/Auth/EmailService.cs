@@ -466,5 +466,49 @@ namespace Data.Service.Auth
                 }
             }
         }
+
+        public async Task SendEmailAsync(
+    string toEmail,
+    string subject,
+    string body)
+        {
+            var fromEmail =
+                _configuration["EmailSettings:Email"];
+
+            var password =
+                _configuration["EmailSettings:Password"];
+
+            var host =
+                _configuration["EmailSettings:Host"];
+
+            var port =
+                int.Parse(_configuration["EmailSettings:Port"]);
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+
+                mail.To.Add(toEmail);
+
+                mail.Subject = subject;
+
+                mail.Body = body;
+
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp =
+                    new SmtpClient(host, port))
+                {
+                    smtp.Credentials =
+                        new NetworkCredential(
+                            fromEmail,
+                            password);
+
+                    smtp.EnableSsl = true;
+
+                    await smtp.SendMailAsync(mail);
+                }
+            }
+        }
     }
 }

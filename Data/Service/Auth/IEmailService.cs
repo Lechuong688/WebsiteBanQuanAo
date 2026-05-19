@@ -44,5 +44,10 @@ namespace Data.Service.Auth
             string customerName,
             string transactionCode
         );
+
+        Task SendEmailAsync(
+            string toEmail,
+            string subject,
+            string body);
     }
 }
