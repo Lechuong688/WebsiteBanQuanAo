@@ -3,6 +3,7 @@ using Data.DTO.Common;
 using Data.DTO.Order;
 using Data.Entity;
 using Data.Helper;
+using Data.Service.Auth;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -18,10 +19,12 @@ namespace Data.Repository.Order
     {
         private readonly DataContext _context;
         private readonly IDatabaseSql _databaseSql;
-        public OrderRepository(DataContext context, IDatabaseSql databaseSql)
+        private readonly IEmailService _emailService;
+        public OrderRepository(DataContext context, IDatabaseSql databaseSql, IEmailService emailService)
         {
             _context = context;
             _databaseSql = databaseSql;
+            _emailService = emailService;
         }
 
         public async Task<int> CreateOrder(OrderCreateDTO dto)
@@ -109,6 +112,51 @@ namespace Data.Repository.Order
                 "Order_Admin_UpdateStatus",
                 param
             );
+
+            var order = _context.Order
+        .FirstOrDefault(x => x.Id == orderId);
+
+            if (order == null)
+                return;
+
+            try
+            {
+                // 1 = Đã xác nhận
+                if (status == 1)
+                {
+                    await _emailService.SendOrderConfirmedEmail(
+                        order.Email,
+                        order.FullName,
+                        order.TransactionCode
+                    );
+                }
+
+                // 2 = Đang giao
+                else if (status == 2)
+                {
+                    await _emailService.SendShippingEmail(
+                        order.Email,
+                        order.FullName,
+                        order.TransactionCode
+                    );
+                }
+
+                // 4 = Đã huỷ
+                else if (status == 4)
+                {
+                    await _emailService.SendCancelOrderEmail(
+                        order.Email,
+                        order.FullName,
+                        order.TransactionCode
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "Send mail error: " + ex.Message
+                );
+            }
         }
         public List<OrderHistoryDTO> GetOrderHistory(string userId, List<int> guestOrderIds)
         {
@@ -186,7 +234,10 @@ namespace Data.Repository.Order
             var expireTime = DateTime.Now.AddHours(-24);
 
             var expiredOrders = await _context.Order
-                .Where(o => o.Status == 0 && o.CreatedDate < expireTime)
+                .Where(o =>
+                    o.Status == 0 &&
+                    o.PaymentMethod == "BANK" &&
+                    o.CreatedDate < expireTime)
                 .ToListAsync();
 
             if (expiredOrders.Any())
@@ -194,12 +245,36 @@ namespace Data.Repository.Order
                 foreach (var order in expiredOrders)
                 {
                     order.Status = 4;
-                    order.Note = (order.Note ?? "") + " | Hệ thống tự động hủy do quá 24h chưa thanh toán.";
+
+                    order.Note = (order.Note ?? "")
+                        + " | Hệ thống tự động hủy do quá 24h chưa thanh toán.";
+
                     order.UpdatedDate = DateTime.Now;
+
                     order.UpdatedBy = "System";
+
+                    try
+                    {
+                        await _emailService.SendCancelOrderEmail(
+                            order.Email,
+                            order.FullName,
+                            order.TransactionCode
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            "Send cancel mail error: "
+                            + ex.Message
+                        );
+                    }
                 }
+
                 await _context.SaveChangesAsync();
 
+                Console.WriteLine(
+                    $"--- Đã tự động hủy {expiredOrders.Count} đơn hàng quá hạn ---"
+                );
             }
         }
     }

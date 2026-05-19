@@ -179,21 +179,34 @@ namespace Data.Repository.Collection
             _dataContext.SaveChanges();
         }
 
+        //public CollectionEntity? GetByCode(string code)
+        //{
+        //    if (string.IsNullOrWhiteSpace(code))
+        //        return null;
+
+        //    UpdateCollectionStatus();
+        //    var now = DateTime.Now;
+
+        //    //return _dataContext.Collection
+        //    //    .FirstOrDefault(x =>
+        //    //        x.Code == code &&
+        //    //        x.IsActive &&
+        //    //        (x.StartDate == null || x.StartDate <= now) &&
+        //    //        (x.EndDate == null || x.EndDate >= now)
+        //    //    );
+        //    return _dataContext.Collection
+        //        .FirstOrDefault(x =>
+        //            x.Code == code
+        //        );
+        //}
+
         public CollectionEntity? GetByCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code))
                 return null;
 
-            UpdateCollectionStatus();
-            var now = DateTime.Now;
-
             return _dataContext.Collection
-                .FirstOrDefault(x =>
-                    x.Code == code &&
-                    x.IsActive &&
-                    (x.StartDate == null || x.StartDate <= now) &&
-                    (x.EndDate == null || x.EndDate >= now)
-                );
+                .FirstOrDefault(x => x.Code == code);
         }
 
         //public List<ProductListDTO> GetProductsByCollection(int collectionId)

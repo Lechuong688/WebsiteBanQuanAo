@@ -46,7 +46,13 @@ namespace WebBanQuanAo.Controllers
                 {
                     p.Id,
                     p.Name,
-
+                    Image = _context.Attachment
+                    .Where(a =>
+                        a.EntityId == p.Id &&
+                        a.EntityType == "Product" &&
+                        a.IsDeleted == false)
+                    .Select(a => a.FilePath)
+                    .FirstOrDefault(),
                     Price = discount != null
                         ? p.Price - (p.Price * discount.Value / 100)
                         : p.Price
@@ -70,6 +76,7 @@ namespace WebBanQuanAo.Controllers
                 {
                     ProductId = p.Id,
                     ProductName = p.Name,
+                    ProductImage = p.Image,
                     Price = p.Price,
                     Quantity = c.Quantity,
 

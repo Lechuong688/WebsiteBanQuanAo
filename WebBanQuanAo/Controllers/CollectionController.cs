@@ -25,6 +25,14 @@ namespace WebBanQuanAo.Controllers
                 return NotFound();
             var (collection, products) = data.Value;
 
+            if (collection.EndDate != null
+                && collection.EndDate < DateTime.Now)
+            {
+                ViewBag.Collection = collection;
+
+                return View("CollectionExpired");
+            }
+
             ViewBag.Collection = collection;
 
             var model = new PagedResult<ProductListDTO>

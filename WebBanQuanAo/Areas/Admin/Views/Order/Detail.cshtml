@@ -65,6 +65,52 @@
                         </div>
                         <div class="col-md-6">
                             <div class="info-box">
+                                <span class="info-label">
+                                    Phương thức thanh toán
+                                </span>
+
+                                <div class="info-value">
+                                    @if (Model.PaymentMethod == "COD")
+                                    {
+                                        <span class="modern-badge badge-soft-success">
+                                            💵 Thanh toán khi nhận hàng
+                                        </span>
+                                    }
+                                    else if (Model.PaymentMethod == "BANK")
+                                    {
+                                        <span class="modern-badge badge-soft-primary">
+                                            🏦 Chuyển khoản ngân hàng
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-label">
+                                    Trạng thái thanh toán
+                                </span>
+
+                                <div class="info-value">
+
+                                    @if (Model.IsPaid == 1)
+                                    {
+                                        <span class="modern-badge badge-soft-success">
+                                            🟢 Đã thanh toán
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="modern-badge badge-soft-danger">
+                                            🔴 Chưa thanh toán
+                                        </span>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
                                 <span class="info-label">Địa chỉ nhận hàng</span>
                                 <div class="info-value">@Model.Address</div>
                             </div>
@@ -82,6 +128,7 @@
                         <thead>
                             <tr>
                                 <th>Sản phẩm</th>
+                                <th>Ảnh</th>
                                 <th class="text-center">Phân loại</th>
                                 <th class="text-center">Số lượng</th>
                                 <th class="text-end">Đơn giá</th>
@@ -93,6 +140,13 @@
                             {
                                 <tr>
                                     <td class="fw-bold" style="color: #0f172a;">@i.ProductName</td>
+                                    <td>
+                                        <img src="@i.ProductImage"
+                                             style="width:70px;
+                                        height:70px;
+                                        object-fit:cover;
+                                        border-radius:10px;" />
+                                    </td>
                                     <td class="text-center">
                                         <span class="modern-badge badge-soft-secondary" style="padding: 4px 10px; font-weight: 500;">
                                             @i.ColorName / @i.SizeName
@@ -170,8 +224,26 @@
                                 <select name="status" id="orderStatusSelect" class="modern-control mb-3">
                                     @if (Model.Status == (int)OrderStatus.New)
                                     {
-                                        <option value="@((int)OrderStatus.Confirmed)">Xác nhận đơn (Confirmed)</option>
-                                        <option value="@((int)OrderStatus.Cancelled)">Hủy đơn (Cancelled)</option>
+                                        if (Model.PaymentMethod == "BANK" && Model.IsPaid != 1)
+                                        {
+                                            <option disabled>
+                                                Chờ khách thanh toán online
+                                            </option>
+
+                                            <option value="@((int)OrderStatus.Cancelled)">
+                                                Hủy đơn (Cancelled)
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@((int)OrderStatus.Confirmed)">
+                                                Xác nhận đơn (Confirmed)
+                                            </option>
+
+                                            <option value="@((int)OrderStatus.Cancelled)">
+                                                Hủy đơn (Cancelled)
+                                            </option>
+                                        }
                                     }
                                     else if (Model.Status == (int)OrderStatus.Confirmed)
                                     {

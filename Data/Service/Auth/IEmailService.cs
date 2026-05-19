@@ -18,5 +18,31 @@ namespace Data.Service.Auth
             string phone,
             string subject,
             string message);
+
+        Task SendOrderSuccessEmail(
+            string toEmail,
+            string customerName,
+            string transactionCode,
+            decimal total,
+            string address
+        );
+
+        Task SendOrderConfirmedEmail(
+            string toEmail,
+            string customerName,
+            string transactionCode
+        );
+
+        Task SendShippingEmail(
+            string toEmail,
+            string customerName,
+            string transactionCode
+        );
+
+        Task SendCancelOrderEmail(
+            string toEmail,
+            string customerName,
+            string transactionCode
+        );
     }
 }

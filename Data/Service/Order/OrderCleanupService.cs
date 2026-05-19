@@ -12,7 +12,7 @@ namespace Data.Service.Order
     public class OrderCleanupService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(30);
+        private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(30); //quét mỗi 30' một lần
 
         public OrderCleanupService(IServiceScopeFactory scopeFactory)
         {

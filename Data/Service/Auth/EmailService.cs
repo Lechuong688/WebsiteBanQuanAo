@@ -205,5 +205,266 @@ namespace Data.Service.Auth
                 }
             }
         }
+
+        public async Task SendOrderSuccessEmail(
+    string toEmail,
+    string customerName,
+    string transactionCode,
+    decimal total,
+    string address)
+        {
+            var fromEmail =
+                _configuration["EmailSettings:Email"];
+
+            var password =
+                _configuration["EmailSettings:Password"];
+
+            var host =
+                _configuration["EmailSettings:Host"];
+
+            var port =
+                int.Parse(_configuration["EmailSettings:Port"]);
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+
+                mail.To.Add(toEmail);
+
+                mail.Subject =
+                    "🛍️ Đặt hàng thành công tại VYBE";
+
+                mail.Body = $@"
+        <div style='font-family:Arial;padding:20px;background:#f9f9f9;'>
+
+            <div style='max-width:600px;margin:auto;background:white;
+                        border-radius:12px;padding:30px;'>
+
+                <h2 style='color:#111;text-align:center;'>
+                    Cảm ơn bạn đã đặt hàng ❤️
+                </h2>
+
+                <p>
+                    Xin chào <b>{customerName}</b>,
+                </p>
+
+                <p>
+                    Đơn hàng của bạn đã được tạo thành công tại
+                    <b>VYBE</b>.
+                </p>
+
+                <hr/>
+
+                <h3>📦 Thông tin đơn hàng</h3>
+
+                <p>
+                    <b>Mã đơn hàng:</b>
+                    {transactionCode}
+                </p>
+
+                <p>
+                    <b>Tổng tiền:</b>
+                    {total:N0} VNĐ
+                </p>
+
+                <p>
+                    <b>Địa chỉ nhận:</b>
+                    {address}
+                </p>
+
+                <hr/>
+
+                <p>
+                    Shop sẽ sớm xác nhận và giao hàng cho bạn.
+                </p>
+
+                <p>
+                    Cảm ơn bạn đã đồng hành cùng
+                    <b>VYBE</b> 💖
+                </p>
+
+            </div>
+
+        </div>
+        ";
+
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp =
+                    new SmtpClient(host, port))
+                {
+                    smtp.Credentials =
+                        new NetworkCredential(
+                            fromEmail,
+                            password);
+
+                    smtp.EnableSsl = true;
+
+                    await smtp.SendMailAsync(mail);
+                }
+            }
+        }
+
+        public async Task SendOrderConfirmedEmail(
+    string toEmail,
+    string customerName,
+    string transactionCode)
+        {
+            var fromEmail = _configuration["EmailSettings:Email"];
+            var password = _configuration["EmailSettings:Password"];
+            var host = _configuration["EmailSettings:Host"];
+            var port = int.Parse(_configuration["EmailSettings:Port"]);
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+
+                mail.To.Add(toEmail);
+
+                mail.Subject = "✅ Đơn hàng đã được xác nhận";
+
+                mail.Body = $@"
+        <div style='font-family:Arial;padding:20px;'>
+
+            <h2>Đơn hàng đã được xác nhận 🎉</h2>
+
+            <p>
+                Xin chào <b>{customerName}</b>
+            </p>
+
+            <p>
+                Đơn hàng <b>{transactionCode}</b>
+                đã được shop xác nhận.
+            </p>
+
+            <p>
+                Shop đang chuẩn bị hàng cho bạn ❤️
+            </p>
+
+        </div>
+        ";
+
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp =
+                    new SmtpClient(host, port))
+                {
+                    smtp.Credentials =
+                        new NetworkCredential(fromEmail, password);
+
+                    smtp.EnableSsl = true;
+
+                    await smtp.SendMailAsync(mail);
+                }
+            }
+        }
+
+        public async Task SendShippingEmail(
+    string toEmail,
+    string customerName,
+    string transactionCode)
+        {
+            var fromEmail = _configuration["EmailSettings:Email"];
+            var password = _configuration["EmailSettings:Password"];
+            var host = _configuration["EmailSettings:Host"];
+            var port = int.Parse(_configuration["EmailSettings:Port"]);
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+
+                mail.To.Add(toEmail);
+
+                mail.Subject = "🚚 Đơn hàng đang được giao";
+
+                mail.Body = $@"
+        <div style='font-family:Arial;padding:20px;'>
+
+            <h2>Đơn hàng đang được giao 🚚</h2>
+
+            <p>
+                Xin chào <b>{customerName}</b>
+            </p>
+
+            <p>
+                Đơn hàng <b>{transactionCode}</b>
+                đang được giao đến bạn.
+            </p>
+
+            <p>
+                Vui lòng chú ý điện thoại để nhận hàng nhé ❤️
+            </p>
+
+        </div>
+        ";
+
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp =
+                    new SmtpClient(host, port))
+                {
+                    smtp.Credentials =
+                        new NetworkCredential(fromEmail, password);
+
+                    smtp.EnableSsl = true;
+
+                    await smtp.SendMailAsync(mail);
+                }
+            }
+        }
+
+        public async Task SendCancelOrderEmail(
+    string toEmail,
+    string customerName,
+    string transactionCode)
+        {
+            var fromEmail = _configuration["EmailSettings:Email"];
+            var password = _configuration["EmailSettings:Password"];
+            var host = _configuration["EmailSettings:Host"];
+            var port = int.Parse(_configuration["EmailSettings:Port"]);
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress(fromEmail);
+
+                mail.To.Add(toEmail);
+
+                mail.Subject = "❌ Đơn hàng đã bị huỷ";
+
+                mail.Body = $@"
+        <div style='font-family:Arial;padding:20px;'>
+
+            <h2>Đơn hàng đã bị huỷ ❌</h2>
+
+            <p>
+                Xin chào <b>{customerName}</b>
+            </p>
+
+            <p>
+                Đơn hàng <b>{transactionCode}</b>
+                đã bị huỷ do quá 24h chưa thanh toán.
+            </p>
+
+            <p>
+                Bạn có thể quay lại website để đặt hàng lại bất cứ lúc nào ❤️
+            </p>
+
+        </div>
+        ";
+
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp =
+                    new SmtpClient(host, port))
+                {
+                    smtp.Credentials =
+                        new NetworkCredential(fromEmail, password);
+
+                    smtp.EnableSsl = true;
+
+                    await smtp.SendMailAsync(mail);
+                }
+            }
+        }
     }
 }

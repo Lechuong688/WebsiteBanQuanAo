@@ -31,6 +31,7 @@
                             <tr class="bg-light">
                                 <th width="50" class="text-center"></th>
                                 <th>Sản phẩm</th>
+                                <th>Hình ảnh</th>
                                 <th>Phân loại</th>
                                 <th>Đơn giá</th>
                                 <th>Số lượng</th>
@@ -50,6 +51,14 @@
                                     </td>
                                     <td>
                                         <p class="mb-0 fw-semibold text-dark">@item.ProductName</p>
+                                    </td>
+                                    <td>
+                                        <img src="@item.ProductImage"
+                                             style="width:80px;
+                                                    height:80px;
+                                                    object-fit:cover;
+                                                    border-radius:10px;
+                                                    border:1px solid #eee;" />
                                     </td>
                                     <td>
                                         <p class="mb-0 text-muted">Màu: @item.ColorName<br />Size: @item.SizeName</p>

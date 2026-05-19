@@ -4,6 +4,7 @@ using Data.Entity;
 using Data.Helper;
 using Data.Repository;
 using Data.Repository.Order;
+using Data.Service.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
@@ -16,11 +17,13 @@ namespace WebBanQuanAo.Controllers
     {
         private readonly DataContext _context;
         private readonly IOrderRepository _orderRepository;
+        private readonly IEmailService _emailService;
 
-        public CheckOutController(DataContext context, IOrderRepository orderRepository)
+        public CheckOutController(DataContext context, IOrderRepository orderRepository, IEmailService emailService)
         {
             _context = context;
             _orderRepository = orderRepository;
+            _emailService = emailService;
         }
         public IActionResult Index()
         {
@@ -58,7 +61,13 @@ namespace WebBanQuanAo.Controllers
                 {
                     p.Id,
                     p.Name,
-
+                    Image = _context.Attachment
+                    .Where(a =>
+                        a.EntityId == p.Id &&
+                        a.EntityType == "Product" &&
+                        a.IsDeleted == false)
+                    .Select(a => a.FilePath)
+                    .FirstOrDefault(),
                     Price = discount != null
                         ? p.Price - (p.Price * discount.Value / 100)
                         : p.Price
@@ -81,6 +90,7 @@ namespace WebBanQuanAo.Controllers
                     {
                         ProductId = p.Id,
                         ProductName = p.Name,
+                        ProductImage = p.Image,
                         Price = p.Price,
                         Quantity = c.Quantity,
                         ColorId = c.ColorId,
@@ -132,6 +142,7 @@ namespace WebBanQuanAo.Controllers
             var selectedItems = Request.Form["SelectedItems"];
             var selectedList = selectedItems.Select(x => x.ToString()).ToList();
             var paymentMethod = Request.Form["PaymentMethod"];
+            var isPaid = paymentMethod == "COD";
 
             if (selectedList.Any())
             {
@@ -183,6 +194,8 @@ namespace WebBanQuanAo.Controllers
                 Address = model.Address,
                 Note = model.Note,
                 CreatedBy = userId,
+                PaymentMethod = paymentMethod,
+                IsPaid = isPaid,
 
                 Items = cart.Select(x => new OrderItemDTO
                 {
@@ -318,6 +331,31 @@ namespace WebBanQuanAo.Controllers
 
             var order = _context.Order
                 .FirstOrDefault(x => x.TransactionCode == dto.TransactionCode);
+
+            try
+            {
+                if (paymentMethod == "COD")
+                {
+                    try
+                    {
+                        await _emailService.SendOrderSuccessEmail(
+                            email,
+                            fullName,
+                            order.TransactionCode,
+                            order.Total,
+                            model.Address
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Send mail error: " + ex.Message);
+            }
 
             if (order == null)
             {

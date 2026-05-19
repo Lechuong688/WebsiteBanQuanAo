@@ -70,6 +70,15 @@ namespace WebBanQuanAo.Areas.Admin.Controllers
             {
                 return BadRequest("Không thể huỷ đơn khi đang giao hàng");
             }
+            var orderEntity = _orderRepository.GetOrderById(orderId);
+
+            if (orderEntity.PaymentMethod == "BANK"
+                && !orderEntity.IsPaid)
+            {
+                return BadRequest(
+                    "Khách hàng chưa thanh toán online!"
+                );
+            }
             await _orderRepository.UpdateStatus(orderId, status, adminId);
 
             return RedirectToAction("Detail", new { id = orderId });

@@ -21,5 +21,7 @@ namespace Data.DTO.CheckOut
         public decimal DiscountAmount { get; set; }
         public decimal Total { get; set; }
         public string TransactionCode { get; set; }
+        public string? PaymentMethod { get; set; }
+        public bool IsPaid { get; set; }
     }
 }

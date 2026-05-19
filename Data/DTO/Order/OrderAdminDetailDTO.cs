@@ -25,6 +25,10 @@ namespace Data.DTO.Order
         public string? CreatedBy { get; set; }
         public decimal? DiscountAmount { get; set; }
         public string TransactionCode { get; set; }
+        public string? PaymentMethod { get; set; }
+
+        //public bool IsPaid { get; set; }
+        public int IsPaid { get; set; }
         public List<OrderItemAdminDTO> Items { get; set; } = new();
     }
 }

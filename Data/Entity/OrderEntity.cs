@@ -32,5 +32,7 @@ namespace Data.Entity
         public DateTime? UpdatedDate { get; set; }
         public decimal DiscountAmount { get; set; }
         public string? TransactionCode { get; set; }
+        public string? PaymentMethod { get; set; }
+        public bool IsPaid { get; set; }
     }
 }
