@@ -94,6 +94,11 @@
                     }
                 </h3>
 
+                <p class="text-muted mb-3">
+                    Còn lại:
+                    <strong>@Model.AvailableQuantity</strong> sản phẩm
+                </p>
+
                 <div class="mb-3">
                     <div class="fw-bold mb-2">Màu sắc:</div>
                     <div class="option-group">
@@ -134,11 +139,17 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button class="btn btn-outline-orange shadow-sm" id="btnAddToCart" data-productid="@Model.Id">
+                        <button class="btn btn-outline-orange shadow-sm"
+                                id="btnAddToCart"
+                                data-productid="@Model.Id"
+                                @(Model.AvailableQuantity <= 0 ? "disabled" : "")>
                             <i class="fas fa-cart-plus me-2"></i> Thêm vào giỏ
                         </button>
 
-                        <button class="btn btn-orange shadow-sm" id="btnBuyNow" data-productid="@Model.Id">
+                        <button class="btn btn-orange shadow-sm"
+                                id="btnBuyNow"
+                                data-productid="@Model.Id"
+                                @(Model.AvailableQuantity <= 0 ? "disabled" : "")>
                             <i class="fas fa-bolt me-2"></i> Mua ngay
                         </button>
                     </div>
@@ -344,67 +355,133 @@
             mainImg.style.transform = "scale(1)";
         });
         const qtyInput = document.getElementById('quantityInput');
+        async function getRealtimeStock() {
+
+            const productId =
+                document.getElementById('btnAddToCart')
+                    .dataset.productid;
+
+            const response =
+                await fetch(`/Product/GetAvailableStock?productId=${productId}`);
+
+            const data = await response.json();
+
+            return data.stock;
+        }
         document.getElementById('btnMinus').addEventListener('click', () => {
             let v = parseInt(qtyInput.value);
             if (v > 1) qtyInput.value = v - 1;
         });
 
-        document.getElementById('btnPlus').addEventListener('click', () => {
+        document.getElementById('btnPlus')
+            .addEventListener('click', async () => {
+
             let v = parseInt(qtyInput.value);
+
+            const stockQuantity =
+                await getRealtimeStock();
+
+            if ((v + 1) > stockQuantity) {
+
+                alert(`⚠️ Chỉ còn ${stockQuantity} sản phẩm khả dụng`);
+
+                return;
+            }
+
             qtyInput.value = v + 1;
         });
 
-        function processCartAction(button, actionType) {
-            const productId = button.dataset.productid;
-            const quantity = document.getElementById('quantityInput').value;
+        async function processCartAction(button, actionType) {
 
-            const color = document.querySelector('input[name="color"]:checked');
-            const size = document.querySelector('input[name="size"]:checked');
+        const productId = button.dataset.productid;
+
+        const stockQuantity = await getRealtimeStock();
+
+        const quantity =
+            parseInt(document.getElementById('quantityInput').value);
+
+        if (stockQuantity <= 0) {
+
+            alert("⚠️ Sản phẩm hiện đã hết hàng");
+
+            return;
+        }
+
+        if (quantity > stockQuantity) {
+
+            alert(`⚠️ Chỉ còn ${stockQuantity} sản phẩm khả dụng`);
+
+            return;
+        }
+
+            const color =
+                document.querySelector('input[name="color"]:checked');
+
+            const size =
+                document.querySelector('input[name="size"]:checked');
 
             if (!color || !size) {
+
                 alert("⚠️ Vui lòng chọn đầy đủ MÀU SẮC và KÍCH THƯỚC trước khi đặt hàng!");
+
                 return;
             }
 
             const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang xử lý...';
+
+            button.innerHTML =
+                '<i class="fas fa-spinner fa-spin me-2"></i> Đang xử lý...';
+
             button.disabled = true;
 
-            let isBuyNow = (actionType === 'checkout') ? "true" : "false";
+            let isBuyNow =
+                (actionType === 'checkout') ? "true" : "false";
 
             fetch('/Cart/AddToCart', {
+
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `productId=${productId}&colorId=${color.value}&sizeId=${size.value}&quantity=${quantity}&isBuyNow=${isBuyNow}`
+
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+
+                body:
+                    `productId=${productId}&colorId=${color.value}&sizeId=${size.value}&quantity=${quantity}&isBuyNow=${isBuyNow}`
             })
-                    .then(res => {
-            if (res.ok) {
+            .then(res => {
 
-                if (actionType === 'cart') {
+                if (res.ok) {
 
-                    alert("🛒 Đã thêm sản phẩm vào giỏ hàng!");
+                    if (actionType === 'cart') {
+
+                        alert("🛒 Đã thêm sản phẩm vào giỏ hàng!");
+
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+
+                    }
+                    else if (actionType === 'checkout') {
+
+                        const selectedKey =
+                            `${productId}-${color.value}-${size.value}`;
+
+                        window.location.href =
+                            `/CheckOut/Index?SelectedItems=${selectedKey}`;
+                    }
+
+                }
+                else {
+
+                    alert("⚠️ Có lỗi xảy ra, không thể thêm vào giỏ hàng");
 
                     button.innerHTML = originalText;
                     button.disabled = false;
-
-                } else if (actionType === 'checkout') {
-
-                    const selectedKey = `${productId}-${color.value}-${size.value}`;
-
-                    window.location.href =
-                        `/CheckOut/Index?SelectedItems=${selectedKey}`;
                 }
-
-            } else {
-
-                alert("⚠️ Có lỗi xảy ra, không thể thêm vào giỏ hàng");
-
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        })
+            })
             .catch(err => {
+
                 alert("⚠️ Lỗi kết nối mạng");
+
                 button.innerHTML = originalText;
                 button.disabled = false;
             });

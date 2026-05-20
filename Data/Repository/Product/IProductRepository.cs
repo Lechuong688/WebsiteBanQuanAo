@@ -37,5 +37,6 @@ namespace Data.Repository.Product
 
         Task<bool> ToggleWishlist(int productId, string userId);
         Task<List<ProductListDTO>> InstantSearch(string keyword);
+        Task<int> GetAvailableStock(int productId);
     }
 }

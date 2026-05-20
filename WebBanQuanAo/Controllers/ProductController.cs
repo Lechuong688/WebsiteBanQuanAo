@@ -33,10 +33,10 @@ namespace WebBanQuanAo.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             var product = await _productRepository.GetDetail(id);
-
+            
             if (product == null)
                 return NotFound();
-
+            product.AvailableQuantity = await _productRepository.GetAvailableStock(id);
             return View(product);
         }
 
@@ -104,6 +104,18 @@ namespace WebBanQuanAo.Controllers
                 price = x.FinalPrice.ToString("N0") + "₫",
                 image = (x.Files != null && x.Files.Any()) ? x.Files.First() : "/admin/img/no-image.png"
             }));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableStock(int productId)
+        {
+            var stock =
+                await _productRepository.GetAvailableStock(productId);
+
+            return Json(new
+            {
+                stock
+            });
         }
     }
 }

@@ -973,5 +973,15 @@ namespace Data.Repository.Product
 
             return result;
         }
+
+        public async Task<int> GetAvailableStock(int productId)
+        {
+            var product = await _context.Product
+                .FirstOrDefaultAsync(x =>
+                    x.Id == productId &&
+                    !x.IsDeleted);
+
+            return product?.Quantity ?? 0;
+        }
     }
 }

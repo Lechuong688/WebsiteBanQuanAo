@@ -28,6 +28,8 @@ namespace Data.DTO.Product
         public decimal FinalPrice { get; set; }
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
+        public int Quantity { get; set; }
+        public int AvailableQuantity { get; set; }
         public List<ProductReviewListDTO>? Reviews { get; set; }
     }
 }

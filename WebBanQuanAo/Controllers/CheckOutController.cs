@@ -7,6 +7,7 @@ using Data.Repository.Order;
 using Data.Service.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WebBanQuanAo.helpers;
 using WebBanQuanAo.Models;
@@ -328,6 +329,28 @@ namespace WebBanQuanAo.Controllers
                 return View("Index", modelView);
             }
             await _orderRepository.CreateOrder(dto);
+
+            foreach (var item in cart)
+            {
+                var product = await _context.Product
+                    .FirstOrDefaultAsync(x =>
+                        x.Id == item.ProductId &&
+                        !x.IsDeleted);
+
+                if (product != null)
+                {
+                    product.Quantity -= item.Quantity;
+
+                    if (product.Quantity < 0)
+                    {
+                        product.Quantity = 0;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            await _context.SaveChangesAsync();
 
             var order = _context.Order
                 .FirstOrDefault(x => x.TransactionCode == dto.TransactionCode);

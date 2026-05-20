@@ -97,7 +97,10 @@
                                     @if (order.Status == 0)
                                     {
                                         <a href="/Order/Payment/@order.Id" class="btn btn-action-main">Thanh toán ngay</a>
-                                        <button class="btn btn-action-sub">Hủy đơn hàng</button>
+                                        <button class="btn btn-action-sub"
+                                                onclick="cancelOrder(@order.Id)">
+                                            Hủy đơn hàng
+                                        </button>
                                     }
                                     else if (order.Status == 1 || order.Status == 2)
                                     {
@@ -134,7 +137,17 @@
                                     }
                                     else
                                     {
-                                        <button class="btn btn-action-sub">Xem chi tiết</button>
+                                        @if (order.Details.Any())
+                                        {
+                                            var firstItem = order.Details.First();
+
+                                            <a href="/Product/Detail/@firstItem.ProductId"
+                                               class="btn btn-action-sub">
+
+                                                Xem chi tiết
+
+                                            </a>
+                                        }
                                     }
                                 </div>
                             </div>
@@ -449,5 +462,44 @@
             }
         }
 
+                async function cancelOrder(orderId) {
+
+            const confirmCancel =
+                confirm("Bạn có chắc muốn hủy đơn hàng này không?");
+
+            if (!confirmCancel)
+                return;
+
+            try {
+
+                const response = await fetch('/Order/CancelOrder', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify(orderId)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+
+                    alert("✅ Hủy đơn hàng thành công");
+
+                    location.reload();
+                }
+                else {
+
+                    alert(result.message);
+                }
+            }
+            catch {
+
+                alert("⚠️ Có lỗi xảy ra");
+            }
+        }
     </script>
 }

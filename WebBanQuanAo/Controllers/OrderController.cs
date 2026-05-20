@@ -146,5 +146,56 @@ namespace WebBanQuanAo.Controllers
 
             return View(orders);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelOrder([FromBody] int orderId)
+        {
+            var order = _context.Order
+                .FirstOrDefault(x => x.Id == orderId);
+
+            if (order == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Không tìm thấy đơn hàng"
+                });
+            }
+
+            if (order.Status != 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Không thể hủy đơn hàng này"
+                });
+            }
+
+            order.Status = 4;
+
+            var orderDetails = _context.OrderDetail
+                .Where(x => x.OrderId == order.Id)
+                .ToList();
+
+            foreach (var item in orderDetails)
+            {
+                var product = _context.Product
+                    .FirstOrDefault(x =>
+                        x.Id == item.ProductId &&
+                        !x.IsDeleted);
+
+                if (product != null)
+                {
+                    product.Quantity += item.Quantity;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true
+            });
+        }
     }
 }
